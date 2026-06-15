@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Star 1 (Large Gaming Star) -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M 74 30 L 76.5 36.5 L 83 39 L 76.5 41.5 L 74 48 L 71.5 41.5 L 65 39 L 71.5 36.5 Z" />
+    
+    <!-- Crescent Moon (Golden Islamic Gacha Moon) -->
+    <path
+        android:fillColor="#00A86B"
+        android:pathData="M 54 24 A 30 30 0 1 0 84 54 A 24 24 0 1 1 54 24 Z" />
+        
+    <!-- Star 2 (Small Sparkle) -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M 38 42 L 39 45 L 42 46 L 39 47 L 38 50 L 37 47 L 34 46 L 37 45 Z" />
+</vector>

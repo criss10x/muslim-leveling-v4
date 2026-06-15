@@ -1,0 +1,6 @@
+{
+  "name": "Muslim Leveling",
+  "description": "Gamified Islamic prayer tracking app for Indonesian Muslim mobile gamers with Mobile Legends theme and live prayer times.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

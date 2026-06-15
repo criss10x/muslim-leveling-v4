@@ -1,0 +1,91 @@
+package com.example.data
+
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
+data class User(
+    val username: String = "",
+    val level: Int = 1,
+    val xp: Int = 0,
+    val intensityMode: String = "standar", // "santai" | "standar" | "sultan"
+    val santaiTrackedPrayers: List<String> = listOf("subuh", "maghrib", "isya"),
+    val kota: String = "",
+    val theme: String = "dark", // "dark" | "light"
+    val notifMode: String = "seimbang" // "fokus" | "seimbang" | "intensif"
+)
+
+@JsonClass(generateAdapter = true)
+data class Timings(
+    val subuh: String = "04:42",
+    val dzuhur: String = "12:01",
+    val ashar: String = "15:20",
+    val maghrib: String = "17:55",
+    val isya: String = "19:08"
+)
+
+@JsonClass(generateAdapter = true)
+data class PlayerPrayerTimesCache(
+    val date: String = "",
+    val timings: Timings = Timings()
+)
+
+@JsonClass(generateAdapter = true)
+data class PrayerLog(
+    val date: String, // YYYY-MM-DD
+    val prayer: String, // subuh, dzuhur, ashar, maghrib, isya, dhuha, rawatib, tahajjud, tilawah
+    val time: String, // HH:mm
+    val type: String // "wajib" | "sunnah" | "tilawah"
+)
+
+@JsonClass(generateAdapter = true)
+data class StreakState(
+    val current: Int = 0,
+    val best: Int = 0,
+    val freezeAvailable: Boolean = true,
+    val lastDate: String = "" // YYYY-MM-DD (or lastFullDay for hero)
+)
+
+@JsonClass(generateAdapter = true)
+data class Quest(
+    val id: String,
+    val desc: String,
+    val xpReward: Int,
+    val target: Int,
+    val progress: Int,
+    val completed: Boolean,
+    val claimed: Boolean
+)
+
+@JsonClass(generateAdapter = true)
+data class QuestState(
+    val date: String = "",
+    val list: List<Quest> = emptyList()
+)
+
+@JsonClass(generateAdapter = true)
+data class ZikirCounter(
+    val date: String = "",
+    val count: Int = 0
+)
+
+@JsonClass(generateAdapter = true)
+data class MuslimLevelingData(
+    val user: User = User(),
+    val prayerTimesCache: PlayerPrayerTimesCache = PlayerPrayerTimesCache(),
+    val prayerLog: List<PrayerLog> = emptyList(),
+    val heroStreak: StreakState = StreakState(),
+    val perPrayerStreaks: Map<String, StreakState> = mapOf(
+        "subuh" to StreakState(),
+        "dzuhur" to StreakState(),
+        "ashar" to StreakState(),
+        "maghrib" to StreakState(),
+        "isya" to StreakState()
+    ),
+    val tilawahStreak: StreakState = StreakState(),
+    val quests: QuestState = QuestState(),
+    val badges: List<String> = emptyList(),
+    val rewards: List<String> = emptyList(),
+    val zikirCounter: ZikirCounter = ZikirCounter(),
+    val comebackCount: Int = 0,
+    val lastCheckedDate: String = ""
+)
