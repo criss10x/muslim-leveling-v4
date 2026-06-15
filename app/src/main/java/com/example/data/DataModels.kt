@@ -89,3 +89,8 @@ data class MuslimLevelingData(
     val comebackCount: Int = 0,
     val lastCheckedDate: String = ""
 )
+
+fun String.capitalizeCompat(): String {
+    if (this.isEmpty()) return this
+    return this.substring(0, 1).uppercase() + this.substring(1)
+}

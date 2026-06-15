@@ -53,6 +53,7 @@ fun HomeScreen(
     }
 
     val isSantaiMode = state.user.intensityMode == "santai"
+    val isStandarMode = state.user.intensityMode == "standar"
     val isSultanMode = state.user.intensityMode == "sultan"
 
     // Denominators
@@ -70,9 +71,15 @@ fun HomeScreen(
 
     // Sunnah rings
     val sunnahCount = state.prayerLog.count {
-        it.date == todayStr && (it.prayer == "dhuha" || it.prayer == "rawatib" || it.prayer == "tahajjud")
+        it.date == todayStr && (
+            it.type == "sunnah" ||
+            it.prayer == "dhuha" ||
+            it.prayer == "rawatib" ||
+            it.prayer == "tahajjud" ||
+            it.prayer.startsWith("rawatib_")
+        )
     }
-    val sunnahDenominator = 3f // target of 3 per day
+    val sunnahDenominator = 8f
     val sunnahProgress = (sunnahCount.toFloat() / sunnahDenominator).coerceIn(0f, 1f)
 
     // Tilawah rings
@@ -132,7 +139,7 @@ fun HomeScreen(
                             wajibProgress = wajibProgress,
                             sunnahProgress = sunnahProgress,
                             tilawahProgress = tilawahProgress,
-                            showSunnahRing = isSultanMode,
+                            showSunnahRing = isSultanMode || isStandarMode,
                             modifier = Modifier.fillMaxSize().testTag("ritual_rings_canvas")
                         )
                         Text(
@@ -185,8 +192,8 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RingLabelView(color = RingRed, name = "Wajib", value = "$checkedTrackedWajibToday/$wajibDenominator")
-                    if (isSultanMode) {
-                        RingLabelView(color = RingGreen, name = "Sunnah", value = "$sunnahCount/3")
+                    if (isSultanMode || isStandarMode) {
+                        RingLabelView(color = RingGreen, name = "Sunnah", value = "$sunnahCount/8")
                     }
                     RingLabelView(color = RingBlue, name = "Tilawah", value = if (tilawahLogged) "Lengkap" else "Belum")
                 }
@@ -279,6 +286,63 @@ fun HomeScreen(
                 }
             }
 
+            if (isSultanMode || isStandarMode) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (isSultanMode) "CHECKLIST SUNNAH & RAWATIB (SULTAN)" else "CHECKLIST SUNNAH & RAWATIB",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = GoldAccent,
+                        letterSpacing = 1.5.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    val sunnahItems = listOf(
+                        Triple("dhuha", "Sholat Dhuha", "Sholat sunnah di pagi hari"),
+                        Triple("tahajjud", "Sholat Tahajjud", "Sholat sunnah sepertiga malam terakhir"),
+                        Triple("rawatib_subuh_qobliyah", "Qobliyah Subuh", "Subuh: 2 rakaat sebelum"),
+                        Triple("rawatib_dzuhur_qobliyah", "Qobliyah Dzuhur Sebelum", "Dzuhur: 2 atau 4 rakaat sebelum"),
+                        Triple("rawatib_dzuhur_ba'diyyah", "Ba'diyyah Dzuhur Sesudah", "Dzuhur: 2 rakaat sesudah"),
+                        Triple("rawatib_ashar_qobliyah", "Qobliyah Ashar", "Ashar: 2 atau 4 rakaat sebelum"),
+                        Triple("rawatib_maghrib_ba'diyyah", "Ba'diyyah Maghrib", "Maghrib: 2 rakaat sesudah"),
+                        Triple("rawatib_isya_ba'diyyah", "Ba'diyyah Isya", "Isya: 2 rakaat sesudah")
+                    )
+
+                    sunnahItems.forEach { (id, name, desc) ->
+                        val isChecked = state.prayerLog.any { it.date == todayStr && it.prayer == id }
+                        
+                        SunnahRowCard(
+                            id = id,
+                            name = name,
+                            desc = desc,
+                            isChecked = isChecked,
+                            onCheckedChange = { check ->
+                                if (check) {
+                                    viewModel.logPrayer(id, "sunnah")
+                                } else {
+                                    showUnlogConfirm = id
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(20.dp))
 
             // Side Quest Divider Banner
@@ -317,39 +381,7 @@ fun HomeScreen(
                     onLog = { viewModel.logPrayer("tilawah", "tilawah") }
                 )
 
-                if (isSultanMode) {
-                    val dhuhaDone = state.prayerLog.any { it.date == todayStr && it.prayer == "dhuha" }
-                    val rawatibCount = state.prayerLog.count { it.date == todayStr && it.prayer == "rawatib" }
-                    val tahajjudDone = state.prayerLog.any { it.date == todayStr && it.prayer == "tahajjud" }
 
-                    SunnahActionCard(
-                        title = "Sholat Dhuha",
-                        description = "Sholat sunnah di pagi hari",
-                        icon = "🌙",
-                        isClaimed = dhuhaDone,
-                        accentColor = RingGreen,
-                        onLog = { viewModel.logPrayer("dhuha", "sunnah") }
-                    )
-
-                    SunnahActionCard(
-                        title = "Sholat Sunnah Rawatib ($rawatibCount kali)",
-                        description = "Sholat sunnah pengiring sholat fardhu",
-                        icon = "✨",
-                        isClaimed = false, // can log multiple times
-                        accentColor = GoldAccent,
-                        buttonLabel = "+ Catat Rawatib",
-                        onLog = { viewModel.logPrayer("rawatib", "sunnah") }
-                    )
-
-                    SunnahActionCard(
-                        title = "Sholat Tahajjud",
-                        description = "Sholat sunnah sepertiga malam terakhir",
-                        icon = "⭐",
-                        isClaimed = tahajjudDone,
-                        accentColor = CyanAccent,
-                        onLog = { viewModel.logPrayer("tahajjud", "sunnah") }
-                    )
-                }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -362,7 +394,7 @@ fun HomeScreen(
         AlertDialog(
             onDismissRequest = { showUnlogConfirm = null },
             title = { Text("Uncheck Sholat?", color = TextLight, fontWeight = FontWeight.Bold) },
-            text = { Text("Apakah kamu yakin ingin membatalkan catatan Sholat ${prayerName.capitalize()} hari ini? XP dan streak harian pendoa ini akan dikurangi.", color = TextLight) },
+            text = { Text("Apakah kamu yakin ingin membatalkan catatan Sholat ${prayerName.capitalizeCompat()} hari ini? XP dan streak harian pendoa ini akan dikurangi.", color = TextLight) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -502,16 +534,16 @@ fun RitualRingsCanvas(
         val center = center
         val strokeWidth = 8.dp.toPx()
 
-        // Outer Ring: Wajib (Green in Sleek theme, to correspond with #00A86B)
+        // Outer Ring: Wajib (Red)
         val outerRadius = (size.minDimension / 2) - 10.dp.toPx()
         drawCircle(
-            color = RingGreen.copy(alpha = 0.1f),
+            color = RingRed.copy(alpha = 0.1f),
             radius = outerRadius,
             center = center,
             style = Stroke(width = strokeWidth)
         )
         drawArc(
-            color = RingGreen,
+            color = RingRed,
             startAngle = -90f,
             sweepAngle = wajibProgress * 360f,
             useCenter = false,
@@ -521,16 +553,16 @@ fun RitualRingsCanvas(
         )
 
         val middleRadius = if (showSunnahRing) {
-            // Middle Ring: Sunnah (Gold Accent)
+            // Middle Ring: Sunnah (Green)
             val r = (size.minDimension / 2) - 22.dp.toPx()
             drawCircle(
-                color = GoldAccent.copy(alpha = 0.1f),
+                color = RingGreen.copy(alpha = 0.1f),
                 radius = r,
                 center = center,
                 style = Stroke(width = strokeWidth)
             )
             drawArc(
-                color = GoldAccent,
+                color = RingGreen,
                 startAngle = -90f,
                 sweepAngle = sunnahProgress * 360f,
                 useCenter = false,
@@ -1051,3 +1083,91 @@ fun tryParsing(timeStr: String, default: LocalTime): LocalTime {
         default
     }
 }
+
+@Composable
+fun SunnahRowCard(
+    id: String,
+    name: String,
+    desc: String,
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    val borderStroke = when {
+        isChecked -> BorderStroke(1.dp, Color(0xFF374151).copy(alpha = 0.5f))
+        else -> BorderStroke(1.dp, Color(0xFF1F2937))
+    }
+
+    val containerColor = when {
+        isChecked -> DarkSurface.copy(alpha = 0.4f)
+        else -> DarkSurface.copy(alpha = 0.6f)
+    }
+
+    val textColor = when {
+        isChecked -> TextLight.copy(alpha = 0.6f)
+        else -> TextLight
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(containerColor)
+            .border(borderStroke, RoundedCornerShape(16.dp))
+            .testTag("sunnah_card_${id}"),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(if (isChecked) RingGreen else Color.Transparent)
+                        .border(
+                            BorderStroke(
+                                width = if (isChecked) 0.dp else 2.dp,
+                                color = Color(0xFF4B5563)
+                            ),
+                            RoundedCornerShape(6.dp)
+                        )
+                        .clickable { onCheckedChange(!isChecked) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isChecked) {
+                        Text(
+                            text = "✓",
+                            color = Color.Black,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+
+                Column {
+                    Text(
+                        text = name,
+                        fontSize = 14.sp,
+                        fontWeight = if (isChecked) FontWeight.Normal else FontWeight.Bold,
+                        color = textColor
+                    )
+                    Text(
+                        text = desc,
+                        fontSize = 11.sp,
+                        color = TextMuted
+                    )
+                }
+            }
+        }
+    }
+}
+

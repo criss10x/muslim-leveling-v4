@@ -61,6 +61,7 @@ private val LightColorScheme = lightColorScheme(
     onSurfaceVariant = Color(0xFF55605A)
 )
 
+@Suppress("DEPRECATION")
 @Composable
 fun MuslimLevelingTheme(
     darkTheme: Boolean = true, // We can default to dark since user asked for dark

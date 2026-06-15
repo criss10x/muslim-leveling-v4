@@ -362,7 +362,7 @@ fun ProfileHeaderCard(state: MuslimLevelingData, viewModel: GameViewModel) {
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(text = "INTENSITAS", fontSize = 11.sp, color = TextMuted)
-                    Text(text = state.user.intensityMode.capitalize(), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = IslamicGreen)
+                    Text(text = state.user.intensityMode.capitalizeCompat(), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = IslamicGreen)
                 }
             }
         }
@@ -775,7 +775,7 @@ fun SettingsPanelContent(
                             .padding(vertical = 10.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = m.capitalize(), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (isS) IslamicGreen else TextLight)
+                        Text(text = m.capitalizeCompat(), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (isS) IslamicGreen else TextLight)
                     }
                 }
             }
@@ -845,7 +845,7 @@ fun SettingsPanelContent(
                             .padding(vertical = 10.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = n.capitalize(), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (isS) RingBlue else TextLight)
+                        Text(text = n.capitalizeCompat(), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (isS) RingBlue else TextLight)
                     }
                 }
             }

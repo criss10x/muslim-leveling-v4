@@ -260,7 +260,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                                 val recoveredNum = floor(prev * 0.75).toInt().coerceAtLeast(1)
                                 trackerMap[prayer] = streak.copy(current = recoveredNum)
                                 comebackCount++
-                                recoverMessages.add("Streak ${prayer.capitalize()} Recovery: mulai dari h-${recoveredNum}!")
+                                recoverMessages.add("Streak ${prayer.capitalizeCompat()} Recovery: mulai dari h-${recoveredNum}!")
                             }
                         }
                     }
@@ -318,7 +318,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                             val recoveredNum = floor(prev * 0.75).toInt().coerceAtLeast(1)
                             trackerMap[prayer] = streak.copy(current = recoveredNum)
                             comebackCount++
-                            recoverMessages.add("Streak ${prayer.capitalize()} Recovery: mulai dari h-${recoveredNum}!")
+                            recoverMessages.add("Streak ${prayer.capitalizeCompat()} Recovery: mulai dari h-${recoveredNum}!")
                         }
                     }
                 }
@@ -527,8 +527,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                         }
                     }
                     "quest_rawatib_two" -> {
-                        if (prayer == "rawatib") {
-                            val todayRawatibCount = updatedLogs.count { it.date == todayStr && it.prayer == "rawatib" }
+                        if (prayer == "rawatib" || prayer.startsWith("rawatib_")) {
+                            val todayRawatibCount = updatedLogs.count { it.date == todayStr && (it.prayer == "rawatib" || it.prayer.startsWith("rawatib_")) }
                             progress = todayRawatibCount.coerceAtMost(2)
                             completed = progress >= 2
                         }
@@ -574,7 +574,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
             // Gacha reveal sequence
             rewardRevealEvent.value = RewardRevealState(
-                prayerName = prayer.capitalize(),
+                prayerName = prayer.capitalizeCompat(),
                 xpGained = xpGained,
                 isFiveOfFiveCompleted = isHeroCompletor,
                 unlockedRewardName = unlockedReward,
@@ -837,7 +837,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             )
 
             // Modes extensions
-            if (state.user.intensityMode == "sultan") {
+            if (state.user.intensityMode == "sultan" || state.user.intensityMode == "standar") {
                 pool.add(
                     Quest(
                         "quest_dhuha_before_dzuhur",

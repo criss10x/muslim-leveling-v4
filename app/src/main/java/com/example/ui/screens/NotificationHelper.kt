@@ -7,6 +7,7 @@ import android.os.Build
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.data.capitalizeCompat
 
 object NotificationHelper {
     private const val CHANNEL_ID = "muslim_leveling_notifications"
@@ -46,7 +47,7 @@ object NotificationHelper {
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle(" Muslim Leveling Mode: ${mode.capitalize()}")
+            .setContentTitle(" Muslim Leveling Mode: ${mode.capitalizeCompat()}")
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)

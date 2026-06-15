@@ -267,8 +267,8 @@ fun OnboardingScreen(
                     ) {
                         val description = when (intensityMode) {
                             "santai" -> "🔴 Ring Wajib dihitung dari 3 sholat wajib pilihanmu (Default: Subuh, Maghrib, Isya). Sholat lain tetap dapat XP bonus!"
-                            "standar" -> "🔴 Ring Wajib dihitung dari ke-5 sholat wajib lengkap. Cocok buat pejuang konsistensi standar harian!"
-                            "sultan" -> "🔴 Ring Wajib (5 sholat) + 🟢 Ring Sunnah aktif (Rawatib, Dhuha, Tahajjud) + 🔵 Ring Tilawah aktif. Mode gamer Muslim sejati!"
+                            "standar" -> "🔴 Ring Wajib (5 sholat) + 🟢 Ring Sunnah aktif + 🔵 Ring Tilawah aktif. Seimbang untuk ibadah wajib dan sunnah harian!"
+                            "sultan" -> "🔴 Ring Wajib (5 sholat) + 🟢 Ring Sunnah aktif + 🔵 Ring Tilawah aktif. Mode gamer Muslim sejati penuh keberkahan!"
                             else -> ""
                         }
                         Text(

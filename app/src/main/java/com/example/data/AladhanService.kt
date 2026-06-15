@@ -12,11 +12,11 @@ import java.util.concurrent.TimeUnit
 
 @JsonClass(generateAdapter = true)
 data class AladhanTimings(
-    @Json(name = "Fajr") val fajr: String,
-    @Json(name = "Dhuhr") val dhuhr: String,
-    @Json(name = "Asr") val asr: String,
-    @Json(name = "Maghrib") val maghrib: String,
-    @Json(name = "Isha") val isha: String
+    @param:Json(name = "Fajr") val fajr: String,
+    @param:Json(name = "Dhuhr") val dhuhr: String,
+    @param:Json(name = "Asr") val asr: String,
+    @param:Json(name = "Maghrib") val maghrib: String,
+    @param:Json(name = "Isha") val isha: String
 )
 
 @JsonClass(generateAdapter = true)
