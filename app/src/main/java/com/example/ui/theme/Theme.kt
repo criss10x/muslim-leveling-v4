@@ -15,11 +15,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
+import kotlin.math.sqrt
+
+// ═══════════════════════════════════════════
+// QUSHO GAMING — Enhanced Background Pattern
+// ═══════════════════════════════════════════
 
 fun Modifier.muslimPattern(): Modifier = this.drawBehind {
-    val dotColor = Color.White.copy(alpha = 0.04f)
-    val dotRadius = 1.2f.dp.toPx()
-    val gap = 20.dp.toPx()
+    // Subtle hexagonal dot grid — gaming aesthetic
+    val dotColor = Color(0xFF00E68A).copy(alpha = 0.03f)
+    val dotRadius = 1.0f.dp.toPx()
+    val gap = 24.dp.toPx()
     val width = size.width
     val height = size.height
     var x = gap / 2f
@@ -31,6 +37,18 @@ fun Modifier.muslimPattern(): Modifier = this.drawBehind {
         }
         x += gap
     }
+
+    // Subtle radial glow at top center
+    val glowColor = Color(0xFF00E68A).copy(alpha = 0.02f)
+    drawCircle(
+        brush = androidx.compose.ui.graphics.Brush.radialGradient(
+            colors = listOf(glowColor, Color.Transparent),
+            center = Offset(width / 2f, 0f),
+            radius = width * 0.6f
+        ),
+        radius = width * 0.6f,
+        center = Offset(width / 2f, 0f)
+    )
 }
 
 private val DarkColorScheme = darkColorScheme(
@@ -64,7 +82,7 @@ private val LightColorScheme = lightColorScheme(
 @Suppress("DEPRECATION")
 @Composable
 fun MuslimLevelingTheme(
-    darkTheme: Boolean = true, // We can default to dark since user asked for dark
+    darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
