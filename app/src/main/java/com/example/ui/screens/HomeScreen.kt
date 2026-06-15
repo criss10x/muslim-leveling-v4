@@ -431,7 +431,7 @@ fun HomeScreen(
             },
             containerColor = DarkSurface,
             shape = RoundedCornerShape(20.dp),
-            border = BorderStroke(1.dp, RingRed.copy(alpha = 0.3f))
+            
         )
     }
 }
