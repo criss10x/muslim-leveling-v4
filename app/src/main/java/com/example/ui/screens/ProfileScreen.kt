@@ -531,7 +531,8 @@ fun AchievementsGrid(unlockedBadges: List<String>) {
         Badge("ramadan_champion", "Virtual Ramadan", "Aktif selama Ramadan 🌙", "🌙"),
         Badge("comeback_king", "Comeback King", "Pernah break 3x tapi balik lagi! 💪", "🛡️"),
         Badge("early_bird", "Early Bird", "20x Sholat tepat waktu", "🏹"),
-        Badge("mythic_reached", "Mythic Reached", "Level 80 tercapai! 🔮", "🔮")
+        Badge("mythic_reached", "Mythic Reached", "Level 80 tercapai! 🔮", "🔮"),
+        Badge("santri_digital", "Santri Digital", "Selesaikan semua 16 modul Belajar! 🎓", "🎓")
     )
 
     // Build absolute grid layout

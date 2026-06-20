@@ -46,7 +46,7 @@ object LearningContent {
                     title = "Kenapa Harus Percaya Ada Tuhan?",
                     icon = "🌌",
                     estimatedMinutes = 4,
-                    xpReward = 50
+                    xpReward = 40
                 ),
                 LearningModule(
                     id = "akidah_1.2",
@@ -54,7 +54,7 @@ object LearningContent {
                     title = "Kenapa Allah Itu Esa (Tauhid)?",
                     icon = "☝️",
                     estimatedMinutes = 5,
-                    xpReward = 60
+                    xpReward = 40
                 ),
                 LearningModule(
                     id = "akidah_1.3",
@@ -62,7 +62,7 @@ object LearningContent {
                     title = "Al-Quran: Firman Tuhan, Bukan Karangan Manusia",
                     icon = "📖",
                     estimatedMinutes = 6,
-                    xpReward = 70
+                    xpReward = 40
                 ),
                 LearningModule(
                     id = "akidah_1.4",
@@ -70,7 +70,7 @@ object LearningContent {
                     title = "Siapa Itu Nabi Muhammad ﷺ?",
                     icon = "🫶",
                     estimatedMinutes = 4,
-                    xpReward = 55
+                    xpReward = 40
                 ),
                 LearningModule(
                     id = "akidah_1.5",
@@ -78,7 +78,7 @@ object LearningContent {
                     title = "Apa Itu Iman dan Rukun Iman?",
                     icon = "💎",
                     estimatedMinutes = 5,
-                    xpReward = 65
+                    xpReward = 40
                 )
             )
         ),
@@ -93,7 +93,7 @@ object LearningContent {
                     title = "5 Rukun Islam: Fondasi Hidup Seorang Muslim",
                     icon = "⭐",
                     estimatedMinutes = 5,
-                    xpReward = 60
+                    xpReward = 40
                 ),
                 LearningModule(
                     id = "rukun_2.2",
@@ -101,7 +101,7 @@ object LearningContent {
                     title = "Syahadat: Gerbang Pertama",
                     icon = "🚪",
                     estimatedMinutes = 4,
-                    xpReward = 50
+                    xpReward = 40
                 ),
                 LearningModule(
                     id = "rukun_2.3",
@@ -109,7 +109,7 @@ object LearningContent {
                     title = "Kenapa Harus Puasa Ramadan?",
                     icon = "🌙",
                     estimatedMinutes = 5,
-                    xpReward = 55
+                    xpReward = 40
                 ),
                 LearningModule(
                     id = "rukun_2.4",
@@ -117,7 +117,7 @@ object LearningContent {
                     title = "Zakat: Kenapa Harus Berbagi?",
                     icon = "💰",
                     estimatedMinutes = 4,
-                    xpReward = 50
+                    xpReward = 40
                 ),
                 LearningModule(
                     id = "rukun_2.5",
@@ -125,7 +125,7 @@ object LearningContent {
                     title = "Haji: Perjalanan Sekali Seumur Hidup",
                     icon = "🕋",
                     estimatedMinutes = 4,
-                    xpReward = 55
+                    xpReward = 40
                 )
             )
         ),
@@ -140,7 +140,7 @@ object LearningContent {
                     title = "Wudhu: Bersih-Bersih Sebelum Menghadap Allah",
                     icon = "💧",
                     estimatedMinutes = 5,
-                    xpReward = 55
+                    xpReward = 60
                 ),
                 LearningModule(
                     id = "praktik_3.2",
@@ -148,7 +148,7 @@ object LearningContent {
                     title = "Syarat Sah & Rukun Sholat",
                     icon = "📋",
                     estimatedMinutes = 4,
-                    xpReward = 50
+                    xpReward = 60
                 ),
                 LearningModule(
                     id = "praktik_3.3",
@@ -156,7 +156,7 @@ object LearningContent {
                     title = "Tata Cara Sholat Step-by-Step",
                     icon = "🧎",
                     estimatedMinutes = 8,
-                    xpReward = 80
+                    xpReward = 60
                 ),
                 LearningModule(
                     id = "praktik_3.4",
@@ -164,7 +164,7 @@ object LearningContent {
                     title = "Bacaan-Bacaan Penting dalam Sholat",
                     icon = "📝",
                     estimatedMinutes = 5,
-                    xpReward = 50
+                    xpReward = 60
                 ),
                 LearningModule(
                     id = "praktik_3.5",
@@ -172,7 +172,7 @@ object LearningContent {
                     title = "Sholat 5 Waktu: Kapan dan Berapa Rakaat?",
                     icon = "⏰",
                     estimatedMinutes = 3,
-                    xpReward = 40
+                    xpReward = 60
                 ),
                 LearningModule(
                     id = "praktik_3.6",
@@ -180,7 +180,7 @@ object LearningContent {
                     title = "Hal-Hal yang Sering Bikin Bingung Pemula",
                     icon = "❓",
                     estimatedMinutes = 5,
-                    xpReward = 55
+                    xpReward = 60
                 )
             )
         )
@@ -3104,6 +3104,74 @@ fun BelajarHubView(
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 6.dp, bottom = 24.dp)
         )
+
+        // ─── Overall Progress Bar ───
+        val totalModules = LearningContent.getAllModulesOrdered().size
+        val completedCount = progress.count { it.completed }
+        val progressPercent = if (totalModules > 0) completedCount.toFloat() / totalModules else 0f
+        val allCompleted = completedCount >= totalModules
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = if (allCompleted) GoldAccent.copy(alpha = 0.08f) else DarkSurface
+            ),
+            border = BorderStroke(
+                1.dp,
+                if (allCompleted) GoldAccent.copy(alpha = 0.4f) else DarkSurfaceVariant
+            )
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = if (allCompleted) "🏆" else "📊",
+                            fontSize = 18.sp
+                        )
+                        Text(
+                            text = "$completedCount/$totalModules modul selesai",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (allCompleted) GoldAccent else TextLight
+                        )
+                    }
+                    if (allCompleted) {
+                        Box(
+                            modifier = Modifier
+                                .background(GoldAccent.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
+                                .padding(horizontal = 10.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "✨ Santri Digital",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = GoldAccent
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                LinearProgressIndicator(
+                    progress = { progressPercent },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .clip(CircleShape),
+                    color = if (allCompleted) GoldAccent else IslamicGreen,
+                    trackColor = DarkSurfaceVariant
+                )
+            }
+        }
 
         // Segmented Control
         SegmentedControl(

@@ -966,6 +966,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             earned.add("mythic_reached")
         }
 
+        // 13. Santri Digital — selesaikan semua 16 modul Belajar
+        val allModulesCompleted = data.learningState.progress.count { it.completed } >= 16
+        if (allModulesCompleted && !earned.contains("santri_digital")) {
+            earned.add("santri_digital")
+        }
+
         return earned.toList()
     }
 
@@ -1209,15 +1215,28 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             val badgesList = evaluateBadges(updatedState)
-            val finalData = updatedState.copy(badges = badgesList)
+            var finalXp = newXp
+            var bonusMsg = ""
+
+            // Check if Santri Digital badge was just earned
+            if (badgesList.contains("santri_digital") && !updatedState.badges.contains("santri_digital")) {
+                finalXp += 300
+                bonusMsg = " 🏆 +300 XP bonus Santri Digital!"
+            }
+
+            val finalLevelInfo = getLevelInfo(finalXp)
+            val finalData = updatedState.copy(
+                user = updatedState.user.copy(xp = finalXp, level = finalLevelInfo.level),
+                badges = badgesList
+            )
             _gameData.value = finalData
             repository.saveGameState(finalData)
 
-            if (newLevelInfo.level > oldLevelInfo.level) {
-                levelUpAnimationEvent.value = newLevelInfo.level
+            if (finalLevelInfo.level > oldLevelInfo.level) {
+                levelUpAnimationEvent.value = finalLevelInfo.level
             }
 
-            _toastEvent.emit("Modul selesai! +$xpAmount XP 🎓")
+            _toastEvent.emit("Modul selesai! +$xpAmount XP 🎓$bonusMsg")
         }
 
         return xpAmount
