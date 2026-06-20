@@ -157,6 +157,30 @@ object LearningContent {
                     icon = "🧎",
                     estimatedMinutes = 8,
                     xpReward = 80
+                ),
+                LearningModule(
+                    id = "praktik_3.4",
+                    categoryId = "praktik_ibadah",
+                    title = "Bacaan-Bacaan Penting dalam Sholat",
+                    icon = "📝",
+                    estimatedMinutes = 5,
+                    xpReward = 50
+                ),
+                LearningModule(
+                    id = "praktik_3.5",
+                    categoryId = "praktik_ibadah",
+                    title = "Sholat 5 Waktu: Kapan dan Berapa Rakaat?",
+                    icon = "⏰",
+                    estimatedMinutes = 3,
+                    xpReward = 40
+                ),
+                LearningModule(
+                    id = "praktik_3.6",
+                    categoryId = "praktik_ibadah",
+                    title = "Hal-Hal yang Sering Bikin Bingung Pemula",
+                    icon = "❓",
+                    estimatedMinutes = 5,
+                    xpReward = 55
                 )
             )
         )
@@ -178,6 +202,9 @@ object LearningContent {
             "praktik_3.1" -> praktik3_1Article
             "praktik_3.2" -> praktik3_2Article
             "praktik_3.3" -> praktik3_3Article
+            "praktik_3.4" -> praktik3_4Article
+            "praktik_3.5" -> praktik3_5Article
+            "praktik_3.6" -> praktik3_6Article
             else -> emptyList()
         }
     }
@@ -198,6 +225,9 @@ object LearningContent {
             "praktik_3.1" -> praktik3_1Quiz
             "praktik_3.2" -> praktik3_2Quiz
             "praktik_3.3" -> praktik3_3Quiz
+            "praktik_3.4" -> praktik3_4Quiz
+            "praktik_3.5" -> praktik3_5Quiz
+            "praktik_3.6" -> praktik3_6Quiz
             else -> emptyList()
         }
     }
@@ -2488,6 +2518,471 @@ object LearningContent {
             ),
             correctIndex = 2,
             explanation = "Salam = tanda sholat selesai. Putar ke kanan 'Assalamu'alaikum warahmatullah', lalu ke kiri."
+        )
+    )
+
+    // ═══════════════════════════════════════════
+    // ARTIKEL: PRAKTIK IBADAH 3.4 — Bacaan-Bacaan Penting dalam Sholat
+    // ═══════════════════════════════════════════
+    private val praktik3_4Article = listOf(
+        ArticleBlock.Heading("Bacaan-Bacaan Penting dalam Sholat"),
+        ArticleBlock.Paragraph(
+            "Modul ini cheat-sheet. Semua bacaan sholat " +
+            "dikumpulin di satu tempat biar gampang dicari ulang. " +
+            "Bookmark halaman ini — kamu bakal sering balik ke sini."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("🛐 Takbiratul Ihram"),
+        ArticleBlock.Paragraph("Kapan: awal sholat, sambil angkat tangan."),
+        ArticleBlock.EducatorNote(
+            "اللَّهُ أَكْبَرُ\n" +
+            "Allahu Akbar.\n" +
+            "Allah Maha Besar."
+        ),
+        ArticleBlock.Subheading("📖 Doa Iftitah"),
+        ArticleBlock.Paragraph("Kapan: setelah takbiratul ihram, sebelum Al-Fatihah."),
+        ArticleBlock.EducatorNote(
+            "اللَّهُ أَكْبَرُ كَبِيرًا وَالْحَمْدُ لِلَّهِ كَثِيرًا وَسُبْحَانَ اللَّهِ بُكْرَةً وَأَصِيلًا\n" +
+            "Allahu akbaru kabiro wal hamdulillahi katsiro wa subhanallahi bukratan wa asila.\n" +
+            "Allah Maha Besar dengan segala kebesaran, segala puji bagi Allah dengan pujian yang banyak, " +
+            "Maha Suci Allah pada pagi dan petang hari."
+        ),
+        ArticleBlock.Subheading("📖 Al-Fatihah (WAJIB setiap rakaat)"),
+        ArticleBlock.EducatorNote(
+            "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n" +
+            "Bismillahirrahmanirrahim.\n\n" +
+            "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ۞ الرَّحْمَٰنِ الرَّحِيمِ ۞ مَالِكِ يَوْمِ الدِّينِ ۞ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ۞ اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ۞ صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ\n\n" +
+            "Alhamdulillahi rabbil 'alamin. Ar rahmanir rahim. Maliki yawmid din. " +
+            "Iyya na'budu wa iyya nasta'in. Ihdinash shiratal mustaqim. " +
+            "Shiratal ladzina an'amta 'alaihim ghairil maghdubi 'alaihim walad dallin.\n\n" +
+            "Segala puji bagi Allah Tuhan seluruh alam. Yang Maha Pengasih lagi Maha Penyayang. " +
+            "Pemilik hari pembalasan. Hanya kepada Engkaulah kami menyembah dan hanya kepada Engkaulah kami mohon pertolongan. " +
+            "Tunjukilah kami jalan yang lurus, (yaitu) jalan orang-orang yang telah Engkau beri nikmat, " +
+            "bukan (jalan) mereka yang dimurkai dan bukan (jalan) mereka yang sesat."
+        ),
+        ArticleBlock.Subheading("📖 Surah Pendek (contoh: Al-Ikhlas)"),
+        ArticleBlock.Paragraph("Kapan: setelah Al-Fatihah di rakaat 1 dan 2."),
+        ArticleBlock.EducatorNote(
+            "قُلْ هُوَ اللَّهُ أَحَدٌ ۞ اللَّهُ الصَّمَدُ ۞ لَمْ يَلِدْ وَلَمْ يُولَدْ ۞ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ\n" +
+            "Qul huwallahu ahad. Allahus-samad. Lam yalid wa lam yuulad. Wa lam yakun lahu kufuwan ahad.\n\n" +
+            "Katakanlah: Dia-lah Allah, Yang Maha Esa. Allah tempat meminta. " +
+            "Dia tidak beranak dan tidak diperanakkan. Dan tidak ada sesuatu pun yang setara dengan Dia."
+        ),
+        ArticleBlock.Subheading("🤲 Ruku"),
+        ArticleBlock.Paragraph("Kapan: setelah surah pendek, sambil bungkuk."),
+        ArticleBlock.EducatorNote(
+            "سُبْحَانَ رَبِّيَ الْعَظِيمِ وَبِحَمْدِهِ\n" +
+            "Subhana rabbiyal 'adzimi wa bihamdih.\n" +
+            "Maha Suci Tuhanku Yang Maha Agung dan dengan memuji-Nya."
+        ),
+        ArticleBlock.Subheading("🧍 I'tidal"),
+        ArticleBlock.Paragraph("Kapan: bangun dari ruku, berdiri tegak."),
+        ArticleBlock.EducatorNote(
+            "سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ\n" +
+            "Sami'allahu liman hamidah.\n" +
+            "Allah mendengar orang yang memuji-Nya.\n\n" +
+            "رَبَّنَا لَكَ الْحَمْدُ مِلْءَ السَّمَاوَاتِ وَمِلْءَ الْأَرْضِ وَمِلْءَ مَا شِئْتَ مِنْ شَيْءٍ بَعْدُ\n" +
+            "Robbana lakal hamdu mil'as samawati wa mil'ul ardhi wa mil'a ma syi'ta min sya'in ba'du.\n" +
+            "Ya Tuhan kami, bagi-Mu segala pujian, sepenuh langit dan sepenuh bumi, " +
+            "dan sepenuh apa yang Engkau kehendaki setelah itu."
+        ),
+        ArticleBlock.Subheading("🙇 Sujud"),
+        ArticleBlock.Paragraph("Kapan: posisi sujud pertama dan kedua, baca 3 kali."),
+        ArticleBlock.EducatorNote(
+            "سُبْحَانَ رَبِّيَ الْأَعْلَى وَبِحَمْدِهِ\n" +
+            "Subhana rabbiyal a'la wa bihamdih.\n" +
+            "Maha Suci Tuhanku Yang Maha Tinggi dan dengan memuji-Nya."
+        ),
+        ArticleBlock.Subheading("🧘 Duduk Antara Dua Sujud"),
+        ArticleBlock.Paragraph("Kapan: setelah sujud pertama, sebelum sujud kedua."),
+        ArticleBlock.EducatorNote(
+            "اللَّهُمَّ اغْفِرْ لِي وَارْحَمْنِي وَاجْبُرْنِي وَارْفَعْنِي وَاعْفُ عَنِّي وَارْزُقْنِي\n" +
+            "Allahummaghfirli warhamni wajburni warfa'ni wa'fu 'anni warzuqni.\n" +
+            "Ya Allah, ampunilah aku, rahmatilah aku, cukupkanlah aku, angkatlah derajatku, " +
+            "maafkanlah aku, dan berilah aku rezeki."
+        ),
+        ArticleBlock.Subheading("🪑 Tasyahud Awal"),
+        ArticleBlock.Paragraph("Kapan: duduk di akhir rakaat ke-2 (sholat 3/4 rakaat)."),
+        ArticleBlock.EducatorNote(
+            "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ\n\n" +
+            "At-tahiyyatu lillahi wash-shalawatu wat-thayyibat. As-salamu 'alaika ayyuhan-nabiyyu wa rahmatullahi wa barakatuh. As-salamu 'alaina wa 'ala 'ibadillahish-shalihin. Asyhadu an la ilaha illallah wa asyhadu anna Muhammadan 'abduhu wa rasuluh.\n\n" +
+            "Segala penghormatan, sholawat, dan kebaikan adalah milik Allah. Semoga keselamatan, rahmat, dan berkah Allah tercurah kepadamu wahai Nabi. Semoga keselamatan tercurah kepada kami dan hamba-hamba Allah yang shaleh. Aku bersaksi bahwa tiada Tuhan selain Allah dan aku bersaksi bahwa Muhammad adalah hamba dan utusan-Nya."
+        ),
+        ArticleBlock.Subheading("🪑 Tasyahud Akhir"),
+        ArticleBlock.Paragraph("Kapan: duduk rakaat terakhir, sebelum salam. = Tasyahud awal + sholawat."),
+        ArticleBlock.EducatorNote(
+            "(Baca tasyahud awal di atas, lalu lanjut:)\n\n" +
+            "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ\n" +
+            "Allahumma shalli 'ala Muhammad wa 'ala ali Muhammad kama shallaita 'ala Ibrahim wa 'ala ali Ibrahim innaka hamidun majid.\n\n" +
+            "اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ\n" +
+            "Allahumma barik 'ala Muhammad wa 'ala ali Muhammad kama barakta 'ala Ibrahim wa 'ala ali Ibrahim innaka hamidun majid.\n\n" +
+            "Ya Allah, berilah sholawat dan berkah kepada Muhammad dan keluarga Muhammad " +
+            "sebagaimana Engkau telah memberikan sholawat dan berkah kepada Ibrahim dan keluarga Ibrahim, " +
+            "sesungguhnya Engkai Maha Terpuji lagi Maha Mulia."
+        ),
+        ArticleBlock.Subheading("👋 Salam"),
+        ArticleBlock.Paragraph("Kapan: akhir sholat, putar ke kanan lalu ke kiri."),
+        ArticleBlock.EducatorNote(
+            "السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ\n" +
+            "Assalamu'alaikum warahmatullah.\n" +
+            "Semoga keselamatan dan rahmat Allah tercurah kepadamu."
+        ),
+        ArticleBlock.Cta(
+            "Cheat-sheet selesai! Simpan modul ini buat referensi. Jawab kuisnya ya. 🎯"
+        )
+    )
+
+    private val praktik3_4Quiz = listOf(
+        QuizQuestion(
+            question = "Kapan membaca Al-Fatihah dalam sholat?",
+            options = listOf(
+                "Cuma di rakaat pertama aja",
+                "Di setiap rakaat — wajib",
+                "Cuma di rakaat terakhir",
+                "Kalau hafal aja"
+            ),
+            correctIndex = 1,
+            explanation = "Al-Fatihah wajib dibaca di SETIAP rakaat, baik imam maupun sendirian. Tanpa Al-Fatihah, rakaatnya gak sah."
+        ),
+        QuizQuestion(
+            question = "Bacaan ruku dan sujud itu...",
+            options = listOf(
+                "Sama aja",
+                "Bedanya: ruku 'Subhana rabbiyal adzimi', sujud 'Subhana rabbiyal a'la'",
+                "Cuma 'Allahu Akbar' aja",
+                "Bebas, mau baca apa aja"
+            ),
+            correctIndex = 1,
+            explanation = "Ruku = Subhana rabbiyal 'adzimi wa bihamdih (Maha Suci Tuhanku Yang Maha Agung). Sujud = Subhana rabbiyal a'la wa bihamdih (Maha Suci Tuhanku Yang Maha Tinggi)."
+        ),
+        QuizQuestion(
+            question = "Tasyahud akhir ditambah apa dari tasyahud awal?",
+            options = listOf(
+                "Ditambah Al-Fatihah",
+                "Ditambah bacaan sholawat untuk Nabi Muhammad ﷺ",
+                "Ditambah surah pendek",
+                "Sama aja, gak ada tambahan"
+            ),
+            correctIndex = 1,
+            explanation = "Tasyahud akhir = tasyahud awal + sholawat Ibrahimiyah. Sholawat wajib dibaca di tasyahud akhir."
+        ),
+        QuizQuestion(
+            question = "Bacaan duduk antara dua sujud itu meminta apa?",
+            options = listOf(
+                "Minta ampun, rahmat, kecukupan, derajat tinggi, maaf, dan rezeki",
+                "Minta kaya aja",
+                "Minta surga",
+                "Cuma minta ampun"
+            ),
+            correctIndex = 0,
+            explanation = "Allahummaghfirli (ampun), warhamni (rahmat), wajburni (cukup), warfa'ni (angkat derajat), wa'fu 'anni (maaf), warzuqni (rezeki)."
+        ),
+        QuizQuestion(
+            question = "Modul ini (cheat-sheet) berguna buat apa?",
+            options = listOf(
+                "Biar lulus kuis",
+                "Referensi cepat — semua bacaan di satu tempat, gampang dicari ulang",
+                "Cuma untuk hafalan",
+                "Biar pinter bahasa Arab"
+            ),
+            correctIndex = 1,
+            explanation = "Cheat-sheet = referensi cepat. Bookmark modul ini, kamu bakal sering balik ke sini saat belajar sholat."
+        )
+    )
+
+    // ═══════════════════════════════════════════
+    // ARTIKEL: PRAKTIK IBADAH 3.5 — Sholat 5 Waktu: Kapan dan Berapa Rakaat?
+    // ═══════════════════════════════════════════
+    private val praktik3_5Article = listOf(
+        ArticleBlock.Heading("Sholat 5 Waktu: Kapan dan Berapa Rakaat?"),
+        ArticleBlock.Paragraph(
+            "Kamu udah tahu cara sholat. Sekarang pertanyaannya: " +
+            "kapan aja sih sholatnya, dan berapa rakaat tiap waktu?"
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("⏰ 5 Waktu Sholat Wajib"),
+        ArticleBlock.Paragraph(
+            "① SUBUH — 2 rakaat\n" +
+            "Waktu: dari terbit fajar (sekitar jam 4:30-an) sampai " +
+            "terbit matahari. Ini sholat paling awal — " +
+            "bangunnya emang berat, tapi pahalanya gede banget."
+        ),
+        ArticleBlock.Paragraph(
+            "② DZUHUR — 4 rakaat\n" +
+            "Waktu: setelah matahari condong ke barat " +
+            "(sekitar jam 12:00-an) sampai masuk waktu Ashar. " +
+            "Sholat siang hari, biasanya pas istirahat kerja/kuliah."
+        ),
+        ArticleBlock.Paragraph(
+            "③ ASHAR — 4 rakaat\n" +
+            "Waktu: ketika bayangan benda sama panjangnya " +
+            "dengan benda itu sendiri (sekitar jam 15:00-an) " +
+            "sampai terbenam matahari. Nabi ﷺ bilang ini waktu " +
+            "yang sangat dianjurkan."
+        ),
+        ArticleBlock.Paragraph(
+            "④ MAGHRIB — 3 rakaat\n" +
+            "Waktu: setelah matahari terbenam (sekitar jam 18:00-an) " +
+            "sampai hilang mega merah di langit. Satu-satunya " +
+            "sholat wajib 3 rakaat."
+        ),
+        ArticleBlock.Paragraph(
+            "⑤ ISYA — 4 rakaat\n" +
+            "Waktu: setelah mega merah hilang (sekitar jam 19:15-an) " +
+            "sampai tengah malam (atau terbit fajar menurut sebagian ulama). " +
+            "Sholat terakhir di hari itu."
+        ),
+        ArticleBlock.Highlight(
+            "Subuh = 2, Dzuhur = 4, Ashar = 4, Maghrib = 3, Isya = 4. " +
+            "Total: 17 rakaat sehari. Cuma 17 — gak banyak kok " +
+            "kalau dibagi sepanjang hari."
+        ),
+        ArticleBlock.Subheading("🤔 Kenapa Rakaatnya Beda-Beda?"),
+        ArticleBlock.Paragraph(
+            "Jumlah rakaat ditentukan langsung oleh Nabi Muhammad ﷺ " +
+            "berdasarkan wahyu. Subuh cuma 2 karena waktunya pendek " +
+            "(fajar ke terbit matahari). Maghrib 3 sebagai \"transisi\" " +
+            "antara siang dan malam. Dzuhur, Ashar, Isya masing-masing 4 " +
+            "karena waktunya lebih panjang."
+        ),
+        ArticleBlock.Paragraph(
+            "Gak ada alasan \"kenapa\" yang bisa dijelasin secara logika 100% — " +
+            "ini udah ketetapan dari Allah lewat Nabi-Nya. " +
+            "Yang jelas: setiap jumlah rakaat punya hikmah."
+        ),
+        ArticleBlock.Subheading("📱 Mau Mulai Tracking?"),
+        ArticleBlock.Paragraph(
+            "Kalau kamu udah siap mulai sholat 5 waktu, " +
+            "buka tab Home di app ini. Di sana kamu bisa " +
+            "tracking sholat harian, lihat waktu sholat buat kotamu, " +
+            "dan kumpulin XP setiap kali sholat!"
+        ),
+        ArticleBlock.Cta(
+            "Sekarang kamu tahu jadwalnya! Jawab kuis dulu, " +
+            "lalu mulai sholat dari yang paling gampang (Subuh). 🎯"
+        )
+    )
+
+    private val praktik3_5Quiz = listOf(
+        QuizQuestion(
+            question = "Berapa rakaat sholat Subuh?",
+            options = listOf("4", "3", "2", "5"),
+            correctIndex = 2,
+            explanation = "Subuh = 2 rakaat. Sholat wajib paling sedikit rakaatnya."
+        ),
+        QuizQuestion(
+            question = "Sholat wajib yang 3 rakaat itu...",
+            options = listOf("Subuh", "Dzuhur", "Maghrib", "Isya"),
+            correctIndex = 2,
+            explanation = "Maghrib = 3 rakaat. Satu-satunya sholat wajib yang 3 rakaat. Subuh 2, yang lain 4."
+        ),
+        QuizQuestion(
+            question = "Total rakaat sholat wajib dalam satu hari ada berapa?",
+            options = listOf("20", "15", "17", "25"),
+            correctIndex = 2,
+            explanation = "2 + 4 + 4 + 3 + 4 = 17 rakaat. Dibagi sepanjang hari, gak banyak kok."
+        ),
+        QuizQuestion(
+            question = "Waktu Ashar itu mulai kapan?",
+            options = listOf(
+                "Setelah matahari terbit",
+                "Ketika bayangan benda sama panjangnya dengan benda itu",
+                "Setelah matahari terbenam",
+                "Tengah malam"
+            ),
+            correctIndex = 1,
+            explanation = "Ashar masuk ketika bayangan benda sama panjangnya dengan benda itu sendiri (sekitar jam 15:00)."
+        ),
+        QuizQuestion(
+            question = "Kenapa Subuh cuma 2 rakaat?",
+            options = listOf(
+                "Karena malas",
+                "Karena waktunya pendek (fajar ke terbit matahari)",
+                "Karena cuma sunnah",
+                "Karena Nabi capek"
+            ),
+            correctIndex = 1,
+            explanation = "Subuh cuma 2 rakaat karena waktunya pendek. Jumlah rakaat ditentukan Nabi ﷺ berdasarkan wahyu."
+        )
+    )
+
+    // ═══════════════════════════════════════════
+    // ARTIKEL: PRAKTIK IBADAH 3.6 — Hal-Hal yang Sering Bikin Bingung Pemula
+    // ═══════════════════════════════════════════
+    private val praktik3_6Article = listOf(
+        ArticleBlock.Heading("Hal-Hal yang Sering Bikin Bingung Pemula"),
+        ArticleBlock.Paragraph(
+            "Ini modul terakhir! Kita bakal jawab pertanyaan-pertanyaan " +
+            "yang paling sering ditanya pemula. " +
+            "Kalau kamu punya pertanyaan yang gak ada di sini, " +
+            "tanya ke orang yang lebih paham atau ustadz terdekat."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("❓ \"Gimana kalau lupa udah rakaat keberapa?\""),
+        ArticleBlock.Paragraph(
+            "Ini normal banget, apalagi pas awal-awal. " +
+            "Solusinya: ambil yang lebih sedikit. " +
+            "Kalau bingung antara rakaat 2 atau 3, " +
+            "anggap aja kamu di rakaat 2. " +
+            "Tambah 1 rakaat, lalu duduk tasyahud akhir + salam. " +
+            "Setelah salam, sujud sahwi (2 sujud tambahan) " +
+            "sebagai kompensasi kelupaan."
+        ),
+        ArticleBlock.Highlight(
+            "Lupa itu manusiawi. Gak usah panik. " +
+            "Ambil yang lebih sedikit, tambah sujud sahwi. " +
+            "Sholatmu tetap sah."
+        ),
+        ArticleBlock.Subheading("❓ \"Gimana kalau gak hafal bacaan panjang?\""),
+        ArticleBlock.Paragraph(
+            "Gak masalah! Yang WAJIB itu Al-Fatihah di setiap rakaat. " +
+            "Surah pendek setelahnya? Boleh baca surah APA SAJA " +
+            "yang kamu hafal. Al-Ikhlas, An-Nas, Al-Falaq, " +
+            "Al-Kautsar, bahkan ayat kursi — bebas."
+        ),
+        ArticleBlock.Paragraph(
+            "Kalau gak hafal surah pendek sama sekali? " +
+            "Fokus hafalin Al-Fatihah dulu. " +
+            "Itu yang paling wajib. " +
+            "Surah pendek bisa ditambah pelan-pelan. " +
+            "Nabi ﷺ sendiri bilang: \"Bacalah apa yang mudah bagimu.\""
+        ),
+        ArticleBlock.Subheading("❓ \"Sholat jamak dan qashar itu apa?\""),
+        ArticleBlock.Paragraph(
+            "Ini keringanan khusus untuk orang yang sedang " +
+            "dalam perjalanan (musafir):"
+        ),
+        ArticleBlock.Paragraph(
+            "• JAMAK — menggabungkan dua sholat di satu waktu. " +
+            "Jamak taqdim: Dzuhur + Ashar di waktu Dzuhur. " +
+            "Jamak takhir: Maghrib + Isya di waktu Isya. " +
+            "Bisa juga jamak di Arafah (Dzuhur + Ashar) " +
+            "dan di Muzdalifah (Maghrib + Isya)."
+        ),
+        ArticleBlock.Paragraph(
+            "• QASHAR — meringkas sholat 4 rakaat jadi 2 rakaat. " +
+            "Boleh untuk Dzuhur, Ashar, dan Isya. " +
+            "Syaratnya: musafir (perjalanan jauh, biasanya > 80 km)."
+        ),
+        ArticleBlock.Paragraph(
+            "Jamak dan qashar boleh digabung. " +
+            "Jadi Dzuhur + Ashar bisa dijamak dan diqashar jadi " +
+            "2 rakaat + 2 rakaat di satu waktu. " +
+            "Ini keringanan dari Allah — Islam itu gak memberatkan."
+        ),
+        ArticleBlock.Subheading("❓ \"Boleh sholat pakai bahasa Indonesia?\""),
+        ArticleBlock.Paragraph(
+            "Ini pertanyaan yang sering banget muncul. Jawabannya:" +
+            ""
+        ),
+        ArticleBlock.Paragraph(
+            "Bacaan rukun sholat (Al-Fatihah, takbir, ruku, sujud, " +
+            "tasyahud, salam) HARUS dalam bahasa Arab. " +
+            "Kenapa? Karena Al-Quran diturunkan dalam bahasa Arab, " +
+            "dan sholat itu ibadah yang udah distandarkan oleh Nabi ﷺ. " +
+            "Mengubah bacaan rukun = mengubah ibadah yang udah ditetapkan."
+        ),
+        ArticleBlock.Paragraph(
+            "TAPI — doa tambahan di luar rukun " +
+            "(misalnya doa setelah tasyahud akhir, sebelum salam) " +
+            "boleh pakai bahasa apa aja, termasuk Indonesia. " +
+            "Jadi kamu bisa berdoa pakai bahasa sendiri " +
+            "setelah selesai bacaan wajib."
+        ),
+        ArticleBlock.Highlight(
+            "Bacaan rukun = Arab (wajib). " +
+            "Doa tambahan = bebas bahasa apa aja. " +
+            "Ini biar sholatmu tetap terstandar tapi tetap bisa " +
+            "curhat sama Allah pakai bahasamu sendiri."
+        ),
+        ArticleBlock.Subheading("❓ \"Sholatku belum perfect, sah gak?\""),
+        ArticleBlock.Paragraph(
+            "Kalau syarat sah terpenuhi dan rukunnya ada — sah. " +
+            "Gak harus perfect. Nabi ﷺ sendiri ngajarin orang " +
+            "yang baru masuk Islam pelan-pelan. " +
+            "Allah tahu kamu lagi belajar."
+        ),
+        ArticleBlock.Paragraph(
+            "Yang penting: JANGAN BERHENTI. " +
+            "Sholat yang gak perfect itu lebih baik dari gak sholat sama sekali. " +
+            "Lama-lama bakal makin lancar. Semua orang juga mulai dari nol."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("🎉 Selamat! Kamu Udah Selesai Semua Kategori!"),
+        ArticleBlock.Paragraph(
+            "Dari \"Kenapa harus percaya Tuhan?\" sampai " +
+            "\"Hal yang bikin bingung pemula\" — kamu udah " +
+            "lewatin 16 modul pembelajaran."
+        ),
+        ArticleBlock.Paragraph(
+            "Sekarang kamu punya dasar yang kuat: " +
+            "Akidah (kepercayaan), Rukun Islam (fondasi), " +
+            "dan Praktik Ibadah (cara ngelakuin). " +
+            "Tinggal PRAKTIKKAN. Pelan-pelan, konsisten, " +
+            "dan jangan pernah berhenti belajar."
+        ),
+        ArticleBlock.Cta(
+            "Alhamdulillah, semua modul selesai! 🎉 " +
+            "Sekarang buka tab Home dan mulai tracking sholatmu. " +
+            "Kamu udah di jalur yang bener! 🚀"
+        )
+    )
+
+    private val praktik3_6Quiz = listOf(
+        QuizQuestion(
+            question = "Kalau lupa udah rakaat keberapa, solusinya...",
+            options = listOf(
+                "Ulang dari awal",
+                "Ambil yang lebih sedikit, tambah sujud sahwi setelah salam",
+                "Langsung salam aja",
+                "Tinggalin sholatnya"
+            ),
+            correctIndex = 1,
+            explanation = "Ambil yang lebih sedikit, tambah sujud sahwi setelah salam. Lupa itu manusiawi — gak usah panik."
+        ),
+        QuizQuestion(
+            question = "Gak hafal surah pendek selain Al-Fatihah, gimana?",
+            options = listOf(
+                "Gak bisa sholat",
+                "Al-Fatihah aja udah cukup — surah pendek bisa ditambah pelan-pelan",
+                "Boleh baca Al-Fatihah 2 kali",
+                "Ganti surah pendek dengan doa dalam bahasa Indonesia"
+            ),
+            correctIndex = 1,
+            explanation = "Al-Fatihah itu yang wajib. Surah pendek itu tambahan — boleh surah apa saja yang dihafal. Fokus hafalin Al-Fatihah dulu."
+        ),
+        QuizQuestion(
+            question = "Sholat qashar artinya...",
+            options = listOf(
+                "Sholat lebih cepat gerakannya",
+                "Meringkas sholat 4 rakaat jadi 2 rakaat (untuk musafir)",
+                "Sholat sambil lari",
+                "Sholat di kereta"
+            ),
+            correctIndex = 1,
+            explanation = "Qashar = meringkas 4 rakaat jadi 2. Khusus untuk musafir (perjalanan jauh). Islam gak memberatkan."
+        ),
+        QuizQuestion(
+            question = "Bolehkah bacaan rukun sholat pakai bahasa Indonesia?",
+            options = listOf(
+                "Boleh, yang penting niat",
+                "Tidak — bacaan rukun HARUS Arab. Tapi doa tambahan di luar rukun boleh bahasa Indonesia.",
+                "Boleh kalau gak hafal Arab",
+                "Tergantung imamnya"
+            ),
+            correctIndex = 1,
+            explanation = "Rukun = Arab (wajib, karena Al-Quran dalam bahasa Arab dan sholat distandarkan Nabi). Doa tambahan = bebas bahasa apa aja."
+        ),
+        QuizQuestion(
+            question = "Sholat belum perfect, tapi udah berusaha — sah gak?",
+            options = listOf(
+                "Gak sah, harus perfect dulu",
+                "Sah — yang penting syarat sah terpenuhi dan rukun ada. Jangan berhenti belajar.",
+                "Tergantung ustadz",
+                "Cuma sah kalau di masjid"
+            ),
+            correctIndex = 1,
+            explanation = "Sholat yang gak perfect > gak sholat sama sekali. Allah tahu kamu lagi belajar. Yang penting JANGAN BERHENTI."
         )
     )
 }
