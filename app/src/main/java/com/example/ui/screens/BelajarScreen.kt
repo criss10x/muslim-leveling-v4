@@ -135,12 +135,28 @@ object LearningContent {
             icon = "🤲",
             modules = listOf(
                 LearningModule(
-                    id = "praktik_1.1",
+                    id = "praktik_3.1",
                     categoryId = "praktik_ibadah",
-                    title = "Cara Sholat: Step by Step",
+                    title = "Wudhu: Bersih-Bersih Sebelum Menghadap Allah",
+                    icon = "💧",
+                    estimatedMinutes = 5,
+                    xpReward = 55
+                ),
+                LearningModule(
+                    id = "praktik_3.2",
+                    categoryId = "praktik_ibadah",
+                    title = "Syarat Sah & Rukun Sholat",
+                    icon = "📋",
+                    estimatedMinutes = 4,
+                    xpReward = 50
+                ),
+                LearningModule(
+                    id = "praktik_3.3",
+                    categoryId = "praktik_ibadah",
+                    title = "Tata Cara Sholat Step-by-Step",
                     icon = "🧎",
-                    estimatedMinutes = 6,
-                    xpReward = 70
+                    estimatedMinutes = 8,
+                    xpReward = 80
                 )
             )
         )
@@ -159,7 +175,9 @@ object LearningContent {
             "rukun_2.3" -> rukun2_3Article
             "rukun_2.4" -> rukun2_4Article
             "rukun_2.5" -> rukun2_5Article
-            "praktik_1.1" -> praktik1_1Article
+            "praktik_3.1" -> praktik3_1Article
+            "praktik_3.2" -> praktik3_2Article
+            "praktik_3.3" -> praktik3_3Article
             else -> emptyList()
         }
     }
@@ -177,7 +195,9 @@ object LearningContent {
             "rukun_2.3" -> rukun2_3Quiz
             "rukun_2.4" -> rukun2_4Quiz
             "rukun_2.5" -> rukun2_5Quiz
-            "praktik_1.1" -> praktik1_1Quiz
+            "praktik_3.1" -> praktik3_1Quiz
+            "praktik_3.2" -> praktik3_2Quiz
+            "praktik_3.3" -> praktik3_3Quiz
             else -> emptyList()
         }
     }
@@ -1814,20 +1834,660 @@ object LearningContent {
     )
 
     // ═══════════════════════════════════════════
-    // ARTIKEL: PRAKTIK IBADAH 1.1 (placeholder for future prompt)
+    // ARTIKEL: PRAKTIK IBADAH 3.1 — Wudhu: Bersih-Bersih Sebelum Menghadap Allah
     // ═══════════════════════════════════════════
-    private val praktik1_1Article = listOf(
-        ArticleBlock.Heading("Cara Sholat: Step by Step"),
-        ArticleBlock.Paragraph("Konten akan datang di prompt berikutnya. Stay tuned! 🚀"),
-        ArticleBlock.Cta("Kuis belum tersedia untuk modul ini.")
+    private val praktik3_1Article = listOf(
+        ArticleBlock.Heading("Wudhu: Bersih-Bersih Sebelum Menghadap Allah"),
+        ArticleBlock.Paragraph(
+            "Sebelum sholat, kamu harus bersih dulu — bukan cuma fisik, " +
+            "tapi juga \"spiritual\" (disebut suci dari hadas kecil). " +
+            "Caranya? Wudhu. Ini step-by-step-nya."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("🛐 Niat di Hati"),
+        ArticleBlock.Paragraph(
+            "Niat itu di dalam hati, gak perlu diucapkan keras-keras. " +
+            "Cukup dalam hati: \"Aku niat berwudhu untuk menghilangkan " +
+            "hadas kecil karena Allah.\" Tapi kalau mau baca, boleh:"
+        ),
+        ArticleBlock.EducatorNote(
+            "نَوَيْتُ الْوُضُوءَ لِرَفْعِ الْحَدَثِ اْلاَصْغَرِ فَرْضًا لِلَّهِ تَعَالَى\n" +
+            "Nawaitul wudhu-a lirof'il hadatsil ashghori fardhon lillahi ta'ala.\n" +
+            "Aku niat berwudhu untuk menghilangkan hadas kecil, fardhu karena Allah Ta'ala."
+        ),
+        ArticleBlock.Subheading("🪜 Langkah-Langkah Wudhu (Urut!)"),
+        ArticleBlock.Paragraph(
+            "Urutan ini harus berurutan sesuai sunnah. " +
+            "Kalau loncat-loncat, wudhunya kurang sempurna:"
+        ),
+        ArticleBlock.Paragraph(
+            "① BASUH KEDUA TELAPAK TANGAN — " +
+            "sampai pergelangan, 3 kali. Bersihin kotoran yang nempel."
+        ),
+        ArticleBlock.Paragraph(
+            "② KUMUR-KUMUR (MADMGH) — " +
+            "ambil air, masukin ke mulut, kumur 3 kali. " +
+            "Bersihin mulut dari sisa makanan."
+        ),
+        ArticleBlock.Paragraph(
+            "③ MASUKKAN AIR KE HIDUNG (MADSTHINSYIQ) — " +
+            "hirup air ke hidung, keluarkan, 3 kali. " +
+            "Gak enak emang, tapi bagian dari wudhu."
+        ),
+        ArticleBlock.Paragraph(
+            "④ BASUH WAJAH — " +
+            "dari batas tumbuhnya rambut sampai dagu, " +
+            "dari telinga ke telinga, 3 kali."
+        ),
+        ArticleBlock.Paragraph(
+            "⑤ BASUH TANGAN SAMPAI SIKU — " +
+            "mulai dari ujung jari sampai siku (termasuk siku), " +
+            "3 kali. Tangan kanan dulu, baru kiri."
+        ),
+        ArticleBlock.Paragraph(
+            "⑥ USAAP KEPALA — " +
+            "pakai tangan basah, usap dari depan ke belakang, " +
+            "balik lagi ke depan. 1 kali aja."
+        ),
+        ArticleBlock.Paragraph(
+            "⑦ USAAP TELINGA — " +
+            "jari telunjuk masukin ke lubang telinga, " +
+            "ibu jari usap belakang telinga. 1 kali."
+        ),
+        ArticleBlock.Paragraph(
+            "⑧ BASUH KAKI SAMPAI MATA KAKI — " +
+            "dari ujung jari sampai mata kaki (termasuk mata kaki), " +
+            "3 kali. Kanan dulu, baru kiri."
+        ),
+        ArticleBlock.Highlight(
+            "Tips: sambil nginget urutannya, bayangin kamu " +
+            "lagi \"nyiram\" dari atas ke bawah. " +
+            "Tangan → muka → tangan → kepala → kaki."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("❌ Hal yang Membatal Wudhu"),
+        ArticleBlock.Paragraph(
+            "Wudhu bisa batal kalau:"
+        ),
+        ArticleBlock.Paragraph(
+            "• Keluar sesuatu dari qubul/dubur (kencing, buang air, kentut)"
+        ),
+        ArticleBlock.Paragraph(
+            "• Tidur nyenyak (bukan sekadar ngantuk)"
+        ),
+        ArticleBlock.Paragraph(
+            "• Hilang akal (pingsan, mabuk)"
+        ),
+        ArticleBlock.Paragraph(
+            "• Menyentuh kemaluan tanpa alas (ada pendapat yang beda, " +
+            "tapi ini yang lebih hati-hati)"
+        ),
+        ArticleBlock.Subheading("💡 Tips Pemula"),
+        ArticleBlock.Paragraph(
+            "• Wudhu bisa tahan lama selama gak batal. " +
+            "Jadi kalau udah wudhu dan belum batal, sholatnya boleh " +
+            "pakai wudhu yang sama."
+        ),
+        ArticleBlock.Paragraph(
+            "• Latihan di rumah dulu. Gak harus perfect di hari pertama. " +
+            "Yang penting niat dan usaha."
+        ),
+        ArticleBlock.Paragraph(
+            "• Kalau gak ada air (perjalanan, sakit), boleh tayamum " +
+            "(pakai debu). Tapi itu materi lanjutan."
+        ),
+        ArticleBlock.Cta(
+            "Wudhu selesai! Sekarang kamu siap sholat. Jawab kuisnya dulu ya. 🎯"
+        )
     )
 
-    private val praktik1_1Quiz = listOf(
+    private val praktik3_1Quiz = listOf(
         QuizQuestion(
-            question = "Modul ini belum tersedia. Kuis akan hadir segera!",
-            options = listOf("Oke, tunggu aja", "Siap!", "Penasaran", "Sip"),
-            correctIndex = 0,
-            explanation = "Modul ini sedang dalam pengembangan. Tunggu update berikutnya ya!"
+            question = "Berapa kali membasuh telapak tangan saat wudhu?",
+            options = listOf(
+                "1 kali",
+                "2 kali",
+                "3 kali",
+                "Seikhlasnya"
+            ),
+            correctIndex = 2,
+            explanation = "Setiap basuhan dalam wudhu dilakukan 3 kali. Ini sunnah yang dianjurkan."
+        ),
+        QuizQuestion(
+            question = "Urutan wudhu yang benar setelah membasuh tangan adalah...",
+            options = listOf(
+                "Wajah → kaki → kepala",
+                "Kumur → hidung → wajah → tangan-siku → usap kepala → usap telinga → kaki",
+                "Kaki → wajah → kepala",
+                "Bebas, yang penting semua kena air"
+            ),
+            correctIndex = 1,
+            explanation = "Urutan wudhu harus berurutan: kumur → hidung → wajah → tangan-siku → usap kepala → telinga → kaki. Bayangin nyiram dari atas ke bawah."
+        ),
+        QuizQuestion(
+            question = "Usap kepala dilakukan berapa kali?",
+            options = listOf(
+                "3 kali",
+                "1 kali aja",
+                "2 kali",
+                "7 kali"
+            ),
+            correctIndex = 1,
+            explanation = "Usap kepala cukup 1 kali — dari depan ke belakang, balik lagi ke depan. Berbeda dari basuhan lain yang 3 kali."
+        ),
+        QuizQuestion(
+            question = "Apa yang batalin wudhu?",
+            options = listOf(
+                "Ngobrol sama orang",
+                "Keluar dari kamar mandi",
+                "Keluar sesuatu dari qubul/dubur, tidur nyenyak, hilang akal",
+                "Makan makanan ringan"
+            ),
+            correctIndex = 2,
+            explanation = "Wudhu batal kalau: kencing/buang air/kentut, tidur nyenyak, pingsan/mabuk, atau menyentuh kemaluan tanpa alas."
+        ),
+        QuizQuestion(
+            question = "Kalau wudhu udah tapi belum batal, bisa dipake buat sholat berikutnya?",
+            options = listOf(
+                "Engga, harus wudhu lagi setiap sholat",
+                "Bisa, selama belum batal wudhunya tetap sah",
+                "Cuma bisa dipake 1 kali",
+                "Tergantung imam masjid"
+            ),
+            correctIndex = 1,
+            explanation = "Wudhu tetap sah selama belum batal. Jadi kalau udah wudhu Subuh dan belum batal, bisa dipake buat Dzuhur juga."
+        )
+    )
+
+    // ═══════════════════════════════════════════
+    // ARTIKEL: PRAKTIK IBADAH 3.2 — Syarat Sah & Rukun Sholat
+    // ═══════════════════════════════════════════
+    private val praktik3_2Article = listOf(
+        ArticleBlock.Heading("Syarat Sah & Rukun Sholat"),
+        ArticleBlock.Paragraph(
+            "Sebelum masuk ke tata cara sholat, kamu perlu tahu " +
+            "dua hal yang sering bikin bingung pemula: " +
+            "syarat sah dan rukun. Kedengarannya mirip, tapi beda."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("📋 Syarat Sah Sholat"),
+        ArticleBlock.Paragraph(
+            "Syarat sah itu hal-hal yang harus DIPENUHI SEBELUM sholat. " +
+            "Kalau gak terpenuhi, sholatnya gak sah — mau gerakannya " +
+            "sempurna sekalipun. Ada 5:"
+        ),
+        ArticleBlock.Paragraph(
+            "① Suci dari hadas besar — " +
+            "kalau junub (habis hubungan suami-istri, mimpi basah, haid), " +
+            "harus mandi besar (mandi junub) dulu. " +
+            "Wudhu aja gak cukup."
+        ),
+        ArticleBlock.Paragraph(
+            "② Suci dari hadas kecil — " +
+            "ini yang diurus sama wudhu (yang udah kita bahas di modul sebelumnya)."
+        ),
+        ArticleBlock.Paragraph(
+            "③ Menutup aurat — " +
+            "laki-laki: pusar sampai lutut. " +
+            "Perempuan: seluruh tubuh kecuali muka dan telapak tangan. " +
+            "Pakai baju yang gak transparan dan gak ketat."
+        ),
+        ArticleBlock.Paragraph(
+            "④ Menghadap kiblat — " +
+            "arah Ka'bah di Makkah. Di Indonesia, umumnya menghadap barat. " +
+            "Kalau gak tahu arahnya, bisa pakai kompas atau tanya."
+        ),
+        ArticleBlock.Paragraph(
+            "⑤ Masuk waktu sholat — " +
+            "setiap sholat punya waktu spesifik. Sholat Subuh sebelum " +
+            "terbit matahari, Dzuhur setelah matahari condong ke barat, " +
+            "dan seterusnya. Sholat di luar waktu = gak sah."
+        ),
+        ArticleBlock.Highlight(
+            "Syarat sah = hal-hal DI LUAR sholat yang harus dipenuhi dulu. " +
+            "Lupa satu? Sholatnya batal dari awal."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("🧱 Rukun Sholat"),
+        ArticleBlock.Paragraph(
+            "Rukun itu hal-hal yang harus dilakukan DI DALAM sholat. " +
+            "Kalau ada yang ketinggalan, sholatnya gak sah. " +
+            "Ada 13 rukun (sebagian ulama bilang 14):"
+        ),
+        ArticleBlock.Paragraph(
+            "① Niat di dalam hati — " +
+            "saat mau takbiratul ihram."
+        ),
+        ArticleBlock.Paragraph(
+            "② Takbiratul ihram — " +
+            "ucap \"Allahu Akbar\" sambil angkat tangan. " +
+            "Ini tanda sholat dimulai."
+        ),
+        ArticleBlock.Paragraph(
+            "③ Berdiri tegak (bagi yang mampu) — " +
+            "saat takbiratul ihram dan saat baca Al-Fatihah."
+        ),
+        ArticleBlock.Paragraph(
+            "④ Membaca Al-Fatihah — " +
+            "wajib di setiap rakaat, baik imam maupun sendirian."
+        ),
+        ArticleBlock.Paragraph(
+            "⑤ Ruku — " +
+            "tunduk, tangan pegang lutut, punggung lurus."
+        ),
+        ArticleBlock.Paragraph(
+            "⑥ I'tidal — " +
+            "bangun dari ruku, berdiri tegak."
+        ),
+        ArticleBlock.Paragraph(
+            "⑦ Sujud (2 kali per rakaat) — " +
+            "dahi, hidung, kedua telapak tangan, kedua lutut, " +
+            "dan ujung jari kaki menyentuh lantai."
+        ),
+        ArticleBlock.Paragraph(
+            "⑧ Duduk antara dua sujud — " +
+            "duduk sebentar setelah sujud pertama, sebelum sujud kedua."
+        ),
+        ArticleBlock.Paragraph(
+            "⑨ Tasyahud akhir — " +
+            "duduk di rakaat terakhir, baca tasyahud."
+        ),
+        ArticleBlock.Paragraph(
+            "⑩ Membaca sholawat — " +
+            "untuk Nabi Muhammad ﷺ di tasyahud akhir."
+        ),
+        ArticleBlock.Paragraph(
+            "⑪ Duduk untuk tasyahud akhir dan tasyahud awal — " +
+            "posisi duduk iftirasy (kaki kiri diduduki, kanan tegak)."
+        ),
+        ArticleBlock.Paragraph(
+            "⑫ Membaca dua kalimat syahadat — " +
+            "di tasyahud akhir."
+        ),
+        ArticleBlock.Paragraph(
+            "⑬ Salam — " +
+            "ucap \"Assalamu'alaikum warahmatullah\" ke kanan dan ke kiri. " +
+            "Ini tanda sholat selesai."
+        ),
+        ArticleBlock.Paragraph(
+            "⑭ Tertib — " +
+            "mengerjakan semua rukun secara berurutan."
+        ),
+        ArticleBlock.Highlight(
+            "Syarat sah = SEBELUM sholat. Rukun = DI DALAM sholat. " +
+            "Bedanya: syarat sah bikin sholat BOLEH dimulai. " +
+            "Rukun bikin sholat JADI sah."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("💡 Kenapa Perlu Tahu Ini?"),
+        ArticleBlock.Paragraph(
+            "Karena banyak pemula yang bingung: \"Sholatku sah gak ya?\" " +
+            "Kalau syarat sah terpenuhi dan rukunnya lengkap, " +
+            "sholatmu sah. Simple. Gak perlu overthinking."
+        ),
+        ArticleBlock.Cta(
+            "Udah paham syarat dan rukunnya? Sekarang jawab kuis, " +
+            "lalu lanjut ke tata cara sholat step-by-step! 🎯"
+        )
+    )
+
+    private val praktik3_2Quiz = listOf(
+        QuizQuestion(
+            question = "Apa bedanya syarat sah dan rukun sholat?",
+            options = listOf(
+                "Sama aja",
+                "Syarat sah = dipenuhi SEBELUM sholat. Rukun = dilakukan DI DALAM sholat.",
+                "Rukun itu opsional",
+                "Syarat sah cuma buat imam"
+            ),
+            correctIndex = 1,
+            explanation = "Syarat sah = hal di luar sholat (suci, tutup aurat, hadap kiblat, masuk waktu). Rukun = hal di dalam sholat (niat, takbir, ruku, sujud, dll)."
+        ),
+        QuizQuestion(
+            question = "Aurat laki-laki saat sholat itu...",
+            options = listOf(
+                "Seluruh tubuh",
+                "Dari pusar sampai lutut",
+                "Cuma kepala aja",
+                "Bebas, yang penting rapi"
+            ),
+            correctIndex = 1,
+            explanation = "Laki-laki: pusar sampai lutut harus tertutup. Perempuan: seluruh tubuh kecuali muka dan telapak tangan."
+        ),
+        QuizQuestion(
+            question = "Berapa kali sujud dalam satu rakaat?",
+            options = listOf(
+                "1 kali",
+                "2 kali",
+                "3 kali",
+                "4 kali"
+            ),
+            correctIndex = 1,
+            explanation = "Setiap rakaat punya 2 sujud. Jadi sholat 2 rakaat = 4 sujud, sholat 4 rakaat = 8 sujud."
+        ),
+        QuizQuestion(
+            question = "Apa yang menandai sholat DIMULAI?",
+            options = listOf(
+                "Berdiri tegak",
+                "Takbiratul ihram — ucap 'Allahu Akbar' sambil angkat tangan",
+                "Membaca Al-Fatihah",
+                "Ruku"
+            ),
+            correctIndex = 1,
+            explanation = "Takbiratul ihram = 'Allahu Akbar' pertama sambil angkat tangan. Ini tanda resmi sholat dimulai."
+        ),
+        QuizQuestion(
+            question = "Sholat di luar waktu yang ditentukan, sah gak?",
+            options = listOf(
+                "Sah aja, yang penting niat",
+                "Gak sah — masuk waktu adalah syarat sah sholat",
+                "Sah kalau ada uzur",
+                "Tergantung mood"
+            ),
+            correctIndex = 1,
+            explanation = "Masuk waktu adalah syarat sah. Sholat di luar waktu = gak sah, harus diulang di waktu yang benar."
+        )
+    )
+
+    // ═══════════════════════════════════════════
+    // ARTIKEL: PRAKTIK IBADAH 3.3 — Tata Cara Sholat Step-by-Step
+    // ═══════════════════════════════════════════
+    private val praktik3_3Article = listOf(
+        ArticleBlock.Heading("Tata Cara Sholat Step-by-Step"),
+        ArticleBlock.Paragraph(
+            "Ini dia yang kamu tunggu-tunggu. " +
+            "Kita bakal bahas sholat 2 rakaat — yang paling dasar. " +
+            "Setelah paham 2 rakaat, tinggal tambah rakaat aja untuk " +
+            "sholat 3 (Maghrib) atau 4 (Dzuhur, Ashar, Isya)."
+        ),
+        ArticleBlock.Paragraph(
+            "Tiap gerakan ada deskripsi posisinya. " +
+            "Kalau bingung, tanya teman atau lihat video tutorial. " +
+            "Praktik langsung itu guru terbaik."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("🕋 RAKAAT 1"),
+        ArticleBlock.Paragraph(""),
+        ArticleBlock.Subheading("① Berdiri Tegak, Hadap Kiblat"),
+        ArticleBlock.Paragraph(
+            "Posisi: berdiri tegak, kedua kaki sejajar, " +
+            "pandangan ke tempat sujud. Hadap kiblat."
+        ),
+        ArticleBlock.Subheading("② Takbiratul Ihram"),
+        ArticleBlock.Paragraph(
+            "Angkat kedua tangan sejajar telinga, lalu ucapkan:"
+        ),
+        ArticleBlock.EducatorNote(
+            "اللَّهُ أَكْبَرُ\n" +
+            "Allahu Akbar.\n" +
+            "Allah Maha Besar."
+        ),
+        ArticleBlock.Paragraph(
+            "Setelah takbir, turunkan tangan. " +
+            "Tangan kanan pegang pergelangan tangan kiri di depan dada."
+        ),
+        ArticleBlock.Subheading("③ Baca Doa Iftitah"),
+        ArticleBlock.Paragraph(
+            "Setelah takbiratul ihram, baca doa iftitah:"
+        ),
+        ArticleBlock.EducatorNote(
+            "اللَّهُ أَكْبَرُ كَبِيرًا وَالْحَمْدُ لِلَّهِ كَثِيرًا وَسُبْحَانَ اللَّهِ بُكْرَةً وَأَصِيلًا\n" +
+            "Allahu akbaru kabiro wal hamdulillahi katsiro wa subhanallahi bukratan wa asila.\n" +
+            "Allah Maha Besar dengan segala kebesaran, segala puji bagi Allah dengan pujian yang banyak, " +
+            "Maha Suci Allah pada pagi dan petang hari."
+        ),
+        ArticleBlock.Subheading("④ Baca Surat Al-Fatihah"),
+        ArticleBlock.Paragraph(
+            "Wajib di setiap rakaat. Bacakan dengan tartil (pelan-pelan, jelas):"
+        ),
+        ArticleBlock.EducatorNote(
+            "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n" +
+            "Bismillahirrahmanirrahim.\n" +
+            "Dengan nama Allah Yang Maha Pengasih lagi Maha Penyayang.\n\n" +
+            "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ\n" +
+            "Alhamdulillahi rabbil 'alamin.\n" +
+            "Segala puji bagi Allah, Tuhan seluruh alam.\n\n" +
+            "الرَّحْمَٰنِ الرَّحِيمِ\n" +
+            "Ar rahmanir rahim.\n" +
+            "Yang Maha Pengasih lagi Maha Penyayang.\n\n" +
+            "مَالِكِ يَوْمِ الدِّينِ\n" +
+            "Maliki yawmid din.\n" +
+            "Pemilik hari pembalasan.\n\n" +
+            "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ\n" +
+            "Iyya na'budu wa iyya nasta'in.\n" +
+            "Hanya kepada Engkaulah kami menyembah dan hanya kepada Engkaulah kami mohon pertolongan.\n\n" +
+            "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ\n" +
+            "Ihdinash shiratal mustaqim.\n" +
+            "Tunjukilah kami jalan yang lurus.\n\n" +
+            "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ\n" +
+            "Shiratal ladzina an'amta 'alaihim ghairil maghdubi 'alaihim walad dallin.\n" +
+            "(Yaitu) jalan orang-orang yang telah Engkau beri nikmat, bukan (jalan) mereka yang dimurkai dan bukan (jalan) mereka yang sesat."
+        ),
+        ArticleBlock.Subheading("⑤ Baca Surah Pendek (Al-Ikhlas)"),
+        ArticleBlock.Paragraph(
+            "Setelah Al-Fatihah, baca surah pendek. " +
+            "Disarankan Al-Ikhlas untuk pemula:"
+        ),
+        ArticleBlock.EducatorNote(
+            "قُلْ هُوَ اللَّهُ أَحَدٌ ١ اللَّهُ الصَّمَدُ ٢ لَمْ يَلِدْ وَلَمْ يُولَدْ ٣ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ ٤\n" +
+            "Qul huwallahu ahad. Allahus-samad. Lam yalid wa lam yuulad. Wa lam yakun lahu kufuwan ahad.\n" +
+            "Katakanlah: Dia-lah Allah, Yang Maha Esa. Allah tempat meminta. Dia tidak beranak dan tidak diperanakkan. " +
+            "Dan tidak ada sesuatu pun yang setara dengan Dia."
+        ),
+        ArticleBlock.Subheading("⑥ Ruku"),
+        ArticleBlock.Paragraph(
+            "Angkat tangan sambil ucap \"Allahu Akbar\", lalu bungkuk. " +
+            "Posisi: tangan pegang lutut, punggung lurus, " +
+            "pandangan ke kaki. Baca:"
+        ),
+        ArticleBlock.EducatorNote(
+            "سُبْحَانَ رَبِّيَ الْعَظِيمِ وَبِحَمْدِهِ\n" +
+            "Subhana rabbiyal 'adzimi wa bihamdih.\n" +
+            "Maha Suci Tuhanku Yang Maha Agung dan dengan memuji-Nya."
+        ),
+        ArticleBlock.Subheading("⑦ I'tidal"),
+        ArticleBlock.Paragraph(
+            "Bangun dari ruku, berdiri tegak. " +
+            "Angkat tangan sambil ucap \"Sami'allahu liman hamidah\" " +
+            "(Allah mendengar orang yang memuji-Nya). " +
+            "Lalu baca:"
+        ),
+        ArticleBlock.EducatorNote(
+            "رَبَّنَا لَكَ الْحَمْدُ مِلْءَ السَّمَاوَاتِ وَمِلْءَ الْأَرْضِ وَمِلْءَ مَا شِئْتَ مِنْ شَيْءٍ بَعْدُ\n" +
+            "Robbana lakal hamdu mil'as samawati wa mil'ul ardhi wa mil'a ma syi'ta min sya'in ba'du.\n" +
+            "Ya Tuhan kami, bagi-Mu segala pujian, sepenuh langit dan sepenuh bumi, dan sepenuh apa yang Engkau kehendaki setelah itu."
+        ),
+        ArticleBlock.Subheading("⑧ Sujud Pertama"),
+        ArticleBlock.Paragraph(
+            "Ucap \"Allahu Akbar\" sambil turun ke sujud. " +
+            "Posisi: dahi dan hidung menyentuh lantai, " +
+            "kedua telapak tangan di samping telinga, " +
+            "kedua lutut di lantai, ujung jari kaki menekuk. " +
+            "Baca 3 kali:"
+        ),
+        ArticleBlock.EducatorNote(
+            "سُبْحَانَ رَبِّيَ الْأَعْلَى وَبِحَمْدِهِ\n" +
+            "Subhana rabbiyal a'la wa bihamdih.\n" +
+            "Maha Suci Tuhanku Yang Maha Tinggi dan dengan memuji-Nya."
+        ),
+        ArticleBlock.Subheading("⑨ Duduk Antara Dua Sujud"),
+        ArticleBlock.Paragraph(
+            "Bangun dari sujud pertama, duduk sebentar. " +
+            "Posisi: kaki kiri diduduki, kaki kanan tegak (iftirasy). " +
+            "Baca:"
+        ),
+        ArticleBlock.EducatorNote(
+            "اللَّهُمَّ اغْفِرْ لِي وَارْحَمْنِي وَاجْبُرْنِي وَارْفَعْنِي وَاعْفُ عَنِّي وَارْزُقْنِي\n" +
+            "Allahummaghfirli warhamni wajburni warfa'ni wa'fu 'anni warzuqni.\n" +
+            "Ya Allah, ampunilah aku, rahmatilah aku, cukupkanlah aku, angkatlah derajatku, " +
+            "maafkanlah aku, dan berilah aku rezeki."
+        ),
+        ArticleBlock.Subheading("⑩ Sujud Kedua"),
+        ArticleBlock.Paragraph(
+            "Turun sujud lagi (posisi sama seperti sujud pertama). " +
+            "Baca \"Subhana rabbiyal a'la wa bihamdih\" 3 kali."
+        ),
+        ArticleBlock.Highlight(
+            "Satu rakaat = berdiri → takbir → Fatihah → surah pendek → " +
+            "ruku → i'tidal → sujud 1 → duduk → sujud 2. " +
+            "Ulangi untuk rakaat berikutnya."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("🕋 RAKAAT 2"),
+        ArticleBlock.Paragraph(
+            "Bangun dari sujud kedua, berdiri tegak. " +
+            "Ulangi dari langkah ④ (Al-Fatihah) sampai ⑩ (sujud kedua). " +
+            "Tapi di rakaat 2, SETELAH sujud kedua, LANGSUNG duduk " +
+            "(jangan berdiri dulu)."
+        ),
+        ArticleBlock.Subheading("⑪ Tasyahud Awal (Duduk di Rakaat 2)"),
+        ArticleBlock.Paragraph(
+            "Duduk iftirasy. Baca tasyahud awal:"
+        ),
+        ArticleBlock.EducatorNote(
+            "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ\n\n" +
+            "At-tahiyyatu lillahi wash-shalawatu wat-thayyibat. As-salamu 'alaika ayyuhan-nabiyyu wa rahmatullahi wa barakatuh. As-salamu 'alaina wa 'ala 'ibadillahish-shalihin. Asyhadu an la ilaha illallah wa asyhadu anna Muhammadan 'abduhu wa rasuluh.\n\n" +
+            "Segala penghormatan, sholawat, dan kebaikan adalah milik Allah. " +
+            "Semoga keselamatan, rahmat, dan berkah Allah tercurah kepadamu wahai Nabi. " +
+            "Semoga keselamatan tercurah kepada kami dan hamba-hamba Allah yang shaleh. " +
+            "Aku bersaksi bahwa tiada Tuhan selain Allah dan aku bersaksi bahwa Muhammad adalah hamba dan utusan-Nya."
+        ),
+        ArticleBlock.Paragraph(
+            "Setelah tasyahud awal, berdiri lagi untuk rakaat 3 dan 4 " +
+            "(kalau sholat 4 rakaat). " +
+            "Untuk sholat 2 rakaat, langsung lanjut ke tasyahud akhir."
+        ),
+        ArticleBlock.Subheading("⑫ Tasyahud Akhir"),
+        ArticleBlock.Paragraph(
+            "Duduk iftirasy. Baca tasyahud akhir (sama seperti tasyahud awal, " +
+            "tapi DITAMBAH bacaan sholawat dan dua kalimat syahadat):"
+        ),
+        ArticleBlock.EducatorNote(
+            "(Baca tasyahud awal seperti di atas, lalu lanjut:)\n\n" +
+            "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ\n" +
+            "Allahumma shalli 'ala Muhammad wa 'ala ali Muhammad kama shallaita 'ala Ibrahim wa 'ala ali Ibrahim innaka hamidun majid.\n" +
+            "Ya Allah, berilah sholawat kepada Muhammad dan keluarga Muhammad " +
+            "sebagaimana Engkau telah memberikan sholawat kepada Ibrahim dan keluarga Ibrahim, " +
+            "sesungguhnya Engkai Maha Terpuji lagi Maha Mulia.\n\n" +
+            "اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ\n" +
+            "Allahumma barik 'ala Muhammad wa 'ala ali Muhammad kama barakta 'ala Ibrahim wa 'ala ali Ibrahim innaka hamidun majid.\n" +
+            "Ya Allah, berilah berkah kepada Muhammad dan keluarga Muhammad " +
+            "sebagaimana Engkau telah memberikan berkah kepada Ibrahim dan keluarga Ibrahim, " +
+            "sesungguhnya Engkai Maha Terpuji lagi Maha Mulia."
+        ),
+        ArticleBlock.Subheading("⑬ Salam"),
+        ArticleBlock.Paragraph(
+            "Putar kepala ke kanan, ucapkan:"
+        ),
+        ArticleBlock.EducatorNote(
+            "السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ\n" +
+            "Assalamu'alaikum warahmatullah.\n" +
+            "Semoga keselamatan dan rahmat Allah tercurah kepadamu."
+        ),
+        ArticleBlock.Paragraph(
+            "Lalu putar kepala ke kiri, ucapkan hal yang sama. " +
+            "Salam ke kanan = untuk malaikat dan orang di kanan. " +
+            "Salam ke kiri = untuk orang di kiri. " +
+            "Ini tanda sholat SELESAI."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("📐 Penyesuaian Rakaat"),
+        ArticleBlock.Paragraph(
+            "• Sholat 2 rakaat: selesai di tasyahud akhir + salam. " +
+            "(Subuh, Jumat, Idul Fitri/Adha)"
+        ),
+        ArticleBlock.Paragraph(
+            "• Sholat 3 rakaat: setelah tasyahud awal, berdiri lagi " +
+            "untuk rakaat 3 (cuma baca Al-Fatihah, tanpa surah pendek). " +
+            "Lalu duduk tasyahud akhir + salam. (Maghrib)"
+        ),
+        ArticleBlock.Paragraph(
+            "• Sholat 4 rakaat: setelah tasyahud awal, berdiri " +
+            "untuk rakaat 3 dan 4 (cuma baca Al-Fatihah). " +
+            "Lalu duduk tasyahud akhir + salam. (Dzuhur, Ashar, Isya)"
+        ),
+        ArticleBlock.Highlight(
+            "Ingat: di rakaat 3 dan 4, CUMA baca Al-Fatihah. " +
+            "Gak usah tambah surah pendek."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("💡 Tips Pemula"),
+        ArticleBlock.Paragraph(
+            "• Mulai dari sholat Subuh (2 rakaat) aja dulu. " +
+            "Kalau udah lancar, baru tambah ke Maghrib (3 rakaat), " +
+            "lalu Dzuhur/Ashar/Isya (4 rakaat)."
+        ),
+        ArticleBlock.Paragraph(
+            "• Gak harus hafal semua bacaan di hari pertama. " +
+            "Mulai dari Al-Fatihah dulu, yang lain nambah pelan-pelan."
+        ),
+        ArticleBlock.Paragraph(
+            "• Sholat itu percakapan sama Allah. " +
+            "Gak perlu perfect — yang penting niat dan usaha. " +
+            "Allah tahu kamu lagi belajar."
+        ),
+        ArticleBlock.Cta(
+            "Kamu udah baca panduan lengkap sholat! 🎉 " +
+            "Sekarang coba praktikkan, dan jawab kuisnya. " +
+            "Gak harus perfect — yang penting mulai. 🚀"
+        )
+    )
+
+    private val praktik3_3Quiz = listOf(
+        QuizQuestion(
+            question = "Berapa rakaat sholat Subuh?",
+            options = listOf(
+                "3 rakaat",
+                "4 rakaat",
+                "2 rakaat",
+                "5 rakaat"
+            ),
+            correctIndex = 2,
+            explanation = "Subuh = 2 rakaat. Maghrib = 3. Dzuhur, Ashar, Isya = 4. Mulai dari Subuh dulu kalau masih belajar."
+        ),
+        QuizQuestion(
+            question = "Setelah Al-Fatihah di rakaat 1, apa yang dibaca?",
+            options = listOf(
+                "Langsung ruku",
+                "Baca surah pendek (misal Al-Ikhlas)",
+                "Baca tasyahud",
+                "Salam"
+            ),
+            correctIndex = 1,
+            explanation = "Setelah Al-Fatihah, baca surah pendek. Disarankan Al-Ikhlas untuk pemula — pendek dan gampang dihafal."
+        ),
+        QuizQuestion(
+            question = "Posisi ruku yang benar itu...",
+            options = listOf(
+                "Duduk di lantai",
+                "Tangan pegang lutut, punggung lurus, pandangan ke kaki",
+                "Berdiri tegak",
+                "Tangan diangkat ke atas"
+            ),
+            correctIndex = 1,
+            explanation = "Ruku: bungkuk, tangan pegang lutut, punggung lurus. Pandangan ke kaki, bukan ke depan."
+        ),
+        QuizQuestion(
+            question = "Di rakaat 3 dan 4, apa yang dibaca?",
+            options = listOf(
+                "Al-Fatihah + surah pendek",
+                "Cuma Al-Fatihah aja, tanpa surah pendek",
+                "Cuma surah pendek",
+                "Gak usah baca apa-apa"
+            ),
+            correctIndex = 1,
+            explanation = "Di rakaat 3 dan 4, cuma baca Al-Fatihah. Gak usah tambah surah pendek."
+        ),
+        QuizQuestion(
+            question = "Salam ke kanan dan ke kiri artinya sholat...",
+            options = listOf(
+                "Baru dimulai",
+                "Lagi istirahat",
+                "SELESAI — ini tanda akhir sholat",
+                "Mau lanjut rakaat berikutnya"
+            ),
+            correctIndex = 2,
+            explanation = "Salam = tanda sholat selesai. Putar ke kanan 'Assalamu'alaikum warahmatullah', lalu ke kiri."
         )
     )
 }
