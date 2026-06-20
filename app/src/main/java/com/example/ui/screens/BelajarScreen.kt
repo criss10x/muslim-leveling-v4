@@ -63,8 +63,23 @@ object LearningContent {
                     icon = "📖",
                     estimatedMinutes = 6,
                     xpReward = 70
+                ),
+                LearningModule(
+                    id = "akidah_1.4",
+                    categoryId = "akidah",
+                    title = "Siapa Itu Nabi Muhammad ﷺ?",
+                    icon = "🫶",
+                    estimatedMinutes = 4,
+                    xpReward = 55
+                ),
+                LearningModule(
+                    id = "akidah_1.5",
+                    categoryId = "akidah",
+                    title = "Apa Itu Iman dan Rukun Iman?",
+                    icon = "💎",
+                    estimatedMinutes = 5,
+                    xpReward = 65
                 )
-                // Future: akidah_1.4, akidah_1.5, ...
             )
         ),
         LearningCategory(
@@ -105,6 +120,8 @@ object LearningContent {
             "akidah_1.1" -> akidah1_1Article
             "akidah_1.2" -> akidah1_2Article
             "akidah_1.3" -> akidah1_3Article
+            "akidah_1.4" -> akidah1_4Article
+            "akidah_1.5" -> akidah1_5Article
             "rukun_1.1" -> rukun1_1Article
             "praktik_1.1" -> praktik1_1Article
             else -> emptyList()
@@ -117,6 +134,8 @@ object LearningContent {
             "akidah_1.1" -> akidah1_1Quiz
             "akidah_1.2" -> akidah1_2Quiz
             "akidah_1.3" -> akidah1_3Quiz
+            "akidah_1.4" -> akidah1_4Quiz
+            "akidah_1.5" -> akidah1_5Quiz
             "rukun_1.1" -> rukun1_1Quiz
             "praktik_1.1" -> praktik1_1Quiz
             else -> emptyList()
@@ -686,6 +705,342 @@ object LearningContent {
             ),
             correctIndex = 2,
             explanation = "Artikel bilang: kamu gak harus langsung percaya. Justru bagus kalau mau renungkan pelan-pelan, tanya-tanya, dan cari tahu sendiri. Kebenaran itu layak ditelusuri."
+        )
+    )
+
+    // ═══════════════════════════════════════════
+    // ARTIKEL: AKIDAH 1.4 — Siapa Itu Nabi Muhammad ﷺ?
+    // ═══════════════════════════════════════════
+    private val akidah1_4Article = listOf(
+        ArticleBlock.Heading("Siapa Itu Nabi Muhammad ﷺ?"),
+        ArticleBlock.Paragraph(
+            "Di modul sebelumnya kita bahas Al-Quran. " +
+            "Sekarang pertanyaan alamiah: siapa orang yang nrima wahyu itu? " +
+            "Kenapa jutaan orang percaya dia utusan Tuhan?"
+        ),
+        ArticleBlock.Paragraph(
+            "Kita gak bakal cerita panjang lebar soal sejarah hidupnya — " +
+            "itu buku tersendiri. Tapi ada beberapa hal tentang Muhammad ﷺ " +
+            "yang menarik banget dan worth kamu tahu."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("🤝 Al-Amin — \"Yang Terpercaya\""),
+        ArticleBlock.Paragraph(
+            "Sebelum jadi nabi di usia 40 tahun, Muhammad ﷺ udah tinggal " +
+            "di Makkah selama 40 tahun. Dan julukannya? Al-Amin — " +
+            "artinya \"yang terpercaya.\" Bukan dikasih sama Muslim, " +
+            "tapi sama seluruh masyarakat Makkah, termasuk yang gak " +
+            "seiman."
+        ),
+        ArticleBlock.Paragraph(
+            "Orang-orang nitip barang berharga sama dia. " +
+            "Mau nyari solusi sengketa? Datang ke Muhammad. " +
+            "Musuh-musuhnya aja — yang kemudian mau ngebunuh dia — " +
+            "sebelum kenal Islam, mereka TETEP percaya dia orang jujur. " +
+            "Bahkan Abu Sufyan, salah satu musuh terbesarnya, " +
+            "ketika ditanya Romawi: \"Pernahkah dia berbohong?\" " +
+            "Jawab: \"Tidak.\""
+        ),
+        ArticleBlock.Highlight(
+            "Bayangin: orang yang mau ngebunuh kamu aja ngakuin kamu gak pernah bohong. " +
+            "Seberapa kuat kredibilitas seseorang kalau musuhnya aja ngakuin kejujurannya?"
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("📖 Kenapa Dipercaya Utusan Terakhir?"),
+        ArticleBlock.Paragraph(
+            "Beberapa alasan kenapa umat Islam percaya Muhammad ﷺ " +
+            "itu utusan terakhir:"
+        ),
+        ArticleBlock.Paragraph(
+            "• Al-Quran sendiri yang mengklaim — dan Al-Quran " +
+            "punya bukti keasliannya (yang udah kita bahas di modul sebelumnya)."
+        ),
+        ArticleBlock.Paragraph(
+            "• Konsistensi karakter — dari muda sampai wafat, " +
+            "gak pernah ada catatan dia berbohong, meskipun itu " +
+            "bisa nguntungin dia secara politik."
+        ),
+        ArticleBlock.Paragraph(
+            "• Nubuatan di kitab-kitab sebelumnya — " +
+            "Taurat dan Injil menyebutkan akan datang nabi setelah " +
+            "Musa dan Isa. Banyak ciri-cirinya cocok sama Muhammad ﷺ."
+        ),
+        ArticleBlock.Paragraph(
+            "• Kehidupannya terdokumentasi super detail — " +
+            "Hadits (catatan perkataan dan perbuatannya) itu " +
+            "jutaan, diriwayatkan dengan rantai periwayatan " +
+            "yang bisa ditelusuri. Gak ada tokoh sejarah lain " +
+            "yang hidupnya tercatat se-detail ini."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("⚖️ Nabi vs Tokoh Agama Lain"),
+        ArticleBlock.Paragraph(
+            "Yang bikin nabi beda dari tokoh agama lain: " +
+            "nabi mengklaim langsung dapat pesan dari Tuhan. " +
+            "Tokoh agama biasanya mengaku punya ilham atau inspirasi, " +
+            "tapi nabi bilang: \"Tuhan ngomong langsung ke saya, " +
+            "dan saya harus sampaikan ke kalian.\""
+        ),
+        ArticleBlock.Paragraph(
+            "Muhammad ﷺ juga beda dari nabi-nabi sebelumnya: " +
+            "dia nabi terakhir. Gak ada nabi setelah dia. " +
+            "Dan risalahnya bukan buat satu kaum aja — tapi buat " +
+            "seluruh manusia, sampai kiamat."
+        ),
+        ArticleBlock.Paragraph(
+            "Yang menarik: meskipun jadi pemimpin negara dan " +
+            "panglima perang, hidupnya tetep sederhana. " +
+            "Kasurnya dari tikar, makannya sering cuma kurma dan air. " +
+            "Gak kayak raja atau diktator yang hidup mewah. " +
+            "Kekuasaannya gak dipake buat diri sendiri."
+        ),
+        ArticleBlock.Highlight(
+            "Karakter Muhammad ﷺ: jujur sebelum jadi nabi, " +
+            "jujur sesudah jadi nabi. Gak pernah berubah " +
+            "meskipun punya kekuasaan besar."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("💡 Penutup"),
+        ArticleBlock.Paragraph(
+            "Muhammad ﷺ bukan tokoh mitos. Dia manusia nyata " +
+            "dengan sejarah yang super detail. Dan karakternya " +
+            "adalah salah satu bukti terkuat: orang se-jujur " +
+            "itu gak mungkin ngarang soal Tuhan."
+        ),
+        ArticleBlock.Paragraph(
+            "Di modul terakhir kategori Akidah, kita bakal " +
+            "rangkum semua yang udah kita pelajari jadi satu " +
+            "kerangka yang utuh: apa sih artinya \"beriman\"?"
+        ),
+        ArticleBlock.Cta(
+            "Selesai baca! Kuisnya menanti. 🎯"
+        )
+    )
+
+    private val akidah1_4Quiz = listOf(
+        QuizQuestion(
+            question = "Apa julukan Muhammad ﷺ sebelum jadi nabi, dan siapa yang ngasih?",
+            options = listOf(
+                "Al-Fatihah, dari keluarganya",
+                "Al-Amin (Yang Terpercaya), dari seluruh masyarakat Makkah termasuk yang non-Muslim",
+                "As-Sidiq, dari para sahabat",
+                "Al-Mustafa, dari Tuhannya"
+            ),
+            correctIndex = 1,
+            explanation = "Al-Amin artinya 'yang terpercaya.' Julukan ini dikasih oleh seluruh masyarakat Makkah — termasuk yang gak seiman — karena selama 40 tahun hidup di sana, dia gak pernah ketahuan bohong."
+        ),
+        QuizQuestion(
+            question = "Kenapa fakta bahwa musuh-musuhnya aja ngakuin dia jujur itu penting?",
+            options = listOf(
+                "Karena musuh pasti jujur",
+                "Karena kalau bahkan orang yang mau ngebunuh kamu aja ngakuin kamu gak pernah bohong, itu bukti kredibilitas luar biasa",
+                "Karena musuh itu baik hati",
+                "Karena itu gak penting"
+            ),
+            correctIndex = 1,
+            explanation = "Abu Sufyan, musuh terbesar Muhammad ﷺ, ketika ditanya 'pernahkah dia berbohong?' menjawab 'tidak.' Kredibilitas seorang jujur yang diakui bahkan oleh musuh."
+        ),
+        QuizQuestion(
+            question = "Apa yang bikin Muhammad ﷺ beda dari tokoh agama lain?",
+            options = listOf(
+                "Dia lebih kaya dari tokoh lain",
+                "Dia mengklaim langsung dapat pesan dari Tuhan dan jadi nabi terakhir untuk seluruh manusia",
+                "Dia cuma ngajar satu kaum aja",
+                "Dia gak punya kitab suci"
+            ),
+            correctIndex = 1,
+            explanation = "Nabi mengklaim dapat pesan langsung dari Tuhan. Muhammad ﷺ spesial karena nabi TERAKHIR dan risalahnya buat seluruh manusia, bukan cuma satu kaum."
+        ),
+        QuizQuestion(
+            question = "Meskipun jadi pemimpin negara dan panglima perang, hidup Muhammad ﷺ...",
+            options = listOf(
+                "Sangat mewah seperti raja",
+                "Sederhana — kasur dari tikar, makan sering cuma kurma dan air",
+                "Biasa aja, gak ada yang spesial",
+                "Penuh harta rampasan perang"
+            ),
+            correctIndex = 1,
+            explanation = "Meskipun punya kekuasaan besar, hidupnya tetap sederhana. Kekuasaannya gak dipake buat diri sendiri — ini beda banget dari raja atau diktator kebanyakan."
+        ),
+        QuizQuestion(
+            question = "Apa hubungan antara karakter Muhammad ﷺ dengan kebenaran kerasulannya?",
+            options = listOf(
+                "Gak ada hubungannya",
+                "Orang se-jujur itu gak mungkin ngarang soal Tuhan — karakternya jadi bukti kuat",
+                "Yang penting cuma kitabnya",
+                "Karakter gak penting, yang penting banyak pengikut"
+            ),
+            correctIndex = 1,
+            explanation = "Muhammad ﷺ jujur sebelum jadi nabi, jujur sesudah jadi nabi. Konsistensi karakternya selama puluhan tahun jadi argumen kuat: orang se-jujur ini gak mungkin bohong soal Tuhan."
+        )
+    )
+
+    // ═══════════════════════════════════════════
+    // ARTIKEL: AKIDAH 1.5 — Apa Itu Iman dan Rukun Iman?
+    // ═══════════════════════════════════════════
+    private val akidah1_5Article = listOf(
+        ArticleBlock.Heading("Apa Itu Iman dan Rukun Iman?"),
+        ArticleBlock.Paragraph(
+            "Keren! Kamu udah sampai di modul terakhir kategori Akidah. " +
+            "Di 4 modul sebelumnya, kita udah bahas: Tuhan itu ada, " +
+            "Allah itu Esa, Al-Quran firman Tuhan, dan Muhammad ﷺ utusan-Nya."
+        ),
+        ArticleBlock.Paragraph(
+            "Sekarang kita rangkum semuanya jadi satu kerangka utuh: " +
+            "Apa sih artinya \"beriman\"? Dan apa aja yang wajib dipercaya " +
+            "seorang Muslim?"
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("✨ Apa Itu Iman?"),
+        ArticleBlock.Paragraph(
+            "Iman itu bukan cuma ngomong \"aku percaya.\" " +
+            "Iman itu keyakinan di hati yang diucapkan lisan dan " +
+            "dibuktikan lewat perbuatan. Tiga komponen: hati, lisan, " +
+            "dan amal. Kalau cuma ngomong tapi gak yakin di hati? " +
+            "Belum iman. Kalau yakin di hati tapi gak pernah " +
+            "ngelakuin? Belum sempurna."
+        ),
+        ArticleBlock.Paragraph(
+            "Dalam Islam, ada 6 hal yang wajib dipercaya. " +
+            "Namanya Rukun Iman. \"Rukun\" artinya tiang penyangga — " +
+            "kalau salah satu copot, bangunan iman goyah."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("1️⃣ Percaya kepada Allah"),
+        ArticleBlock.Paragraph(
+            "Ini fondasi dari semuanya. Percaya Allah itu ada, " +
+            "Esa, punya sifat-sifat sempurna, dan Dia satu-satunya " +
+            "yang layak disembah. Tanpa ini, yang lain gak ada artinya. " +
+            "Udah kita bahas panjang lebar di modul 1.1 dan 1.2."
+        ),
+        ArticleBlock.Highlight(
+            "Percaya Allah = percaya ada Perancang, dan Dia layak " +
+            "jadi pusat hidupmu."
+        ),
+        ArticleBlock.Subheading("2️⃣ Percaya kepada Malaikat"),
+        ArticleBlock.Paragraph(
+            "Malaikat itu makhluk dari cahaya yang diciptakan Allah. " +
+            "Mereka gak punya nafsu, gak pernah durhaka, " +
+            "dan selalu patuh. Kenapa penting percaya? " +
+            "Karena mereka punya tugas penting: nyampein wahyu, " +
+            "mencatat amal, mendoain orang baik, dan banyak lagi. " +
+            "Mereka bukti kalau alam ini lebih luas dari yang keliatan mata."
+        ),
+        ArticleBlock.Subheading("3️⃣ Percaya kepada Kitab-kitab"),
+        ArticleBlock.Paragraph(
+            "Allah pernah ngasih petunjuk ke manusia lewat " +
+            "beberapa kitab: Taurat (ke Nabi Musa), Zabur (ke Nabi Daud), " +
+            "Injil (ke Nabi Isa), dan Al-Quran (ke Nabi Muhammad ﷺ). " +
+            "Percaya kitab-kitab = percaya Allah itu konsisten ngasih " +
+            "petunjuk dari dulu. Tapi yang terakhir dan terjaga " +
+            "keasliannya adalah Al-Quran."
+        ),
+        ArticleBlock.Subheading("4️⃣ Percaya kepada Rasul-rasul"),
+        ArticleBlock.Paragraph(
+            "Allah gak ninggalin manusia sendirian. Dia ngasih " +
+            "contoh nyata lewat para rasul — manusia biasa yang " +
+            "dipilih buat nyampein pesan-Nya. Dari Nabi Adam sampai " +
+            "Nabi Muhammad ﷺ, semuanya manusia, bukan Tuhan. " +
+            "Percaya rasul = percaya Allah peduli dan ngasih " +
+            "panutan yang bisa diteladani."
+        ),
+        ArticleBlock.Subheading("5️⃣ Percaya kepada Hari Akhir"),
+        ArticleBlock.Paragraph(
+            "Hidup di dunia ini gak selamanya. Akan ada hari " +
+            "di mana semuanya berakhir, dan semua perbuatan " +
+            "akan dihitung. Percaya Hari Akhir = percaya bahwa " +
+            "apa yang kamu lakuin sekarang ada konsekuensinya. " +
+            "Ini bikin hidup lebih bermakna: gak sekadar hidup " +
+            "buat senang-senang, tapi ada tujuan jangka panjang."
+        ),
+        ArticleBlock.Subheading("6️⃣ Percaya kepada Qada dan Qadar"),
+        ArticleBlock.Paragraph(
+            "Qada dan Qadar itu takdir dari Allah — " +
+            "semua yang terjadi udah dalam pengetahuan dan kehendak-Nya. " +
+            "Tapi ini BUKAN berarti kamu pasif. " +
+            "Justru karena Allah udah tahu segalanya, " +
+            "kamu tetep HARUS berusaha. Hasilnya? " +
+            "Itu urusan Allah. Yang penting kamu udah ngelakuin bagianmu."
+        ),
+        ArticleBlock.Highlight(
+            "Qadar itu kayak GPS: rute udah ditentukan, " +
+            "tapi kamu tetep harus nyetir mobilnya."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("💡 Rangkuman Kategori Akidah"),
+        ArticleBlock.Paragraph(
+            "Lima modul ini adalah fondasi kepercayaan seorang Muslim: " +
+            "Tuhan ada → Allah Esa → Al-Quran firman-Nya → " +
+            "Muhammad ﷺ utusan-Nya → dan ada 6 pilar iman " +
+            "yang jadi penyangga."
+        ),
+        ArticleBlock.Paragraph(
+            "Kalau kamu udah paham ini, kamu udah punya dasar " +
+            "yang kuat. Sekarang waktunya naik level: dari \"percaya\" " +
+            "ke \"ngelakuin.\""
+        ),
+        ArticleBlock.Cta(
+            "Kategori Akidah selesai! 🎉 Sekarang lanjut ke tab \"Rukun Islam\" " +
+            "buat belajar 5 pilar yang jadi aksi nyata seorang Muslim. " +
+            "Kamu udah di jalur yang bener! 🚀"
+        )
+    )
+
+    private val akidah1_5Quiz = listOf(
+        QuizQuestion(
+            question = "Iman itu terdiri dari berapa komponen, apa aja?",
+            options = listOf(
+                "Cuma 1: percaya di hati aja",
+                "2: hati dan lisan",
+                "3: hati (keyakinan), lisan (ucapan), dan amal (perbuatan)",
+                "4: hati, lisan, amal, dan doa"
+            ),
+            correctIndex = 2,
+            explanation = "Iman itu tiga komponen: keyakinan di hati, diucapkan lewat lisan, dan dibuktikan lewat perbuatan. Kalau cuma satu aja, belum sempurna."
+        ),
+        QuizQuestion(
+            question = "Kenapa percaya kepada Malaikat itu penting?",
+            options = listOf(
+                "Karena malaikat itu lucu",
+                "Karena mereka bukti alam ini lebih luas dari yang keliatan mata, dan mereka punya tugas penting dari Allah",
+                "Karena semua orang percaya",
+                "Karena malaikat bisa ngasih uang"
+            ),
+            correctIndex = 1,
+            explanation = "Malaikat punya tugas penting: nyampein wahyu, mencatat amal, mendoain orang baik. Mereka bukti kalau ada dimensi lain di luar yang bisa kita lihat."
+        ),
+        QuizQuestion(
+            question = "Apa bedanya kitab-kitab sebelumnya dengan Al-Quran?",
+            options = listOf(
+                "Gak ada bedanya",
+                "Al-Quran lebih pendek",
+                "Al-Quran adalah kitab terakhir dan terjaga keasliannya 100%",
+                "Kitab sebelumnya lebih penting"
+            ),
+            correctIndex = 2,
+            explanation = "Allah ngasih petunjuk lewat beberapa kitab. Tapi yang terakhir dan terjaga 100% keasliannya adalah Al-Quran. Kitab sebelumnya udah mengalami perubahan seiring waktu."
+        ),
+        QuizQuestion(
+            question = "Apa arti percaya Hari Akhir dalam kehidupan sehari-hari?",
+            options = listOf(
+                "Biar takut sama neraka aja",
+                "Bikin hidup lebih bermakna — perbuatan ada konsekuensi, bukan sekadar senang-senang",
+                "Gak ngaruh ke kehidupan",
+                "Biar rajin sedekah aja"
+            ),
+            correctIndex = 1,
+            explanation = "Percaya Hari Akhir bikin hidup lebih bermakna. Kamu tahu apa yang kamu lakuin sekarang ada konsekuensinya — jadi hidup gak sekadar buat senang-senang."
+        ),
+        QuizQuestion(
+            question = "Qada dan Qadar (takdir) berarti kamu pasif dan gak usah usaha?",
+            options = listOf(
+                "Iya, karena udah ditentukan",
+                "Engga — justru kamu WAJIB berusaha, hasilnya serahkan ke Allah",
+                "Tergantung mood",
+                "Cuma buat hal besar aja, hal kecil gak usah"
+            ),
+            correctIndex = 1,
+            explanation = "Qadar itu kayak GPS: rute udah ditentukan, tapi kamu tetep harus nyetir. Kamu WAJIB berusaha — yang penting udah ngelakuin bagianmu, hasilnya urusan Allah."
         )
     )
 
