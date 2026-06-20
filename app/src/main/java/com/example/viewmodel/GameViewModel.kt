@@ -1139,6 +1139,96 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             else -> ""
         }
     }
+
+    // ═══════════════════════════════════════════
+    // LEARNING SYSTEM — Belajar Tab Methods
+    // ═══════════════════════════════════════════
+
+    /**
+     * Save quiz result for a module. If score >= 70%, marks module completed.
+     * Returns true if passed (>=70%), false otherwise.
+     */
+    fun submitModuleQuiz(moduleId: String, scorePercent: Int): Boolean {
+        val state = _gameData.value
+        val existing = state.learningState.progress.find { it.moduleId == moduleId }
+        val passed = scorePercent >= 70
+
+        val updatedProgress = if (existing != null) {
+            state.learningState.progress.map { p ->
+                if (p.moduleId == moduleId) {
+                    p.copy(
+                        completed = p.completed || passed,
+                        quizScore = maxOf(p.quizScore, scorePercent)
+                    )
+                } else p
+            }
+        } else {
+            state.learningState.progress + ModuleProgress(
+                moduleId = moduleId,
+                completed = passed,
+                quizScore = scorePercent
+            )
+        }
+
+        val updatedState = state.copy(
+            learningState = state.learningState.copy(progress = updatedProgress)
+        )
+        _gameData.value = updatedState
+
+        viewModelScope.launch {
+            repository.saveGameState(updatedState)
+        }
+
+        return passed
+    }
+
+    /**
+     * Claim XP reward for a completed module. Only works once per module.
+     * Returns the XP amount claimed, or 0 if already claimed / not completed.
+     */
+    fun claimModuleXp(moduleId: String, xpAmount: Int): Int {
+        val state = _gameData.value
+        val progress = state.learningState.progress.find { it.moduleId == moduleId }
+
+        if (progress == null || !progress.completed || progress.xpClaimed) return 0
+
+        val newXp = state.user.xp + xpAmount
+        val oldLevelInfo = getLevelInfo(state.user.xp)
+        val newLevelInfo = getLevelInfo(newXp)
+
+        val updatedProgress = state.learningState.progress.map { p ->
+            if (p.moduleId == moduleId) p.copy(xpClaimed = true) else p
+        }
+
+        val updatedState = state.copy(
+            user = state.user.copy(xp = newXp, level = newLevelInfo.level),
+            learningState = state.learningState.copy(progress = updatedProgress)
+        )
+
+        _gameData.value = updatedState
+
+        viewModelScope.launch {
+            val badgesList = evaluateBadges(updatedState)
+            val finalData = updatedState.copy(badges = badgesList)
+            _gameData.value = finalData
+            repository.saveGameState(finalData)
+
+            if (newLevelInfo.level > oldLevelInfo.level) {
+                levelUpAnimationEvent.value = newLevelInfo.level
+            }
+
+            _toastEvent.emit("Modul selesai! +$xpAmount XP 🎓")
+        }
+
+        return xpAmount
+    }
+
+    /**
+     * Get the ModuleProgress for a given module ID, or null if not started.
+     */
+    fun getModuleProgress(moduleId: String): ModuleProgress? {
+        return _gameData.value.learningState.progress.find { it.moduleId == moduleId }
+    }
 }
 
 data class LevelInfo(

@@ -82,8 +82,8 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     } else {
-                        // Game Main Screen with 3 tabs switcher
-                        var activeTab by remember { mutableStateOf("home") } // home, quest, profil
+                        // Game Main Screen with 4 tabs switcher
+                        var activeTab by remember { mutableStateOf("home") } // home, quest, belajar, profil
 
                         Scaffold(
                             modifier = Modifier.fillMaxSize(),
@@ -115,6 +115,10 @@ class MainActivity : ComponentActivity() {
                                             state = gameState
                                         )
                                         "quest" -> QuestScreen(
+                                            viewModel = gameViewModel,
+                                            state = gameState
+                                        )
+                                        "belajar" -> BelajarScreen(
                                             viewModel = gameViewModel,
                                             state = gameState
                                         )
@@ -201,7 +205,16 @@ fun CustomGameBottomNavbar(
                     onClick = { onTabSelected("quest") }
                 )
 
-                // Tab 3: Profil
+                // Tab 3: Belajar
+                BottomTabItem(
+                    tag = "belajar",
+                    label = "Belajar",
+                    iconString = "📚",
+                    isActive = activeTab == "belajar",
+                    onClick = { onTabSelected("belajar") }
+                )
+
+                // Tab 4: Profil
                 BottomTabItem(
                     tag = "profil",
                     label = "Profil",

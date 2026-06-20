@@ -87,7 +87,49 @@ data class MuslimLevelingData(
     val rewards: List<String> = emptyList(),
     val zikirCounter: ZikirCounter = ZikirCounter(),
     val comebackCount: Int = 0,
-    val lastCheckedDate: String = ""
+    val lastCheckedDate: String = "",
+    val learningState: LearningState = LearningState()
+)
+
+// ═══════════════════════════════════════════
+// LEARNING SYSTEM — Belajar Tab Data Models
+// ═══════════════════════════════════════════
+
+@JsonClass(generateAdapter = true)
+data class ModuleProgress(
+    val moduleId: String = "",
+    val completed: Boolean = false,
+    val quizScore: Int = 0,        // percentage 0-100
+    val xpClaimed: Boolean = false
+)
+
+@JsonClass(generateAdapter = true)
+data class LearningState(
+    val progress: List<ModuleProgress> = emptyList()
+)
+
+// Non-serializable UI models (not persisted, hardcoded in BelajarScreen.kt)
+data class LearningModule(
+    val id: String,
+    val categoryId: String,
+    val title: String,
+    val icon: String,
+    val estimatedMinutes: Int,
+    val xpReward: Int
+)
+
+data class LearningCategory(
+    val id: String,
+    val label: String,
+    val icon: String,
+    val modules: List<LearningModule>
+)
+
+data class QuizQuestion(
+    val question: String,
+    val options: List<String>,
+    val correctIndex: Int,
+    val explanation: String
 )
 
 fun String.capitalizeCompat(): String {
