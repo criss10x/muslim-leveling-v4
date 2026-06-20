@@ -47,8 +47,16 @@ object LearningContent {
                     icon = "🌌",
                     estimatedMinutes = 4,
                     xpReward = 50
+                ),
+                LearningModule(
+                    id = "akidah_1.2",
+                    categoryId = "akidah",
+                    title = "Kenapa Allah Itu Esa (Tauhid)?",
+                    icon = "☝️",
+                    estimatedMinutes = 5,
+                    xpReward = 60
                 )
-                // Future: akidah_1.2, akidah_1.3, ...
+                // Future: akidah_1.3, akidah_1.4, ...
             )
         ),
         LearningCategory(
@@ -87,6 +95,7 @@ object LearningContent {
     fun getArticleContent(moduleId: String): List<ArticleBlock> {
         return when (moduleId) {
             "akidah_1.1" -> akidah1_1Article
+            "akidah_1.2" -> akidah1_2Article
             "rukun_1.1" -> rukun1_1Article
             "praktik_1.1" -> praktik1_1Article
             else -> emptyList()
@@ -97,6 +106,7 @@ object LearningContent {
     fun getQuizQuestions(moduleId: String): List<QuizQuestion> {
         return when (moduleId) {
             "akidah_1.1" -> akidah1_1Quiz
+            "akidah_1.2" -> akidah1_2Quiz
             "rukun_1.1" -> rukun1_1Quiz
             "praktik_1.1" -> praktik1_1Quiz
             else -> emptyList()
@@ -254,6 +264,183 @@ object LearningContent {
             ),
             correctIndex = 1,
             explanation = "Kalau memang ada Perancang alam semesta, pasti Dia punya tujuan dan petunjuk. Nah itu yang bakal kita pelajari bareng!"
+        )
+    )
+
+    // ═══════════════════════════════════════════
+    // ARTIKEL: AKIDAH 1.2 — Kenapa Allah Itu Esa (Tauhid)?
+    // ═══════════════════════════════════════════
+    private val akidah1_2Article = listOf(
+        ArticleBlock.Heading("Kenapa Allah Itu Esa (Tauhid)?"),
+        ArticleBlock.Paragraph(
+            "Oke, di modul sebelumnya kita udah bahas kalau ada Perancang di balik alam semesta. " +
+            "Pertanyaan selanjutnya: \"Emangnya cuma satu? Bisa dong lebih dari satu?\""
+        ),
+        ArticleBlock.Paragraph(
+            "Pertanyaan ini penting banget, karena jawabannya ngaruh ke cara kita ngelihat " +
+            "seluruh alam semesta. Yuk kita bahas pakai logika yang sama — santai, gak ribet."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("🚗 Analogi: Dua Sopir, Satu Kemudi"),
+        ArticleBlock.Paragraph(
+            "Bayangin kamu naik mobil. Tiba-tiba ada DUA orang yang megang kemudi. " +
+            "Yang satu mau belok kiri, yang satu mau belok kanan. Apa yang terjadi? " +
+            "Kecelakaan. Kacau. Gak ada yang sampai tujuan."
+        ),
+        ArticleBlock.Paragraph(
+            "Sekarang bayangin alam semesta ini. Ada jutaan hukum fisika yang bekerja " +
+            "bersamaan dengan super presisi — gravitasi, elektromagnetik, gaya nuklir kuat dan lemah. " +
+            "Semuanya saling melengkapi, gak konflik satu sama lain."
+        ),
+        ArticleBlock.Paragraph(
+            "Kalau ada DUA \"Tuhan\" dengan kehendak berbeda, " +
+            "pasti ada tabrakan di suatu titik. Satu mau atur gravitasi naik, satu mau turun. " +
+            "Satu mau bikin air mengalir ke bawah, satu mau ke atas. Hasilnya? Kekacauan."
+        ),
+        ArticleBlock.Highlight(
+            "Tapi kenyataannya: alam semesta ini rapi banget. Konsisten miliaran tahun. " +
+            "Itu cuma mungkin kalau ADA SATU sumber kehendak."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("🔬 Bukti dari Keteraturan Kosmos"),
+        ArticleBlock.Paragraph(
+            "Para ilmuwan udah mengamati alam semesta selama ratusan tahun. " +
+            "Dan yang mereka temuin: hukum-hukum alam itu UNIVERSAL. " +
+            "Gravitasi di Bumi sama dengan gravitasi di galaksi lain. " +
+            "Kecepatan cahaya konstan di mana pun."
+        ),
+        ArticleBlock.Paragraph(
+            "Kalau ada lebih dari satu \"pengatur\", " +
+            "mustahil keteraturan ini bisa terjaga konsisten. " +
+            "Bayangin: satu perusahaan aja kalau ada dua CEO yang visinya beda, " +
+            "pasti karyawan bingung. Apalagi alam semesta."
+        ),
+        ArticleBlock.Paragraph(
+            "Jadi logikanya: kalau alam semesta ini teratur dan konsisten, " +
+            "sumbernya pasti SATU. Satu Perancang. Satu Pengatur. " +
+            "Dalam Islam, itu disebut Allah — yang Esa, gak berbilang."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("📜 Tauhid di Awal Sejarah"),
+        ArticleBlock.Paragraph(
+            "Menariknya, konsep \"Tuhan itu Esa\" bukan cuma ajaran Islam. " +
+            "Di awal sejarahnya, hampir semua agama besar ngajarin Tauhid — " +
+            "bahwa Tuhan itu satu."
+        ),
+        ArticleBlock.Paragraph(
+            "Nabi Ibrahim ajarin Tauhid. Nabi Musa ajarin Tauhid. " +
+            "Nabi Isa ajarin Tauhid. Tapi seiring waktu, ajaran itu berubah " +
+            "karena campur tangan manusia. Islam datang sebagai penyempurnaan — " +
+            "mengembalikan ajaran Tauhid murni yang udah ada sejak awal."
+        ),
+        ArticleBlock.Highlight(
+            "Tauhid itu ajaran paling tua dalam sejarah manusia. " +
+            "Islam bukan \"agama baru\" — Islam adalah Tauhid yang asli."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("📖 Ayat Al-Qur'an: Surat Al-Ikhlas"),
+        ArticleBlock.Paragraph(
+            "Surat Al-Ikhlas (QS. 112) adalah inti dari konsep Tauhid. " +
+            "Cuma 4 ayat, tapi isinya ngejelasin konsep ke-Esa-an Allah secara sempurna:"
+        ),
+        ArticleBlock.EducatorNote(
+            "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n\n" +
+            "قُلْ هُوَ اللَّهُ أَحَدٌ ١\n" +
+            "Qul huwallahu ahad. (1)\n" +
+            "Katakanlah: Dia-lah Allah, Yang Maha Esa.\n\n" +
+            "اللَّهُ الصَّمَدُ ٢\n" +
+            "Allahus-samad. (2)\n" +
+            "Allah tempat meminta segala sesuatu.\n\n" +
+            "لَمْ يَلِدْ وَلَمْ يُولَدْ ٣\n" +
+            "Lam yalid wa lam yuulad. (3)\n" +
+            "Dia tidak beranak dan tidak pula diperanakkan.\n\n" +
+            "وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ ٤\n" +
+            "Wa lam yakun lahu kufuwan ahad. (4)\n" +
+            "Dan tidak ada sesuatu pun yang setara dengan Dia."
+        ),
+        ArticleBlock.Paragraph(
+            "\"Al-Ahad\" artinya Yang Maha Esa — bener-bener satu, " +
+            "gak ada duanya, gak ada yang nyamain. \"As-Samad\" artinya " +
+            "tempat bergantung segala sesuatu — Dia butuh siapa-siapa, " +
+            "tapi semua yang ada butuh Dia."
+        ),
+        ArticleBlock.Paragraph(
+            "\"Tidak beranak dan tidak diperanakkan\" artinya Dia gak " +
+            "lahir dari siapa pun dan gak melahirkan siapa pun. " +
+            "Dia ada tanpa sebab — karena Dia SEBAB dari segalanya."
+        ),
+        ArticleBlock.Divider,
+        ArticleBlock.Subheading("💡 Kesimpulan"),
+        ArticleBlock.Paragraph(
+            "Tauhid itu sederhana: Allah itu SATU. Esa. Gak ada duanya. " +
+            "Dan itu bukan cuma soal iman — tapi juga logika. " +
+            "Alam semesta yang teratur ini cuma mungkin kalau sumbernya satu."
+        ),
+        ArticleBlock.Paragraph(
+            "Di modul berikutnya, kita bakal bahas: kalau Allah udah ada " +
+            "dan Esa, terus apa hubungannya sama kita? Dia ngurus kita gak sih? " +
+            "Stay tuned."
+        ),
+        ArticleBlock.Cta(
+            "Selesai baca! Saatnya kuis. Kamu pasti bisa. 🎯"
+        )
+    )
+
+    private val akidah1_2Quiz = listOf(
+        QuizQuestion(
+            question = "Kenapa analogi \"dua sopir, satu kemudi\" dipake di artikel ini?",
+            options = listOf(
+                "Biar seru aja ceritanya",
+                "Buat nunjukin kalau dua kehendak berbeda di satu sistem pasti bikin kacau",
+                "Karena sopir itu penting",
+                "Biar kamu hati-hati naik mobil"
+            ),
+            correctIndex = 1,
+            explanation = "Logikanya: kalau ada dua pihak dengan kehendak beda megang kendali yang sama, hasilnya konflik. Makanya alam semesta yang rapi = bukti satu sumber kehendak."
+        ),
+        QuizQuestion(
+            question = "Apa bukti dari keteraturan kosmos kalau Allah itu Esa?",
+            options = listOf(
+                "Bintang-bintang bentuknya bagus",
+                "Hukum fisika universal dan konsisten miliaran tahun",
+                "Langit biru warnanya cantik",
+                "Bumi itu bulat"
+            ),
+            correctIndex = 1,
+            explanation = "Hukum alam yang konsisten di mana pun dan kapan pun = mustahil kalau ada lebih dari satu \"pengatur\" dengan kehendak berbeda."
+        ),
+        QuizQuestion(
+            question = "Menurut artikel, konsep Tauhid di agama-agama besar itu...",
+            options = listOf(
+                "Baru ada setelah Islam datang",
+                "Cuma ada di Kristen aja",
+                "Udah ada di awal sejarah agama-agama besar, tapi berubah seiring waktu",
+                "Gak ada hubungannya sama Islam"
+            ),
+            correctIndex = 2,
+            explanation = "Di awal sejarahnya, Nabi Ibrahim, Musa, dan Isa semuanya ngajarin Tauhid. Islam datang sebagai penyempurnaan dan pengembalian ke ajaran asli."
+        ),
+        QuizQuestion(
+            question = "Apa arti \"As-Samad\" dalam Surat Al-Ikhlas?",
+            options = listOf(
+                "Yang Maha Kuasa",
+                "Yang Maha Esa",
+                "Tempat meminta / tempat bergantung segala sesuatu",
+                "Yang Maha Pemurah"
+            ),
+            correctIndex = 2,
+            explanation = "As-Samad artinya tempat bergantung. Allah gak butuh siapa-siapa, tapi semua yang ada butuh Dia."
+        ),
+        QuizQuestion(
+            question = "\"Lam yalid wa lam yuulad\" artinya...",
+            options = listOf(
+                "Dia punya banyak anak",
+                "Dia tidak beranak dan tidak diperanakkan",
+                "Dia lahir dari manusia",
+                "Dia punya orang tua"
+            ),
+            correctIndex = 1,
+            explanation = "Allah gak lahir dari siapa pun dan gak melahirkan siapa pun. Dia ada tanpa sebab — karena Dia SEBAB dari segalanya."
         )
     )
 
