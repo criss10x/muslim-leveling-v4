@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.border
 import com.example.viewmodel.RewardRevealState
 import androidx.compose.ui.geometry.Offset
@@ -168,21 +169,9 @@ fun RewardRevealOverlay(
 
     var currentStepIdx by remember { mutableStateOf(0) }
     val currentStep = stepsSequence.getOrElse(currentStepIdx) { -1 }
+    val isLastStep = currentStepIdx >= stepsSequence.size - 1
 
-    // Auto-advance timer: 2.8 seconds per card (was 1.5s — too fast to read)
-    LaunchedEffect(currentStep) {
-        if (currentStep != -1) {
-            delay(2800)
-            if (currentStepIdx < stepsSequence.size - 1) {
-                currentStepIdx++
-            } else {
-                delay(400) // brief pause before dismiss
-                onDismiss()
-            }
-        }
-    }
-
-    // Screen tap skip trigger
+    // Tap-to-advance only — no auto-advance timer, user controls pacing
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -197,27 +186,54 @@ fun RewardRevealOverlay(
             .testTag("reward_reveal_overlay"),
         contentAlignment = Alignment.Center
     ) {
-        AnimatedContent(
-            targetState = currentStep,
-            transitionSpec = {
-                slideInHorizontally { width -> width / 2 } + fadeIn() togetherWith
-                slideOutHorizontally { width -> -width / 2 } + fadeOut()
-            },
-            label = "StepTransition"
-        ) { targetStep ->
-            when (targetStep) {
-                1 -> RewardStepCard_Confirm(state.prayerName)
-                2 -> RewardStepCard_Xp(state.prayerName, state.xpGained)
-                3 -> RewardStepCard_FiveOfFive()
-                4 -> RewardStepCard_GachaUnlock(state.unlockedRewardName ?: "", state.rewardIndex)
-                else -> Box(modifier = Modifier.size(1.dp))
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            // Step indicator dots
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                stepsSequence.forEachIndexed { index, _ ->
+                    Box(
+                        modifier = Modifier
+                            .size(if (index == currentStepIdx) 10.dp else 7.dp)
+                            .background(
+                                if (index == currentStepIdx) Brush.horizontalGradient(GradientGreenGold)
+                                else Brush.horizontalGradient(listOf(DarkSurfaceVariant, DarkSurfaceVariant)),
+                                CircleShape
+                            )
+                            .then(
+                                if (index == currentStepIdx) Modifier.shadow(6.dp, CircleShape, ambientColor = IslamicGreen.copy(alpha = 0.5f))
+                                else Modifier
+                            )
+                    )
+                }
+            }
+
+            AnimatedContent(
+                targetState = currentStep,
+                transitionSpec = {
+                    slideInHorizontally { width -> width / 2 } + fadeIn() togetherWith
+                    slideOutHorizontally { width -> -width / 2 } + fadeOut()
+                },
+                label = "StepTransition"
+            ) { targetStep ->
+                when (targetStep) {
+                    1 -> RewardStepCard_Confirm(state.prayerName, isLastStep)
+                    2 -> RewardStepCard_Xp(state.prayerName, state.xpGained, isLastStep)
+                    3 -> RewardStepCard_FiveOfFive(isLastStep)
+                    4 -> RewardStepCard_GachaUnlock(state.unlockedRewardName ?: "", state.rewardIndex, isLastStep)
+                    else -> Box(modifier = Modifier.size(1.dp))
+                }
             }
         }
     }
 }
 
 @Composable
-fun RewardStepCard_Confirm(prayerName: String) {
+fun RewardStepCard_Confirm(prayerName: String, isLastStep: Boolean) {
     Card(
         modifier = Modifier
             .width(310.dp)
@@ -225,7 +241,7 @@ fun RewardStepCard_Confirm(prayerName: String) {
             .testTag("reward_step_1"),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = DarkSurface),
-        border = BorderStroke(2.dp, IslamicGreen)
+        border = BorderStroke(2.dp, Brush.linearGradient(GradientGreenGold))
     ) {
         Column(
             modifier = Modifier.padding(24.dp),
@@ -234,14 +250,15 @@ fun RewardStepCard_Confirm(prayerName: String) {
             Box(
                 modifier = Modifier
                     .size(80.dp)
+                    .shadow(12.dp, CircleShape, ambientColor = IslamicGreen.copy(alpha = 0.4f))
                     .background(
-                        Brush.radialGradient(listOf(IslamicGreen.copy(alpha = 0.25f), Color.Transparent)),
+                        Brush.radialGradient(listOf(IslamicGreen.copy(alpha = 0.3f), Color.Transparent)),
                         CircleShape
                     )
                     .border(
                         BorderStroke(
                             2.dp,
-                            Brush.linearGradient(listOf(IslamicGreen, CyanAccent, IslamicGreen))
+                            Brush.linearGradient(GradientGreenGold)
                         ),
                         CircleShape
                     ),
@@ -278,12 +295,22 @@ fun RewardStepCard_Confirm(prayerName: String) {
                 lineHeight = 15.sp,
                 modifier = Modifier.padding(top = 10.dp)
             )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = if (isLastStep) "👇 TAP DI MANA AJA BUAT TUTUP" else "👇 TAP DI MANA AJA BUAT LANJUT",
+                fontSize = 10.sp,
+                color = IslamicGreen.copy(alpha = 0.7f),
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
         }
     }
 }
 
 @Composable
-fun RewardStepCard_Xp(prayerName: String, xpGained: Int) {
+fun RewardStepCard_Xp(prayerName: String, xpGained: Int, isLastStep: Boolean) {
     var progressVal by remember { mutableStateOf(0f) }
 
     LaunchedEffect(Unit) {
@@ -303,7 +330,7 @@ fun RewardStepCard_Xp(prayerName: String, xpGained: Int) {
             .testTag("reward_step_2"),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = DarkSurface),
-        border = BorderStroke(2.dp, IslamicGreen)
+        border = BorderStroke(2.dp, Brush.linearGradient(GradientGreenGold))
     ) {
         Column(
             modifier = Modifier.padding(24.dp),
@@ -312,14 +339,15 @@ fun RewardStepCard_Xp(prayerName: String, xpGained: Int) {
             Box(
                 modifier = Modifier
                     .size(80.dp)
+                    .shadow(12.dp, CircleShape, ambientColor = IslamicGreen.copy(alpha = 0.4f))
                     .background(
-                        Brush.radialGradient(listOf(IslamicGreen.copy(alpha = 0.25f), Color.Transparent)),
+                        Brush.radialGradient(listOf(IslamicGreen.copy(alpha = 0.3f), Color.Transparent)),
                         CircleShape
                     )
                     .border(
                         BorderStroke(
                             2.dp,
-                            Brush.linearGradient(listOf(IslamicGreen, CyanAccent, IslamicGreen))
+                            Brush.linearGradient(GradientGreenGold)
                         ),
                         CircleShape
                     ),
@@ -360,12 +388,22 @@ fun RewardStepCard_Xp(prayerName: String, xpGained: Int) {
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 10.dp)
             )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = if (isLastStep) "👇 TAP DI MANA AJA BUAT TUTUP" else "👇 TAP DI MANA AJA BUAT LANJUT",
+                fontSize = 10.sp,
+                color = IslamicGreen.copy(alpha = 0.7f),
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
         }
     }
 }
 
 @Composable
-fun RewardStepCard_FiveOfFive() {
+fun RewardStepCard_FiveOfFive(isLastStep: Boolean) {
     Card(
         modifier = Modifier
             .width(310.dp)
@@ -373,7 +411,7 @@ fun RewardStepCard_FiveOfFive() {
             .testTag("reward_step_3"),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = DarkSurface),
-        border = BorderStroke(2.5.dp, Brush.linearGradient(listOf(GoldAccent, OrangeFlame)))
+        border = BorderStroke(2.5.dp, Brush.linearGradient(GradientGoldAmber))
     ) {
         Column(
             modifier = Modifier
@@ -392,7 +430,15 @@ fun RewardStepCard_FiveOfFive() {
             Box(
                 modifier = Modifier
                     .size(80.dp)
-                    .background(OrangeFlame.copy(alpha = 0.2f), CircleShape),
+                    .shadow(12.dp, CircleShape, ambientColor = OrangeFlame.copy(alpha = 0.4f))
+                    .background(
+                        Brush.radialGradient(listOf(OrangeFlame.copy(alpha = 0.25f), Color.Transparent)),
+                        CircleShape
+                    )
+                    .border(
+                        BorderStroke(2.dp, Brush.linearGradient(GradientGoldAmber)),
+                        CircleShape
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "🔥", fontSize = 44.sp)
@@ -433,12 +479,22 @@ fun RewardStepCard_FiveOfFive() {
                 lineHeight = 15.sp,
                 modifier = Modifier.padding(top = 12.dp)
             )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = if (isLastStep) "👇 TAP DI MANA AJA BUAT TUTUP" else "👇 TAP DI MANA AJA BUAT LANJUT",
+                fontSize = 10.sp,
+                color = GoldAccent.copy(alpha = 0.7f),
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
         }
     }
 }
 
 @Composable
-fun RewardStepCard_GachaUnlock(rewardName: String, iconIndex: Int) {
+fun RewardStepCard_GachaUnlock(rewardName: String, iconIndex: Int, isLastStep: Boolean) {
     val bEmoji = when (iconIndex) {
         1 -> "🌙"
         2 -> "🔱"
@@ -459,7 +515,7 @@ fun RewardStepCard_GachaUnlock(rewardName: String, iconIndex: Int) {
             .testTag("reward_step_4"),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = DarkSurface),
-        border = BorderStroke(2.dp, GoldAccent)
+        border = BorderStroke(2.dp, Brush.linearGradient(GradientGoldAmber))
     ) {
         Column(
             modifier = Modifier.padding(24.dp),
@@ -468,8 +524,12 @@ fun RewardStepCard_GachaUnlock(rewardName: String, iconIndex: Int) {
             Box(
                 modifier = Modifier
                     .size(80.dp)
-                    .background(GoldAccent.copy(alpha = 0.15f), CircleShape)
-                    .border(BorderStroke(2.dp, GoldAccent), CircleShape),
+                    .shadow(12.dp, CircleShape, ambientColor = GoldAccent.copy(alpha = 0.4f))
+                    .background(
+                        Brush.radialGradient(listOf(GoldAccent.copy(alpha = 0.2f), Color.Transparent)),
+                        CircleShape
+                    )
+                    .border(BorderStroke(2.dp, Brush.linearGradient(GradientGoldAmber)), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = bEmoji, fontSize = 40.sp)
@@ -502,6 +562,16 @@ fun RewardStepCard_GachaUnlock(rewardName: String, iconIndex: Int) {
                 textAlign = TextAlign.Center,
                 lineHeight = 15.sp,
                 modifier = Modifier.padding(top = 10.dp)
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = if (isLastStep) "👇 TAP DI MANA AJA BUAT TUTUP" else "👇 TAP DI MANA AJA BUAT LANJUT",
+                fontSize = 10.sp,
+                color = GoldAccent.copy(alpha = 0.7f),
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
             )
         }
     }
