@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.*
+import com.example.ui.components.NeonProgressBar
 import com.example.ui.theme.*
 import com.example.viewmodel.*
 import java.time.LocalDate
@@ -112,10 +114,19 @@ fun ProfileScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("consistency_chart_card"),
+                    .testTag("consistency_chart_card")
+                    .shadow(
+                        elevation = 12.dp,
+                        shape = RoundedCornerShape(20.dp),
+                        ambientColor = IslamicGreen.copy(alpha = 0.15f),
+                        spotColor = IslamicGreen.copy(alpha = 0.08f)
+                    ),
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = DarkSurface),
-                border = BorderStroke(1.dp, IslamicGreen.copy(alpha = 0.2f))
+                border = BorderStroke(
+                    1.dp,
+                    Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.4f), CyanAccent.copy(alpha = 0.2f), IslamicGreen.copy(alpha = 0.4f)))
+                )
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
@@ -259,10 +270,19 @@ fun ProfileHeaderCard(state: MuslimLevelingData, viewModel: GameViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .testTag("profile_header_card"),
+            .testTag("profile_header_card")
+            .shadow(
+                elevation = 14.dp,
+                shape = RoundedCornerShape(20.dp),
+                ambientColor = IslamicGreen.copy(alpha = 0.18f),
+                spotColor = IslamicGreen.copy(alpha = 0.10f)
+            ),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = DarkSurface),
-        border = BorderStroke(1.dp, Color(0xFF1F2937))
+        border = BorderStroke(
+            1.dp,
+            Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.4f), GoldAccent.copy(alpha = 0.25f), IslamicGreen.copy(alpha = 0.4f)))
+        )
     ) {
         Column(
             modifier = Modifier
@@ -336,13 +356,12 @@ fun ProfileHeaderCard(state: MuslimLevelingData, viewModel: GameViewModel) {
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            LinearProgressIndicator(
-                progress = { levelInfo.progress },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(CircleShape),
-                color = IslamicGreen,
+            NeonProgressBar(
+                progress = levelInfo.progress,
+                modifier = Modifier.fillMaxWidth(),
+                height = 9.dp,
+                brush = Brush.horizontalGradient(listOf(IslamicGreen, GoldAccent, IslamicGreen)),
+                glowColor = IslamicGreen,
                 trackColor = DarkSurfaceVariant
             )
 
@@ -378,10 +397,19 @@ fun SmallStatCard(
     icon: String
 ) {
     Card(
-        modifier = modifier,
+        modifier = modifier
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(16.dp),
+                ambientColor = IslamicGreen.copy(alpha = 0.12f),
+                spotColor = IslamicGreen.copy(alpha = 0.08f)
+            ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = DarkSurface),
-        border = BorderStroke(1.dp, IslamicGreen.copy(alpha = 0.15f))
+        border = BorderStroke(
+            1.dp,
+            Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.35f), DarkSurfaceVariant, IslamicGreen.copy(alpha = 0.35f)))
+        )
     ) {
         Row(
             modifier = Modifier.padding(14.dp),
@@ -451,11 +479,11 @@ fun ConsistencyLineChartCanvas(
             }
         }
 
-        // Draw glowing line path
+        // Draw glowing gradient line path
         drawPath(
             path = path,
-            color = IslamicGreen,
-            style = Stroke(width = 6f, cap = StrokeCap.Round)
+            brush = Brush.horizontalGradient(listOf(CyanAccent, IslamicGreen, GoldAccent)),
+            style = Stroke(width = 7f, cap = StrokeCap.Round)
         )
 
         // Draw under-fill gradient
@@ -468,7 +496,7 @@ fun ConsistencyLineChartCanvas(
         drawPath(
             path = fillPath,
             brush = Brush.verticalGradient(
-                listOf(IslamicGreen.copy(alpha = 0.25f), Color.Transparent)
+                listOf(CyanAccent.copy(alpha = 0.18f), IslamicGreen.copy(alpha = 0.10f), Color.Transparent)
             )
         )
 
@@ -564,10 +592,22 @@ fun BadgeItemView(badge: Badge, isUnlocked: Boolean, modifier: Modifier) {
     val borderCol = if (isUnlocked) GoldAccent else Color.Gray.copy(alpha = 0.1f)
 
     Card(
-        modifier = modifier.height(105.dp),
+        modifier = modifier
+            .height(105.dp)
+            .then(
+                if (isUnlocked) Modifier.shadow(
+                    elevation = 8.dp,
+                    shape = RoundedCornerShape(16.dp),
+                    ambientColor = GoldAccent.copy(alpha = 0.25f),
+                    spotColor = GoldAccent.copy(alpha = 0.12f)
+                ) else Modifier
+            ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = containerCol),
-        border = BorderStroke(1.2.dp, borderCol)
+        border = BorderStroke(
+            1.2.dp,
+            if (isUnlocked) Brush.linearGradient(listOf(GoldAccent.copy(alpha = 0.8f), OrangeFlame.copy(alpha = 0.5f), GoldAccent.copy(alpha = 0.8f))) else Brush.linearGradient(listOf(borderCol, borderCol))
+        )
     ) {
         Column(
             modifier = Modifier

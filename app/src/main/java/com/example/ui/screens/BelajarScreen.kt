@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.*
+import com.example.ui.components.NeonProgressBar
 import com.example.ui.theme.*
 import com.example.viewmodel.GameViewModel
 
@@ -3113,14 +3115,23 @@ fun BelajarHubView(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = 16.dp)
+                .then(
+                    if (allCompleted) Modifier.shadow(
+                        elevation = 12.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        ambientColor = GoldAccent.copy(alpha = 0.25f),
+                        spotColor = GoldAccent.copy(alpha = 0.15f)
+                    ) else Modifier
+                ),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = if (allCompleted) GoldAccent.copy(alpha = 0.08f) else DarkSurface
             ),
             border = BorderStroke(
                 1.dp,
-                if (allCompleted) GoldAccent.copy(alpha = 0.4f) else DarkSurfaceVariant
+                if (allCompleted) Brush.linearGradient(listOf(GoldAccent.copy(alpha = 0.7f), OrangeFlame.copy(alpha = 0.4f), GoldAccent.copy(alpha = 0.7f)))
+                else Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.3f), DarkSurfaceVariant, IslamicGreen.copy(alpha = 0.3f)))
             )
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -3160,13 +3171,12 @@ fun BelajarHubView(
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                LinearProgressIndicator(
-                    progress = { progressPercent },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .clip(CircleShape),
-                    color = if (allCompleted) GoldAccent else IslamicGreen,
+                NeonProgressBar(
+                    progress = progressPercent,
+                    modifier = Modifier.fillMaxWidth(),
+                    height = 9.dp,
+                    brush = if (allCompleted) neonGoldBrush() else neonGreenBrush(),
+                    glowColor = if (allCompleted) GoldAccent else IslamicGreen,
                     trackColor = DarkSurfaceVariant
                 )
             }
@@ -3269,8 +3279,8 @@ fun SegmentedControl(
                     .weight(1f)
                     .clip(RoundedCornerShape(10.dp))
                     .background(
-                        if (isSelected) IslamicGreen.copy(alpha = 0.15f)
-                        else Color.Transparent
+                        if (isSelected) Brush.verticalGradient(listOf(IslamicGreen.copy(alpha = 0.25f), IslamicGreen.copy(alpha = 0.08f)))
+                        else Brush.verticalGradient(listOf(Color.Transparent, Color.Transparent))
                     )
                     .clickable { onSelect(index) }
                     .padding(vertical = 10.dp),
@@ -3310,15 +3320,30 @@ fun ModuleCard(
 
     val containerAlpha = if (status == ModuleStatus.LOCKED) 0.5f else 1f
 
+    val moduleBorderBrush = when (status) {
+        ModuleStatus.LOCKED -> Brush.linearGradient(listOf(borderColor, borderColor))
+        ModuleStatus.AVAILABLE -> Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.5f), CyanAccent.copy(alpha = 0.25f), IslamicGreen.copy(alpha = 0.5f)))
+        ModuleStatus.COMPLETED -> Brush.linearGradient(listOf(GoldAccent.copy(alpha = 0.7f), OrangeFlame.copy(alpha = 0.4f), GoldAccent.copy(alpha = 0.7f)))
+        ModuleStatus.CLAIMED -> Brush.linearGradient(listOf(borderColor, borderColor))
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(enabled = status != ModuleStatus.LOCKED) { onClick() },
+            .clickable(enabled = status != ModuleStatus.LOCKED) { onClick() }
+            .then(
+                if (status == ModuleStatus.COMPLETED) Modifier.shadow(
+                    elevation = 10.dp,
+                    shape = RoundedCornerShape(18.dp),
+                    ambientColor = GoldAccent.copy(alpha = 0.2f),
+                    spotColor = GoldAccent.copy(alpha = 0.1f)
+                ) else Modifier
+            ),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
             containerColor = DarkSurface.copy(alpha = containerAlpha)
         ),
-        border = BorderStroke(1.2.dp, borderColor)
+        border = BorderStroke(1.4.dp, moduleBorderBrush)
     ) {
         Row(
             modifier = Modifier
@@ -3333,10 +3358,10 @@ fun ModuleCard(
                     .clip(RoundedCornerShape(14.dp))
                     .background(
                         when (status) {
-                            ModuleStatus.LOCKED -> DarkSurfaceVariant
-                            ModuleStatus.AVAILABLE -> IslamicGreen.copy(alpha = 0.12f)
-                            ModuleStatus.COMPLETED -> GoldAccent.copy(alpha = 0.12f)
-                            ModuleStatus.CLAIMED -> DarkSurfaceVariant
+                            ModuleStatus.LOCKED -> Brush.linearGradient(listOf(DarkSurfaceVariant, DarkSurfaceVariant))
+                            ModuleStatus.AVAILABLE -> Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.22f), CyanAccent.copy(alpha = 0.08f)))
+                            ModuleStatus.COMPLETED -> Brush.linearGradient(listOf(GoldAccent.copy(alpha = 0.22f), OrangeFlame.copy(alpha = 0.08f)))
+                            ModuleStatus.CLAIMED -> Brush.linearGradient(listOf(DarkSurfaceVariant, DarkSurfaceVariant))
                         }
                     ),
                 contentAlignment = Alignment.Center
@@ -3682,12 +3707,12 @@ fun ModuleQuizView(
         }
 
         // Progress bar
-        LinearProgressIndicator(
-            progress = { (currentIndex + 1).toFloat() / questions.size },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(4.dp),
-            color = IslamicGreen,
+        NeonProgressBar(
+            progress = (currentIndex + 1).toFloat() / questions.size,
+            modifier = Modifier.fillMaxWidth(),
+            height = 5.dp,
+            brush = neonGreenBrush(),
+            glowColor = IslamicGreen,
             trackColor = DarkSurfaceVariant
         )
 

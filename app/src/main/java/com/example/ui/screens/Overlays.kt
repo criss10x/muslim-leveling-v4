@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.components.NeonProgressBar
 import com.example.ui.theme.*
 import kotlinx.coroutines.delay
 
@@ -91,8 +92,17 @@ fun LevelUpCelebrationOverlay(
             Box(
                 modifier = Modifier
                     .size(140.dp)
-                    .background(IslamicGreen.copy(alpha = 0.2f), CircleShape)
-                    .border(BorderStroke(4.dp, GoldAccent), CircleShape),
+                    .background(
+                        Brush.radialGradient(listOf(GoldAccent.copy(alpha = 0.25f), IslamicGreen.copy(alpha = 0.1f), Color.Transparent)),
+                        CircleShape
+                    )
+                    .border(
+                        BorderStroke(
+                            4.dp,
+                            Brush.linearGradient(listOf(GoldAccent, OrangeFlame, GoldAccent))
+                        ),
+                        CircleShape
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -223,8 +233,17 @@ fun RewardStepCard_Confirm(prayerName: String) {
             Box(
                 modifier = Modifier
                     .size(80.dp)
-                    .background(IslamicGreen.copy(alpha = 0.15f), CircleShape)
-                    .border(BorderStroke(2.dp, IslamicGreen), CircleShape),
+                    .background(
+                        Brush.radialGradient(listOf(IslamicGreen.copy(alpha = 0.25f), Color.Transparent)),
+                        CircleShape
+                    )
+                    .border(
+                        BorderStroke(
+                            2.dp,
+                            Brush.linearGradient(listOf(IslamicGreen, CyanAccent, IslamicGreen))
+                        ),
+                        CircleShape
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "✅", fontSize = 38.sp)
@@ -292,8 +311,17 @@ fun RewardStepCard_Xp(prayerName: String, xpGained: Int) {
             Box(
                 modifier = Modifier
                     .size(80.dp)
-                    .background(IslamicGreen.copy(alpha = 0.15f), CircleShape)
-                    .border(BorderStroke(2.dp, IslamicGreen), CircleShape),
+                    .background(
+                        Brush.radialGradient(listOf(IslamicGreen.copy(alpha = 0.25f), Color.Transparent)),
+                        CircleShape
+                    )
+                    .border(
+                        BorderStroke(
+                            2.dp,
+                            Brush.linearGradient(listOf(IslamicGreen, CyanAccent, IslamicGreen))
+                        ),
+                        CircleShape
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "⚡", fontSize = 42.sp)
@@ -315,13 +343,12 @@ fun RewardStepCard_Xp(prayerName: String, xpGained: Int) {
                 modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
             )
 
-            LinearProgressIndicator(
-                progress = { animProgress },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(CircleShape),
-                color = IslamicGreen,
+            NeonProgressBar(
+                progress = animProgress,
+                modifier = Modifier.fillMaxWidth(),
+                height = 9.dp,
+                brush = Brush.horizontalGradient(listOf(IslamicGreen, GoldAccent, IslamicGreen)),
+                glowColor = IslamicGreen,
                 trackColor = DarkSurfaceVariant
             )
 

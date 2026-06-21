@@ -21,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -31,13 +32,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ui.screens.*
-import com.example.ui.theme.DarkBackground
-import com.example.ui.theme.DarkSurface
-import com.example.ui.theme.GoldAccent
-import com.example.ui.theme.IslamicGreen
-import com.example.ui.theme.MuslimLevelingTheme
-import com.example.ui.theme.TextLight
-import com.example.ui.theme.TextMuted
+import androidx.compose.ui.graphics.Brush
+import com.example.ui.theme.*
 import com.example.viewmodel.GameViewModel
 
 class MainActivity : ComponentActivity() {
@@ -241,15 +237,34 @@ fun BottomTabItem(
     Column(
         modifier = Modifier
             .testTag("tab_button_$tag")
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(14.dp))
+            .then(
+                if (isActive) Modifier
+                    .background(
+                        Brush.verticalGradient(listOf(IslamicGreen.copy(alpha = 0.18f), IslamicGreen.copy(alpha = 0.05f))),
+                        RoundedCornerShape(14.dp)
+                    )
+                    .border(
+                        1.dp,
+                        Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.6f), GoldAccent.copy(alpha = 0.3f))),
+                        RoundedCornerShape(14.dp)
+                    )
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(14.dp),
+                        ambientColor = IslamicGreen.copy(alpha = 0.35f),
+                        spotColor = IslamicGreen.copy(alpha = 0.2f)
+                    )
+                else Modifier
+            )
             .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 14.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = iconString,
-            fontSize = if (isActive) 22.sp else 18.sp,
+            fontSize = if (isActive) 24.sp else 18.sp,
             color = if (isActive) activeColor else inactiveColor
         )
 
@@ -258,7 +273,7 @@ fun BottomTabItem(
         Text(
             text = label,
             fontSize = 11.sp,
-            fontWeight = if (isActive) FontWeight.Bold else FontWeight.Medium,
+            fontWeight = if (isActive) FontWeight.Black else FontWeight.Medium,
             color = if (isActive) activeColor else inactiveColor
         )
     }

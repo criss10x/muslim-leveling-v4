@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.*
+import com.example.ui.components.NeonProgressBar
 import com.example.ui.theme.*
 import com.example.viewmodel.GameViewModel
 import java.time.LocalDate
@@ -121,14 +122,17 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp)
                     .shadow(
-                        elevation = 16.dp,
+                        elevation = 18.dp,
                         shape = RoundedCornerShape(24.dp),
-                        ambientColor = IslamicGreen.copy(alpha = 0.15f),
-                        spotColor = IslamicGreen.copy(alpha = 0.1f)
+                        ambientColor = IslamicGreen.copy(alpha = 0.25f),
+                        spotColor = IslamicGreen.copy(alpha = 0.15f)
                     ),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = DarkSurface),
-                border = BorderStroke(1.dp, IslamicGreen.copy(alpha = 0.2f))
+                border = BorderStroke(
+                    1.dp,
+                    Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.5f), CyanAccent.copy(alpha = 0.3f), IslamicGreen.copy(alpha = 0.5f)))
+                )
             ) {
                 Column(
                     modifier = Modifier.padding(20.dp),
@@ -481,14 +485,17 @@ fun GameHeaderView(state: MuslimLevelingData, viewModel: GameViewModel) {
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 12.dp)
             .shadow(
-                elevation = 12.dp,
+                elevation = 16.dp,
                 shape = RoundedCornerShape(24.dp),
-                ambientColor = IslamicGreen.copy(alpha = 0.15f),
-                spotColor = IslamicGreen.copy(alpha = 0.1f)
+                ambientColor = IslamicGreen.copy(alpha = 0.22f),
+                spotColor = IslamicGreen.copy(alpha = 0.12f)
             ),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = DarkSurface),
-        border = BorderStroke(1.dp, IslamicGreen.copy(alpha = 0.2f))
+        border = BorderStroke(
+            1.dp,
+            Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.5f), GoldAccent.copy(alpha = 0.25f), IslamicGreen.copy(alpha = 0.5f)))
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -613,26 +620,13 @@ fun GameHeaderView(state: MuslimLevelingData, viewModel: GameViewModel) {
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(10.dp)
-                    .clip(RoundedCornerShape(100.dp))
-                    .background(XpBarTrack)
-                    .shadow(4.dp, RoundedCornerShape(100.dp), ambientColor = IslamicGreen.copy(alpha = 0.3f))
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(fraction = levelInfo.progress)
-                        .background(
-                            Brush.horizontalGradient(
-                                colors = listOf(IslamicGreen, GoldAccent.copy(alpha = 0.8f))
-                            ),
-                            RoundedCornerShape(100.dp)
-                        )
-                )
-            }
+            NeonProgressBar(
+                progress = levelInfo.progress,
+                modifier = Modifier.fillMaxWidth(),
+                height = 10.dp,
+                brush = Brush.horizontalGradient(listOf(IslamicGreen, GoldAccent, IslamicGreen)),
+                glowColor = IslamicGreen
+            )
         }
     }
 }
@@ -654,7 +648,7 @@ fun RitualRingsCanvas(
 
         // Glow effect
         drawCircle(
-            color = RingRed.copy(alpha = 0.08f),
+            color = RingRed.copy(alpha = 0.15f),
             radius = outerRadius + 4.dp.toPx(),
             center = center,
             style = Stroke(width = strokeWidth + 8.dp.toPx())
@@ -683,7 +677,7 @@ fun RitualRingsCanvas(
             val r = (size.minDimension / 2) - 22.dp.toPx()
             // Glow
             drawCircle(
-                color = RingGreen.copy(alpha = 0.06f),
+                color = RingGreen.copy(alpha = 0.12f),
                 radius = r + 4.dp.toPx(),
                 center = center,
                 style = Stroke(width = strokeWidth + 6.dp.toPx())
@@ -718,7 +712,7 @@ fun RitualRingsCanvas(
         }
 
         drawCircle(
-            color = RingBlue.copy(alpha = 0.06f),
+            color = RingBlue.copy(alpha = 0.12f),
             radius = innerRadius + 4.dp.toPx(),
             center = center,
             style = Stroke(width = strokeWidth + 6.dp.toPx())

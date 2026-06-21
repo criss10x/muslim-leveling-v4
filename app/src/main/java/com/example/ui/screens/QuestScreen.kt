@@ -13,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -21,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.MuslimLevelingData
 import com.example.data.Quest
+import com.example.ui.components.NeonProgressBar
 import com.example.ui.theme.*
 import com.example.viewmodel.GameViewModel
 
@@ -156,15 +159,29 @@ fun QuestRowCard(
         else -> IslamicGreen.copy(alpha = 0.2f)
     }
 
+    val cardBorderBrush = when {
+        isClaimed -> Brush.linearGradient(listOf(DarkSurfaceVariant, DarkSurfaceVariant))
+        isCompleted -> Brush.linearGradient(listOf(GoldAccent.copy(alpha = 0.8f), OrangeFlame.copy(alpha = 0.6f), GoldAccent.copy(alpha = 0.8f)))
+        else -> Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.4f), DarkSurfaceVariant, IslamicGreen.copy(alpha = 0.4f)))
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .testTag("quest_card_${quest.id}"),
+            .testTag("quest_card_${quest.id}")
+            .then(
+                if (isCompleted) Modifier.shadow(
+                    elevation = 10.dp,
+                    shape = RoundedCornerShape(16.dp),
+                    ambientColor = GoldAccent.copy(alpha = 0.25f),
+                    spotColor = GoldAccent.copy(alpha = 0.15f)
+                ) else Modifier
+            ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isClaimed) DarkSurface.copy(alpha = 0.5f) else DarkSurface
         ),
-        border = BorderStroke(1.2.dp, borderColor)
+        border = BorderStroke(1.5.dp, cardBorderBrush)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Title + XP badge
@@ -224,13 +241,12 @@ fun QuestRowCard(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    LinearProgressIndicator(
-                        progress = { progressPercent },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(6.dp)
-                            .clip(CircleShape),
-                        color = if (isCompleted) GoldAccent else IslamicGreen,
+                    NeonProgressBar(
+                        progress = progressPercent,
+                        modifier = Modifier.fillMaxWidth(),
+                        height = 7.dp,
+                        brush = if (isCompleted) neonGoldBrush() else neonGreenBrush(),
+                        glowColor = if (isCompleted) GoldAccent else IslamicGreen,
                         trackColor = DarkSurfaceVariant
                     )
                 }
