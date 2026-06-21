@@ -169,13 +169,14 @@ fun RewardRevealOverlay(
     var currentStepIdx by remember { mutableStateOf(0) }
     val currentStep = stepsSequence.getOrElse(currentStepIdx) { -1 }
 
-    // Auto-advance timer: 1.5 seconds per card
+    // Auto-advance timer: 2.8 seconds per card (was 1.5s — too fast to read)
     LaunchedEffect(currentStep) {
         if (currentStep != -1) {
-            delay(1500)
+            delay(2800)
             if (currentStepIdx < stepsSequence.size - 1) {
                 currentStepIdx++
             } else {
+                delay(400) // brief pause before dismiss
                 onDismiss()
             }
         }
@@ -286,13 +287,13 @@ fun RewardStepCard_Xp(prayerName: String, xpGained: Int) {
     var progressVal by remember { mutableStateOf(0f) }
 
     LaunchedEffect(Unit) {
-        delay(100)
+        delay(400)
         progressVal = 0.75f // simulate progress animation bar
     }
 
     val animProgress by animateFloatAsState(
         targetValue = progressVal,
-        animationSpec = tween(durationMillis = 1000)
+        animationSpec = tween(durationMillis = 2200)
     )
 
     Card(

@@ -90,8 +90,7 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkBackground)
-            .muslimPattern()
+            .futuristicBackground()
             .windowInsetsPadding(WindowInsets.statusBars)
     ) {
         Column(
@@ -107,33 +106,44 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             // ═══ RITUAL RINGS — Gaming Card ═══
-            Text(
-                text = "⚔ DAILY QUEST",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Black,
-                color = IslamicGreen,
-                letterSpacing = 2.sp,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .padding(bottom = 12.dp)
+                    .shadow(8.dp, RoundedCornerShape(100.dp), ambientColor = IslamicGreen.copy(alpha = 0.4f))
+                    .background(Brush.horizontalGradient(GradientGreenGold), RoundedCornerShape(100.dp))
+                    .padding(horizontal = 16.dp, vertical = 5.dp)
+            ) {
+                Text(
+                    text = "⚔ DAILY QUEST",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Color.Black,
+                    letterSpacing = 2.sp
+                )
+            }
 
-            // Main rings card with glow border
+            // Main rings card with neon gradient border + glow
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp)
                     .shadow(
-                        elevation = 18.dp,
+                        elevation = 22.dp,
                         shape = RoundedCornerShape(24.dp),
-                        ambientColor = IslamicGreen.copy(alpha = 0.25f),
-                        spotColor = IslamicGreen.copy(alpha = 0.15f)
+                        ambientColor = IslamicGreen.copy(alpha = 0.35f),
+                        spotColor = CyanAccent.copy(alpha = 0.2f)
                     ),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = DarkSurface),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 border = BorderStroke(
-                    1.dp,
-                    Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.5f), CyanAccent.copy(alpha = 0.3f), IslamicGreen.copy(alpha = 0.5f)))
+                    1.5.dp,
+                    Brush.linearGradient(listOf(IslamicGreen, CyanAccent, IslamicGreen))
                 )
             ) {
+                Box(
+                    modifier = Modifier
+                        .background(Brush.verticalGradient(GradientDarkSurface))
+                ) {
                 Column(
                     modifier = Modifier.padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -222,6 +232,7 @@ fun HomeScreen(
                         RingLabelView(color = RingBlue, name = "Tilawah", value = if (tilawahLogged) "Lengkap" else "Belum")
                     }
                 }
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -239,13 +250,20 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "🕐 QUEST SHOLAT HARI INI",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Black,
-                    color = GoldAccent,
-                    letterSpacing = 1.5.sp
-                )
+                Box(
+                    modifier = Modifier
+                        .shadow(6.dp, RoundedCornerShape(100.dp), ambientColor = GoldAccent.copy(alpha = 0.4f))
+                        .background(Brush.horizontalGradient(GradientGoldAmber), RoundedCornerShape(100.dp))
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "🕐 QUEST SHOLAT HARI INI",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.Black,
+                        letterSpacing = 1.5.sp
+                    )
+                }
                 val modeLabel = when (state.user.intensityMode) {
                     "santai" -> "🎮 SANTAI"
                     "sultan" -> "👑 SULTAN"
@@ -321,13 +339,20 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = if (isSultanMode) "🌙 BONUS QUEST — SUNNAH SULTAN" else "🌙 BONUS QUEST — SUNNAH",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Black,
-                        color = RingGreen,
-                        letterSpacing = 1.5.sp
-                    )
+                    Box(
+                        modifier = Modifier
+                            .shadow(6.dp, RoundedCornerShape(100.dp), ambientColor = RingGreen.copy(alpha = 0.4f))
+                            .background(Brush.horizontalGradient(GradientCyanGreen), RoundedCornerShape(100.dp))
+                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = if (isSultanMode) "🌙 BONUS QUEST — SUNNAH SULTAN" else "🌙 BONUS QUEST — SUNNAH",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color.Black,
+                            letterSpacing = 1.5.sp
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -379,15 +404,22 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(modifier = Modifier.weight(1f).height(1.dp).background(RingBlue.copy(alpha = 0.3f)))
-                Text(
-                    text = "📜 SIDE QUEST",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Black,
-                    color = RingBlue,
-                    letterSpacing = 2.sp
-                )
-                Box(modifier = Modifier.weight(1f).height(1.dp).background(RingBlue.copy(alpha = 0.3f)))
+                Box(modifier = Modifier.weight(1f).height(1.dp).background(Brush.horizontalGradient(listOf(Color.Transparent, RingBlue.copy(alpha = 0.6f), Color.Transparent))))
+                Box(
+                    modifier = Modifier
+                        .shadow(5.dp, RoundedCornerShape(100.dp), ambientColor = RingBlue.copy(alpha = 0.4f))
+                        .background(Brush.horizontalGradient(GradientBlueCyan), RoundedCornerShape(100.dp))
+                        .padding(horizontal = 10.dp, vertical = 3.dp)
+                ) {
+                    Text(
+                        text = "📜 SIDE QUEST",
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.Black,
+                        letterSpacing = 2.sp
+                    )
+                }
+                Box(modifier = Modifier.weight(1f).height(1.dp).background(Brush.horizontalGradient(listOf(Color.Transparent, RingBlue.copy(alpha = 0.6f), Color.Transparent))))
             }
 
             Column(
@@ -485,18 +517,21 @@ fun GameHeaderView(state: MuslimLevelingData, viewModel: GameViewModel) {
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 12.dp)
             .shadow(
-                elevation = 16.dp,
+                elevation = 20.dp,
                 shape = RoundedCornerShape(24.dp),
-                ambientColor = IslamicGreen.copy(alpha = 0.22f),
-                spotColor = IslamicGreen.copy(alpha = 0.12f)
+                ambientColor = IslamicGreen.copy(alpha = 0.3f),
+                spotColor = GoldAccent.copy(alpha = 0.18f)
             ),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = DarkSurface),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         border = BorderStroke(
-            1.dp,
-            Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.5f), GoldAccent.copy(alpha = 0.25f), IslamicGreen.copy(alpha = 0.5f)))
+            1.5.dp,
+            Brush.linearGradient(GradientGreenGold)
         )
     ) {
+        Box(
+            modifier = Modifier.background(Brush.verticalGradient(GradientDarkSurface))
+        ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
@@ -627,6 +662,7 @@ fun GameHeaderView(state: MuslimLevelingData, viewModel: GameViewModel) {
                 brush = Brush.horizontalGradient(listOf(IslamicGreen, GoldAccent, IslamicGreen)),
                 glowColor = IslamicGreen
             )
+        }
         }
     }
 }
@@ -810,15 +846,15 @@ fun HeroStreakCard(state: MuslimLevelingData, isSantaiMode: Boolean) {
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
                 .shadow(
-                    elevation = 20.dp,
+                    elevation = 24.dp,
                     shape = RoundedCornerShape(24.dp),
-                    ambientColor = IslamicGreen.copy(alpha = 0.2f),
-                    spotColor = IslamicGreen.copy(alpha = 0.15f)
+                    ambientColor = IslamicGreen.copy(alpha = 0.35f),
+                    spotColor = GoldAccent.copy(alpha = 0.2f)
                 )
                 .testTag("hero_streak_card_active"),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            border = BorderStroke(1.dp, IslamicGreen.copy(alpha = 0.3f))
+            border = BorderStroke(1.5.dp, Brush.linearGradient(GradientGreenGold))
         ) {
             Box(
                 modifier = Modifier
@@ -965,15 +1001,15 @@ fun PrayerRowCard(
     onCheckedChange: (Boolean) -> Unit
 ) {
     val borderStroke = when {
-        isChecked -> BorderStroke(1.5.dp, IslamicGreen.copy(alpha = 0.5f))
-        isActive -> BorderStroke(1.5.dp, GoldAccent.copy(alpha = 0.8f))
+        isChecked -> BorderStroke(1.5.dp, Brush.linearGradient(GradientGreenGold))
+        isActive -> BorderStroke(1.5.dp, Brush.linearGradient(GradientGoldAmber))
         else -> BorderStroke(1.dp, DarkSurfaceVariant)
     }
 
     val containerColor = when {
-        isChecked -> IslamicGreen.copy(alpha = 0.1f)
-        isActive -> DarkSurface
-        else -> DarkSurface.copy(alpha = 0.6f)
+        isChecked -> Brush.verticalGradient(listOf(IslamicGreen.copy(alpha = 0.12f), DarkSurface))
+        isActive -> Brush.verticalGradient(listOf(GoldAccent.copy(alpha = 0.08f), DarkSurface))
+        else -> Brush.verticalGradient(GradientDarkSurface)
     }
 
     val timeColor = when {
@@ -1153,19 +1189,19 @@ fun SunnahActionCard(
     buttonLabel: String = "Catat ✅",
     onLog: () -> Unit
 ) {
-    val cardBg = accentColor.copy(alpha = 0.05f)
-    val cardBorder = accentColor.copy(alpha = 0.2f)
+    val cardBg = Brush.verticalGradient(listOf(accentColor.copy(alpha = 0.08f), DarkSurface))
+    val cardBorder = Brush.linearGradient(listOf(accentColor.copy(alpha = 0.6f), accentColor.copy(alpha = 0.2f), accentColor.copy(alpha = 0.6f)))
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .then(
-                if (!isClaimed) Modifier.shadow(6.dp, RoundedCornerShape(16.dp), ambientColor = accentColor.copy(alpha = 0.15f))
+                if (!isClaimed) Modifier.shadow(8.dp, RoundedCornerShape(16.dp), ambientColor = accentColor.copy(alpha = 0.25f))
                 else Modifier
             )
             .background(cardBg)
-            .border(BorderStroke(1.dp, cardBorder), RoundedCornerShape(16.dp)),
+            .border(BorderStroke(1.5.dp, cardBorder), RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
@@ -1315,13 +1351,13 @@ fun SunnahRowCard(
     onCheckedChange: (Boolean) -> Unit
 ) {
     val borderStroke = when {
-        isChecked -> BorderStroke(1.5.dp, RingGreen.copy(alpha = 0.5f))
+        isChecked -> BorderStroke(1.5.dp, Brush.linearGradient(GradientCyanGreen))
         else -> BorderStroke(1.dp, DarkSurfaceVariant)
     }
 
     val containerColor = when {
-        isChecked -> RingGreen.copy(alpha = 0.1f)
-        else -> DarkSurface.copy(alpha = 0.6f)
+        isChecked -> Brush.verticalGradient(listOf(RingGreen.copy(alpha = 0.12f), DarkSurface))
+        else -> Brush.verticalGradient(GradientDarkSurface)
     }
 
     Card(
