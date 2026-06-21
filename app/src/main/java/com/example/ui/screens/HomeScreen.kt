@@ -107,7 +107,7 @@ fun HomeScreen(
 
             // ═══ RITUAL RINGS — Gaming Card ═══
             Text(
-                text = "⚔ RITUAL RING HARIAN",
+                text = "⚔ DAILY QUEST",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Black,
                 color = IslamicGreen,
@@ -236,7 +236,7 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "🕐 JADWAL SHOLAT HARI INI",
+                    text = "🕐 QUEST SHOLAT HARI INI",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Black,
                     color = GoldAccent,
@@ -318,7 +318,7 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (isSultanMode) "🌙 CHECKLIST SUNNAH (SULTAN)" else "🌙 CHECKLIST SUNNAH & RAWATIB",
+                        text = if (isSultanMode) "🌙 BONUS QUEST — SUNNAH SULTAN" else "🌙 BONUS QUEST — SUNNAH",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Black,
                         color = RingGreen,
@@ -476,84 +476,147 @@ fun GameHeaderView(state: MuslimLevelingData, viewModel: GameViewModel) {
     val levelInfo = viewModel.getLevelInfo(state.user.xp)
     val rankTitle = viewModel.getRankTitle(levelInfo.level)
 
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 18.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(horizontal = 20.dp, vertical = 12.dp)
+            .shadow(
+                elevation = 12.dp,
+                shape = RoundedCornerShape(24.dp),
+                ambientColor = IslamicGreen.copy(alpha = 0.15f),
+                spotColor = IslamicGreen.copy(alpha = 0.1f)
+            ),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = DarkSurface),
+        border = BorderStroke(1.dp, IslamicGreen.copy(alpha = 0.2f))
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.weight(1f)
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            // Level badge with neon glow
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .shadow(
-                        elevation = 8.dp,
-                        shape = CircleShape,
-                        ambientColor = IslamicGreen.copy(alpha = 0.4f),
-                        spotColor = IslamicGreen.copy(alpha = 0.2f)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                // Avatar + level badge combined
+                Box(
+                    contentAlignment = Alignment.BottomEnd,
+                    modifier = Modifier.size(58.dp)
+                ) {
+                    // Avatar circle with gradient
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.radialGradient(
+                                    colors = listOf(
+                                        IslamicGreen.copy(alpha = 0.3f),
+                                        DarkSurfaceVariant
+                                    ),
+                                    radius = 120f
+                                ),
+                                CircleShape
+                            )
+                            .border(
+                                BorderStroke(2.dp, IslamicGreen.copy(alpha = 0.5f)),
+                                CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = state.user.username.take(1).uppercase(),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = TextLight
+                        )
+                    }
+
+                    // Floating level badge
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .offset(x = 4.dp, y = 4.dp)
+                            .background(GoldAccent, CircleShape)
+                            .border(BorderStroke(2.dp, DarkSurface), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "${levelInfo.level}",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color.Black
+                        )
+                    }
+                }
+
+                // User info
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = state.user.username,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextLight
                     )
-                    .background(
-                        Brush.radialGradient(
-                            colors = listOf(IslamicGreen.copy(alpha = 0.2f), DarkSurfaceVariant),
-                            radius = 60f
-                        ),
-                        CircleShape
+                    Text(
+                        text = rankTitle.uppercase(),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = GoldAccent,
+                        letterSpacing = 1.sp
                     )
-                    .border(2.dp, IslamicGreen, CircleShape),
-                contentAlignment = Alignment.Center
+                }
+
+                // Mode badge
+                val modeLabel = when (state.user.intensityMode) {
+                    "santai" -> "🎮 SANTAI"
+                    "sultan" -> "👑 SULTAN"
+                    else -> "⚔ STANDAR"
+                }
+                Box(
+                    modifier = Modifier
+                        .background(IslamicGreen.copy(alpha = 0.12f), RoundedCornerShape(100.dp))
+                        .border(1.dp, IslamicGreen.copy(alpha = 0.35f), RoundedCornerShape(100.dp))
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                ) {
+                    Text(
+                        text = modeLabel,
+                        fontSize = 9.sp,
+                        color = IslamicGreen,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // XP bar section
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "LV",
-                    fontSize = 9.sp,
+                    text = "LV ${levelInfo.level}",
+                    fontSize = 11.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = IslamicGreen,
-                    letterSpacing = 0.5.sp
+                    color = TextMuted
                 )
                 Text(
-                    text = "${levelInfo.level}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Black,
-                    color = TextLight,
-                    modifier = Modifier.offset(y = 10.dp)
+                    text = "XP ${levelInfo.xpInCurrentLevel}/${levelInfo.xpNeededForNextLevel}",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = IslamicGreen
                 )
             }
 
-            Column {
-                Text(
-                    text = rankTitle.uppercase(),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = GoldAccent,
-                    letterSpacing = 1.5.sp
-                )
-                Text(
-                    text = state.user.username,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextLight
-                )
-            }
-        }
+            Spacer(modifier = Modifier.height(6.dp))
 
-        Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = "XP ${levelInfo.xpInCurrentLevel}/${levelInfo.xpNeededForNextLevel}",
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                color = IslamicGreen
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            // Neon XP bar
             Box(
                 modifier = Modifier
-                    .width(100.dp)
-                    .height(8.dp)
+                    .fillMaxWidth()
+                    .height(10.dp)
                     .clip(RoundedCornerShape(100.dp))
                     .background(XpBarTrack)
                     .shadow(4.dp, RoundedCornerShape(100.dp), ambientColor = IslamicGreen.copy(alpha = 0.3f))
@@ -564,7 +627,7 @@ fun GameHeaderView(state: MuslimLevelingData, viewModel: GameViewModel) {
                         .fillMaxWidth(fraction = levelInfo.progress)
                         .background(
                             Brush.horizontalGradient(
-                                colors = listOf(IslamicGreen, IslamicGreen.copy(alpha = 0.7f))
+                                colors = listOf(IslamicGreen, GoldAccent.copy(alpha = 0.8f))
                             ),
                             RoundedCornerShape(100.dp)
                         )
@@ -908,39 +971,53 @@ fun PrayerRowCard(
     onCheckedChange: (Boolean) -> Unit
 ) {
     val borderStroke = when {
-        isChecked -> BorderStroke(1.dp, IslamicGreen.copy(alpha = 0.3f))
-        isActive -> BorderStroke(2.dp, GoldAccent)
+        isChecked -> BorderStroke(1.5.dp, IslamicGreen.copy(alpha = 0.5f))
+        isActive -> BorderStroke(1.5.dp, GoldAccent.copy(alpha = 0.8f))
         else -> BorderStroke(1.dp, DarkSurfaceVariant)
     }
 
     val containerColor = when {
-        isChecked -> IslamicGreen.copy(alpha = 0.08f)
+        isChecked -> IslamicGreen.copy(alpha = 0.1f)
         isActive -> DarkSurface
-        else -> DarkSurface.copy(alpha = 0.7f)
+        else -> DarkSurface.copy(alpha = 0.6f)
     }
 
-    val textColor = when {
+    val timeColor = when {
         isChecked -> IslamicGreen.copy(alpha = 0.7f)
         isActive -> GoldAccent
-        else -> TextLight
+        else -> TextMuted
+    }
+
+    val prayerEmoji = when (name.lowercase()) {
+        "subuh" -> "🌙"
+        "dzuhur" -> "☀️"
+        "ashar" -> "🌤"
+        "maghrib" -> "🌇"
+        "isya" -> "🌃"
+        else -> "🕌"
     }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(18.dp))
             .then(
                 if (isActive) Modifier.shadow(
-                    elevation = 8.dp,
-                    shape = RoundedCornerShape(16.dp),
-                    ambientColor = GoldAccent.copy(alpha = 0.2f),
-                    spotColor = GoldAccent.copy(alpha = 0.1f)
-                ) else Modifier
+                    elevation = 10.dp,
+                    shape = RoundedCornerShape(18.dp),
+                    ambientColor = GoldAccent.copy(alpha = 0.25f),
+                    spotColor = GoldAccent.copy(alpha = 0.15f)
+                ) else Modifier.shadow(
+                    elevation = 4.dp,
+                    shape = RoundedCornerShape(18.dp),
+                    ambientColor = Color.Black.copy(alpha = 0.2f),
+                    spotColor = Color.Black.copy(alpha = 0.1f)
+                )
             )
             .background(containerColor)
-            .border(borderStroke, RoundedCornerShape(16.dp))
+            .border(borderStroke, RoundedCornerShape(18.dp))
             .testTag("prayer_card_${name.lowercase()}"),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Row(
@@ -950,9 +1027,9 @@ fun PrayerRowCard(
                     if (isActive) {
                         drawCircle(
                             Brush.radialGradient(
-                                listOf(GoldAccent.copy(alpha = 0.06f), Color.Transparent),
-                                center = Offset(size.width * 0.15f, size.height * 0.5f),
-                                radius = size.height * 1.5f
+                                listOf(GoldAccent.copy(alpha = 0.08f), Color.Transparent),
+                                center = Offset(size.width * 0.1f, size.height * 0.5f),
+                                radius = size.height * 2f
                             )
                         )
                     }
@@ -963,37 +1040,33 @@ fun PrayerRowCard(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                // Checkbox with glow
+                // Prayer emoji icon
                 Box(
                     modifier = Modifier
-                        .size(24.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .then(
-                            if (isChecked) Modifier.shadow(4.dp, RoundedCornerShape(8.dp), ambientColor = IslamicGreen.copy(alpha = 0.5f))
-                            else if (isActive) Modifier.shadow(4.dp, RoundedCornerShape(8.dp), ambientColor = GoldAccent.copy(alpha = 0.3f))
-                            else Modifier
+                        .size(42.dp)
+                        .background(
+                            if (isChecked) IslamicGreen.copy(alpha = 0.15f)
+                            else if (isActive) GoldAccent.copy(alpha = 0.1f)
+                            else DarkBackground.copy(alpha = 0.5f),
+                            RoundedCornerShape(12.dp)
                         )
-                        .background(if (isChecked) IslamicGreen else Color.Transparent)
                         .border(
                             BorderStroke(
-                                width = if (isChecked) 0.dp else 2.dp,
-                                color = if (isActive) GoldAccent else DarkSurfaceVariant
+                                1.dp,
+                                if (isChecked) IslamicGreen.copy(alpha = 0.3f)
+                                else if (isActive) GoldAccent.copy(alpha = 0.25f)
+                                else DarkSurfaceVariant
                             ),
-                            RoundedCornerShape(8.dp)
-                        )
-                        .clickable { onCheckedChange(!isChecked) },
+                            RoundedCornerShape(12.dp)
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isChecked) {
-                        Text(
-                            text = "✓",
-                            color = Color.Black,
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 14.sp
-                        )
-                    }
+                    Text(
+                        text = prayerEmoji,
+                        fontSize = 20.sp
+                    )
                 }
 
                 Column {
@@ -1001,8 +1074,8 @@ fun PrayerRowCard(
                         Text(
                             text = name,
                             fontSize = 15.sp,
-                            fontWeight = if (isActive || isChecked) FontWeight.Bold else FontWeight.SemiBold,
-                            color = textColor
+                            fontWeight = if (isActive || isChecked) FontWeight.ExtraBold else FontWeight.SemiBold,
+                            color = if (isChecked) IslamicGreen else if (isActive) GoldAccent else TextLight
                         )
                         if (isSantaiMode && !isTrackedInSantai) {
                             Text(
@@ -1021,13 +1094,57 @@ fun PrayerRowCard(
                 }
             }
 
-            Text(
-                text = time,
-                fontSize = 13.sp,
-                color = if (isActive) GoldAccent else TextMuted,
-                fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
-                fontFamily = FontFamily.Monospace
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Text(
+                    text = time,
+                    fontSize = 15.sp,
+                    color = timeColor,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace
+                )
+
+                // Gaming checkbox
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .then(
+                            if (isChecked) Modifier.shadow(
+                                6.dp,
+                                RoundedCornerShape(10.dp),
+                                ambientColor = IslamicGreen.copy(alpha = 0.6f)
+                            )
+                            else if (isActive) Modifier.shadow(
+                                4.dp,
+                                RoundedCornerShape(10.dp),
+                                ambientColor = GoldAccent.copy(alpha = 0.4f)
+                            )
+                            else Modifier
+                        )
+                        .background(if (isChecked) IslamicGreen else Color.Transparent)
+                        .border(
+                            BorderStroke(
+                                width = if (isChecked) 0.dp else 2.dp,
+                                color = if (isActive) GoldAccent else DarkSurfaceVariant
+                            ),
+                            RoundedCornerShape(10.dp)
+                        )
+                        .clickable { onCheckedChange(!isChecked) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isChecked) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = Color.Black,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -1204,24 +1321,25 @@ fun SunnahRowCard(
     onCheckedChange: (Boolean) -> Unit
 ) {
     val borderStroke = when {
-        isChecked -> BorderStroke(1.dp, RingGreen.copy(alpha = 0.3f))
+        isChecked -> BorderStroke(1.5.dp, RingGreen.copy(alpha = 0.5f))
         else -> BorderStroke(1.dp, DarkSurfaceVariant)
     }
 
     val containerColor = when {
-        isChecked -> RingGreen.copy(alpha = 0.06f)
-        else -> DarkSurface.copy(alpha = 0.7f)
-    }
-
-    val textColor = when {
-        isChecked -> RingGreen.copy(alpha = 0.7f)
-        else -> TextLight
+        isChecked -> RingGreen.copy(alpha = 0.1f)
+        else -> DarkSurface.copy(alpha = 0.6f)
     }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
+            .shadow(
+                elevation = if (isChecked) 6.dp else 3.dp,
+                shape = RoundedCornerShape(16.dp),
+                ambientColor = if (isChecked) RingGreen.copy(alpha = 0.2f) else Color.Black.copy(alpha = 0.15f),
+                spotColor = if (isChecked) RingGreen.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.08f)
+            )
             .background(containerColor)
             .border(borderStroke, RoundedCornerShape(16.dp))
             .testTag("sunnah_card_${id}"),
@@ -1237,48 +1355,76 @@ fun SunnahRowCard(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
+                // Icon box
                 Box(
                     modifier = Modifier
-                        .size(22.dp)
-                        .clip(RoundedCornerShape(6.dp))
-                        .then(
-                            if (isChecked) Modifier.shadow(4.dp, RoundedCornerShape(6.dp), ambientColor = RingGreen.copy(alpha = 0.4f))
-                            else Modifier
+                        .size(36.dp)
+                        .background(
+                            if (isChecked) RingGreen.copy(alpha = 0.15f) else DarkBackground.copy(alpha = 0.5f),
+                            RoundedCornerShape(10.dp)
                         )
-                        .background(if (isChecked) RingGreen else Color.Transparent)
                         .border(
                             BorderStroke(
-                                width = if (isChecked) 0.dp else 2.dp,
-                                color = DarkSurfaceVariant
+                                1.dp,
+                                if (isChecked) RingGreen.copy(alpha = 0.3f) else DarkSurfaceVariant
                             ),
-                            RoundedCornerShape(6.dp)
-                        )
-                        .clickable { onCheckedChange(!isChecked) },
+                            RoundedCornerShape(10.dp)
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isChecked) {
-                        Text(
-                            text = "✓",
-                            color = Color.Black,
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 12.sp
-                        )
-                    }
+                    Text(
+                        text = "✨",
+                        fontSize = 16.sp
+                    )
                 }
 
                 Column {
                     Text(
                         text = name,
                         fontSize = 14.sp,
-                        fontWeight = if (isChecked) FontWeight.Normal else FontWeight.Bold,
-                        color = textColor
+                        fontWeight = if (isChecked) FontWeight.ExtraBold else FontWeight.Bold,
+                        color = if (isChecked) RingGreen else TextLight
                     )
                     Text(
                         text = desc,
                         fontSize = 11.sp,
-                        color = TextMuted
+                        color = TextMuted,
+                        lineHeight = 15.sp
+                    )
+                }
+            }
+
+            // Gaming checkbox
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(RoundedCornerShape(9.dp))
+                    .then(
+                        if (isChecked) Modifier.shadow(
+                            5.dp,
+                            RoundedCornerShape(9.dp),
+                            ambientColor = RingGreen.copy(alpha = 0.5f)
+                        ) else Modifier
+                    )
+                    .background(if (isChecked) RingGreen else Color.Transparent)
+                    .border(
+                        BorderStroke(
+                            width = if (isChecked) 0.dp else 2.dp,
+                            color = DarkSurfaceVariant
+                        ),
+                        RoundedCornerShape(9.dp)
+                    )
+                    .clickable { onCheckedChange(!isChecked) },
+                contentAlignment = Alignment.Center
+            ) {
+                if (isChecked) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = Color.Black,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
