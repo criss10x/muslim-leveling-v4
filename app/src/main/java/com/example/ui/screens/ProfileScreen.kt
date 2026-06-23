@@ -1124,9 +1124,18 @@ fun SettingsPanelContent(
                     .background(Brush.horizontalGradient(GradientGreenGold), RoundedCornerShape(12.dp))
                     .clickable {
                         val finalSantai = if (selectedSantaiList.isEmpty()) listOf("subuh", "maghrib", "isya") else selectedSantaiList
+                        // Validate kota: must be from the Indonesian cities list
+                        val validKota = if (IndonesianCities.allCities.contains(kota.trim())) {
+                            kota.trim()
+                        } else {
+                            // Try case-insensitive match
+                            IndonesianCities.allCities.find {
+                                it.equals(kota.trim(), ignoreCase = true)
+                            } ?: state.user.kota // fallback to existing city if invalid
+                        }
                         viewModel.updateProfileSettings(
                             username = username.trim(),
-                            kota = kota.trim(),
+                            kota = validKota,
                             intensityMode = intensityMode,
                             santaiPrayers = finalSantai,
                             notifMode = notifMode,

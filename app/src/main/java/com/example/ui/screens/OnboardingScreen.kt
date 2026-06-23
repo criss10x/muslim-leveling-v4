@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.data.IndonesianCities
 import com.example.ui.components.CityDropdownPicker
 import com.example.ui.theme.*
 
@@ -124,7 +125,9 @@ fun OnboardingScreen(
                                 username.trim().isEmpty() ->
                                     errorMsg = "Oops! Nickname-nya jangan kosong ya 😅"
                                 kota.trim().isEmpty() ->
-                                    errorMsg = "Masukin kota asalmu dulu biar jadwal sholatnya muncul!"
+                                    errorMsg = "Pilih kota asalmu dulu biar jadwal sholatnya muncul!"
+                                !IndonesianCities.allCities.contains(kota.trim()) ->
+                                    errorMsg = "Kotanya nggak ada di daftar nih. Pilih dari dropdown ya! 🙏"
                                 else -> onComplete(username.trim(), intensityMode, kota.trim())
                             }
                         }

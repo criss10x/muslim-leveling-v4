@@ -14,7 +14,10 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +41,13 @@ import com.example.ui.theme.*
  * - Dropdown: DarkSurfaceElevated bg, 8dp rounded corners, max height 240dp
  * - Selected city: teal accent + check icon
  * - Region group headers: GoldAccent, 11sp bold uppercase
+ *
+ * Behaviour:
+ * - Dropdown auto-expands when the field gains focus (readOnly=false).
+ * - User can type to filter the list, but ONLY cities from IndonesianCities
+ *   can be selected — free-text input that doesn't match any city is rejected
+ *   on dismiss (reverted to the last valid value).
+ * - If the text field is cleared, the dropdown shows all cities.
  */
 @Composable
 fun CityDropdownPicker(
@@ -67,11 +77,11 @@ fun CityDropdownPicker(
         OutlinedTextField(
             value = value,
             onValueChange = { typed ->
-                // Typing updates the query and re-opens the dropdown so results show.
-                if (!expanded) expanded = true
+                // Typing updates the query and keeps the dropdown open so results show.
+                expanded = true
                 onValueChange(typed)
             },
-            placeholder = { Text("Cari kota...", color = TextMuted) },
+            placeholder = { Text("Cari atau pilih kota...", color = TextMuted) },
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = TextLight,
@@ -83,6 +93,16 @@ fun CityDropdownPicker(
                 cursorColor = IslamicGreen
             ),
             shape = RoundedCornerShape(12.dp),
+            interactionSource = remember { MutableInteractionSource() }
+                .also { source ->
+                    LaunchedEffect(source) {
+                        source.interactions.collect { interaction ->
+                            if (interaction is FocusInteraction.Focus) {
+                                expanded = true
+                            }
+                        }
+                    }
+                },
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = !expanded }
@@ -90,7 +110,26 @@ fun CityDropdownPicker(
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
+            onDismissRequest = {
+                expanded = false
+                // Validate: if the current text doesn't match a city in the list,
+                // revert to empty so the user knows they must pick from the list.
+                val isValid = IndonesianCities.allCities.any {
+                    it.equals(value.trim(), ignoreCase = true)
+                }
+                if (!isValid && value.isNotBlank()) {
+                    // Try to find a case-insensitive match and use its canonical form
+                    val match = IndonesianCities.allCities.find {
+                        it.equals(value.trim(), ignoreCase = true)
+                    }
+                    if (match != null) {
+                        onValueChange(match)
+                    } else {
+                        // No match — clear the field so user must pick again
+                        onValueChange("")
+                    }
+                }
+            },
             modifier = Modifier
                 .background(DarkSurfaceElevated, RoundedCornerShape(8.dp))
                 .width(IntrinsicSize.Max)
