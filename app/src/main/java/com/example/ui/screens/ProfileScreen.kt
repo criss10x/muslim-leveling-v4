@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.*
+import com.example.notifications.NotificationScheduler
 import com.example.ui.components.CityDropdownPicker
 import com.example.ui.components.NeonProgressBar
 import com.example.ui.theme.*
@@ -1037,6 +1038,78 @@ fun SettingsPanelContent(
                             notifMode = n
                             NotificationHelper.sendTestNotification(context, n)
                         }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ─── Adzan Reminder Toggle ───
+            var adzanEnabled by remember {
+                mutableStateOf(NotificationScheduler.isRemindersEnabled(context))
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(
+                        if (adzanEnabled) IslamicGreen.copy(alpha = 0.12f)
+                        else DarkBackground
+                    )
+                    .border(
+                        BorderStroke(
+                            1.dp,
+                            if (adzanEnabled) IslamicGreen else ArenaBorder
+                        ),
+                        RoundedCornerShape(12.dp)
+                    )
+                    .clickable {
+                        adzanEnabled = !adzanEnabled
+                        NotificationScheduler.setRemindersEnabled(context, adzanEnabled)
+                        if (adzanEnabled && state.prayerTimesCache.timings.subuh.isNotEmpty()) {
+                            val timings = mapOf(
+                                "subuh" to state.prayerTimesCache.timings.subuh,
+                                "dzuhur" to state.prayerTimesCache.timings.dzuhur,
+                                "ashar" to state.prayerTimesCache.timings.ashar,
+                                "maghrib" to state.prayerTimesCache.timings.maghrib,
+                                "isya" to state.prayerTimesCache.timings.isya
+                            )
+                            NotificationScheduler.scheduleAdhanReminders(
+                                context, state.user.kota, timings
+                            )
+                        }
+                    }
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        "🔔 Pengingat Adzan",
+                        fontSize = 13.sp,
+                        color = TextLight,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        if (adzanEnabled) "Aktif — notifikasi tiap waktu sholat"
+                        else "Mati — aktifkan untuk reminder sholat",
+                        fontSize = 10.sp,
+                        color = if (adzanEnabled) IslamicGreen else TextMuted
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .size(width = 44.dp, height = 24.dp)
+                        .clip(RoundedCornerShape(100.dp))
+                        .background(if (adzanEnabled) IslamicGreen else DarkSurfaceVariant)
+                        .border(1.dp, if (adzanEnabled) IslamicGreen else ArenaBorder, RoundedCornerShape(100.dp)),
+                    contentAlignment = if (adzanEnabled) Alignment.CenterEnd else Alignment.CenterStart
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 2.dp)
+                            .size(18.dp)
+                            .background(TextLight, RoundedCornerShape(100.dp))
                     )
                 }
             }

@@ -9,6 +9,7 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.*
+import com.example.notifications.NotificationScheduler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -1014,6 +1015,20 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     val updatedData = _gameData.value.copy(prayerTimesCache = newCache)
                     _gameData.value = updatedData
                     repository.saveGameState(updatedData)
+
+                    // ── Schedule adhan reminders if enabled ──
+                    val timingsMap = mapOf(
+                        "subuh" to newCache.timings.subuh,
+                        "dzuhur" to newCache.timings.dzuhur,
+                        "ashar" to newCache.timings.ashar,
+                        "maghrib" to newCache.timings.maghrib,
+                        "isya" to newCache.timings.isya
+                    )
+                    val ctx = getApplication<Application>()
+                    if (NotificationScheduler.isRemindersEnabled(ctx)) {
+                        NotificationScheduler.scheduleAdhanReminders(ctx, kota, timingsMap)
+                    }
+
                     _toastEvent.emit("Jadwal sholat $kota udah ke-load! ✅")
                 } else {
                     _toastEvent.emit("Gagal load jadwal sholat 😥")

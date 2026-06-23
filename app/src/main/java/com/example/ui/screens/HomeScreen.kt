@@ -169,13 +169,16 @@ fun HomeScreen(
                                 showSunnahRing = isSultanMode || isStandarMode,
                                 modifier = Modifier.fillMaxSize().testTag("ritual_rings_canvas")
                             )
-                            // Center text with glow
+                            // Center text — persentase (bukan 5/5, biar gak tabrakan sama label kanan)
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
+                                val pct = if (wajibDenominator > 0) {
+                                    (checkedTrackedWajibToday * 100 / wajibDenominator)
+                                } else 0
                                 Text(
-                                    text = "$checkedTrackedWajibToday/$wajibDenominator",
-                                    fontSize = 22.sp,
+                                    text = "$pct%",
+                                    fontSize = 24.sp,
                                     fontWeight = FontWeight.Black,
                                     color = IslamicGreen
                                 )
@@ -193,7 +196,7 @@ fun HomeScreen(
                         Column(
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(start = 20.dp)
+                                .padding(start = 24.dp)
                         ) {
                             Text(
                                 text = "RITUAL PROGRESS",
@@ -202,13 +205,13 @@ fun HomeScreen(
                                 fontWeight = FontWeight.ExtraBold,
                                 letterSpacing = 1.2.sp
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
                             RingLabelRow(color = RingRed, name = "Wajib", value = "$checkedTrackedWajibToday/$wajibDenominator")
                             if (isSultanMode || isStandarMode) {
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(6.dp))
                                 RingLabelRow(color = RingGreen, name = "Sunnah", value = "$sunnahCount/8")
                             }
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(6.dp))
                             RingLabelRow(color = RingBlue, name = "Tilawah", value = if (tilawahLogged) "Lengkap" else "Belum")
                         }
                     }
@@ -996,23 +999,24 @@ fun StatCard(stat: StatItem, modifier: Modifier = Modifier) {
 fun RingLabelRow(color: Color, name: String, value: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(8.dp)
-                .shadow(4.dp, CircleShape, ambientColor = color.copy(alpha = 0.5f))
+                .size(6.dp)
+                .shadow(3.dp, CircleShape, ambientColor = color.copy(alpha = 0.5f))
                 .background(color, CircleShape)
         )
         Text(
             text = name,
             fontSize = 11.sp,
             color = TextMuted,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.weight(1f)
         )
         Text(
             text = value,
-            fontSize = 11.sp,
+            fontSize = 12.sp,
             color = color,
             fontWeight = FontWeight.ExtraBold
         )
