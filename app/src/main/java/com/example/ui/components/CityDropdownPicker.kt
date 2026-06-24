@@ -1,8 +1,9 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,13 +15,9 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.foundation.interaction.FocusInteraction
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.*
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -43,7 +40,7 @@ import com.example.ui.theme.*
  * - Region group headers: GoldAccent, 11sp bold uppercase
  *
  * Behaviour:
- * - Dropdown auto-expands when the field gains focus (readOnly=false).
+ * - Dropdown auto-expands when the field gains focus.
  * - User can type to filter the list, but ONLY cities from IndonesianCities
  *   can be selected — free-text input that doesn't match any city is rejected
  *   on dismiss (reverted to the last valid value).
@@ -57,6 +54,15 @@ fun CityDropdownPicker(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val keyboard = LocalSoftwareKeyboardController.current
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    // Auto-expand dropdown when the text field gains focus.
+    LaunchedEffect(isFocused) {
+        if (isFocused) {
+            expanded = true
+        }
+    }
 
     // Pre-compute filtered groups reactively from the current value (search query).
     val filteredGroups by remember(value) {
@@ -93,19 +99,15 @@ fun CityDropdownPicker(
                 cursorColor = IslamicGreen
             ),
             shape = RoundedCornerShape(12.dp),
-            interactionSource = remember { MutableInteractionSource() }
-                .also { source ->
-                    LaunchedEffect(source) {
-                        source.interactions.collect { interaction ->
-                            if (interaction is FocusInteraction.Focus) {
-                                expanded = true
-                            }
-                        }
-                    }
-                },
+            interactionSource = interactionSource,
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = !expanded }
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    expanded = !expanded
+                }
         )
 
         DropdownMenu(
