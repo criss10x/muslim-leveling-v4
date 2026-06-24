@@ -48,6 +48,9 @@ fun JadwalSholatScreen(
     val context = LocalContext.current
     val today = LocalDate.now()
     val todayStr = today.toString()
+
+    // Qibla overlay state
+    var showQibla by remember { mutableStateOf(false) }
     val dateFormatter = DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy")
     val todayFormatted = today.format(dateFormatter)
 
@@ -114,6 +117,36 @@ fun JadwalSholatScreen(
                     color = IslamicGreen,
                     fontWeight = FontWeight.Bold
                 )
+            }
+
+            // Tombol Kompas Kiblat
+            Spacer(modifier = Modifier.height(10.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(8.dp, RoundedCornerShape(14.dp), ambientColor = GoldAccent.copy(alpha = 0.3f))
+                    .background(Brush.horizontalGradient(GradientGoldAmber), RoundedCornerShape(14.dp))
+                    .clickable { showQibla = true }
+                    .padding(vertical = 14.dp, horizontal = 20.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("🧭", fontSize = 20.sp)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        "Kompas Kiblat",
+                        fontWeight = FontWeight.Black,
+                        fontSize = 15.sp,
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "→",
+                        fontSize = 16.sp,
+                        color = Color.Black.copy(alpha = 0.6f),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
 
             // Cache date check
@@ -207,6 +240,14 @@ fun JadwalSholatScreen(
             // NOTIFIKASI SETTINGS (dipindah dari tab Notif)
             // ═══════════════════════════════════════
             NotificationSettingsSection(state = state, context = context)
+        }
+
+        // ─── Qibla overlay ───
+        if (showQibla) {
+            QiblaScreen(
+                cityName = state.user.kota,
+                onBack = { showQibla = false }
+            )
         }
     }
 }
