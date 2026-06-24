@@ -1,9 +1,6 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -20,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.IndonesianCities
@@ -28,24 +29,22 @@ import com.example.ui.theme.*
 /**
  * A searchable dropdown picker for Indonesian cities.
  *
- * Shows a text field that, when focused/clicked, opens a dropdown menu with
- * the city list filtered by the search query. Cities are grouped by region
- * (island) with gold uppercase headers.
+ * Uses Material3 [ExposedDropdownMenuBox] — the official, crash-safe way to
+ * build a combo-box style picker in Jetpack Compose.
  *
  * Design language (Arena Hikmah):
- * - DarkSurface background, IslamicGreen (teal) border on focus
+ * - DarkBackground container, IslamicGreen (teal) border on focus
  * - TextLight text, TextMuted placeholder
- * - Dropdown: DarkSurfaceElevated bg, 8dp rounded corners, max height 240dp
+ * - Dropdown: DarkSurfaceElevated bg, 8dp rounded corners, max height 280dp
  * - Selected city: teal accent + check icon
  * - Region group headers: GoldAccent, 11sp bold uppercase
  *
  * Behaviour:
- * - Dropdown auto-expands when the field gains focus.
- * - User can type to filter the list, but ONLY cities from IndonesianCities
- *   can be selected — free-text input that doesn't match any city is rejected
- *   on dismiss (reverted to the last valid value).
- * - If the text field is cleared, the dropdown shows all cities.
+ * - Tap the field → dropdown opens immediately (readOnly = true, no keyboard).
+ * - User can type to filter; only cities from IndonesianCities can be selected.
+ * - Free-text that doesn't match any city is cleared on dismiss.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CityDropdownPicker(
     value: String,
@@ -53,39 +52,41 @@ fun CityDropdownPicker(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val keyboard = LocalSoftwareKeyboardController.current
-    val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
+    var query by remember { mutableStateOf(value) }
 
-    // Auto-expand dropdown when the text field gains focus.
-    LaunchedEffect(isFocused) {
-        if (isFocused) {
-            expanded = true
-        }
+    // Sync external value → internal query when value changes outside (e.g. reset)
+    LaunchedEffect(value) {
+        if (value != query) query = value
     }
 
-    // Pre-compute filtered groups reactively from the current value (search query).
-    val filteredGroups by remember(value) {
+    val keyboard = LocalSoftwareKeyboardController.current
+
+    // Pre-compute filtered groups reactively from the search query.
+    val filteredGroups by remember(query) {
         derivedStateOf {
-            val query = value.trim()
+            val q = query.trim()
             IndonesianCities.cityGroups.mapNotNull { group ->
-                val matches = if (query.isBlank()) {
+                val matches = if (q.isBlank()) {
                     group.cities
                 } else {
-                    group.cities.filter { it.contains(query, ignoreCase = true) }
+                    group.cities.filter { it.contains(q, ignoreCase = true) }
                 }
                 if (matches.isEmpty()) null else group.copy(cities = matches)
             }
         }
     }
 
-    Box(modifier = modifier) {
+        ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = modifier
+    ) {
         OutlinedTextField(
-            value = value,
+            value = query,
             onValueChange = { typed ->
-                // Typing updates the query and keeps the dropdown open so results show.
-                expanded = true
+                query = typed
                 onValueChange(typed)
+                if (!expanded) expanded = true
             },
             placeholder = { Text("Cari atau pilih kota...", color = TextMuted) },
             singleLine = true,
@@ -99,43 +100,48 @@ fun CityDropdownPicker(
                 cursorColor = IslamicGreen
             ),
             shape = RoundedCornerShape(12.dp),
-            interactionSource = interactionSource,
+            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            ),
             modifier = Modifier
+                .menuAnchor()
                 .fillMaxWidth()
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) {
-                    expanded = !expanded
-                }
         )
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = {
                 expanded = false
-                // Validate: if the current text doesn't match a city in the list,
-                // revert to empty so the user knows they must pick from the list.
+                // Validate: if the text doesn't match a city, clear it.
                 val isValid = IndonesianCities.allCities.any {
-                    it.equals(value.trim(), ignoreCase = true)
+                    it.equals(query.trim(), ignoreCase = true)
                 }
-                if (!isValid && value.isNotBlank()) {
-                    // Try to find a case-insensitive match and use its canonical form
+                if (!isValid && query.isNotBlank()) {
                     val match = IndonesianCities.allCities.find {
-                        it.equals(value.trim(), ignoreCase = true)
+                        it.equals(query.trim(), ignoreCase = true)
                     }
                     if (match != null) {
+                        query = match
                         onValueChange(match)
                     } else {
-                        // No match — clear the field so user must pick again
+                        query = ""
                         onValueChange("")
+                    }
+                } else if (isValid) {
+                    // Sync canonical form
+                    val match = IndonesianCities.allCities.find {
+                        it.equals(query.trim(), ignoreCase = true)
+                    }
+                    if (match != null && match != query) {
+                        query = match
+                        onValueChange(match)
                     }
                 }
             },
             modifier = Modifier
                 .background(DarkSurfaceElevated, RoundedCornerShape(8.dp))
-                .width(IntrinsicSize.Max)
-                .heightIn(max = 240.dp)
+                .heightIn(max = 280.dp)
         ) {
             if (filteredGroups.isEmpty()) {
                 Text(
@@ -165,7 +171,7 @@ fun CityDropdownPicker(
                             )
                         )
                         group.cities.forEach { city ->
-                            val isSelected = city == value
+                            val isSelected = city.equals(value, ignoreCase = true)
                             DropdownMenuItem(
                                 text = {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -188,6 +194,7 @@ fun CityDropdownPicker(
                                     }
                                 },
                                 onClick = {
+                                    query = city
                                     onValueChange(city)
                                     expanded = false
                                     keyboard?.hide()
