@@ -1209,7 +1209,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getXpNeededForLevel(level: Int): Int {
-        return Math.round(100 * (level + 1) * Math.pow(1.15, (level + 1).toDouble())).toInt()
+        // Balanced curve: 20 + 3*level + 0.25*level²
+        // Total XP to level 100 ≈ 102K
+        // Casual (~350 XP/day): ~10 months | Active (~600 XP/day): ~6 months | Hardcore (~1000 XP/day): ~3 months
+        return Math.round(20f + 3f * level + 0.25f * level * level).toInt()
     }
 
     fun getLevelInfo(cumulativeXp: Int): LevelInfo {
@@ -1271,7 +1274,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     else -> "Muslim Mythic Immortal"
                 }
             }
-            else -> "Muslim Mythic Immortal ★${level - 100}"
+            else -> {
+                // Level 100+: each level adds 1 star
+                // 100 → ★1, 101 → ★2, 102 → ★3, ...
+                val stars = level - 99
+                "Muslim Mythic Immortal ★$stars"
+            }
         }
     }
 
