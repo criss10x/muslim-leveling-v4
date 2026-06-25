@@ -58,6 +58,7 @@ fun ProfileScreen(
 ) {
     var showResetConfirm by remember { mutableStateOf(false) }
     var isSettingsExpanded by remember { mutableStateOf(false) }
+    var showStatistikSheet by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -156,6 +157,55 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // ─── STATISTIK BUTTON ───
+            val statistikShape = RoundedCornerShape(16.dp)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showStatistikSheet = true }
+                    .testTag("statistik_button_card")
+                    .shadow(10.dp, statistikShape, ambientColor = IslamicGreen.copy(alpha = 0.25f)),
+                shape = statistikShape,
+                colors = CardDefaults.cardColors(containerColor = DarkSurface),
+                border = BorderStroke(1.dp, Brush.linearGradient(
+                    listOf(IslamicGreen.copy(alpha = 0.6f), CyanAccent.copy(alpha = 0.2f))
+                ))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = "📊", fontSize = 24.sp, modifier = Modifier.padding(end = 12.dp))
+                        Column {
+                            Text(
+                                text = "STATISTIK MINGGUAN",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextLight,
+                                letterSpacing = 1.sp
+                            )
+                            Text(
+                                text = "Bar chart · Win rate · Streak · XP bulan ini",
+                                fontSize = 10.sp,
+                                color = TextMuted
+                            )
+                        }
+                    }
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowUp,
+                        contentDescription = "Buka Statistik",
+                        tint = IslamicGreen,
+                        modifier = Modifier.graphicsLayer { rotationZ = 90f }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             // ─── ACHIEVEMENTS ───
             ArenaSectionPill(text = "PENCAPAIAN & BADGE 🏆", gradient = GradientGreenGold, modifier = Modifier.align(Alignment.Start))
             Spacer(modifier = Modifier.height(10.dp))
@@ -242,6 +292,13 @@ fun ProfileScreen(
             },
             containerColor = DarkSurface,
             shape = RoundedCornerShape(16.dp)
+        )
+    }
+
+    if (showStatistikSheet) {
+        StatistikBottomSheet(
+            state = state,
+            onDismiss = { showStatistikSheet = false }
         )
     }
 }

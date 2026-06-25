@@ -4,11 +4,11 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -25,12 +25,12 @@ import com.example.data.*
 import com.example.ui.theme.*
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
 // ═══════════════════════════════════════════════════════════════
-// ARENA HIKMAH — STATISTIK SCREEN (Weekly Recap)
+// ARENA HIKMAH — STATISTIK BOTTOM SHEET (Weekly Recap)
+// Dipanggil dari ProfileScreen via tombol "Lihat Statistik 📊"
 // Gen Z vibes: bar chart konsistensi, win rate per sholat,
 // streak terpanjang, total XP bulan ini.
 // All charts drawn with Canvas (no external lib).
@@ -61,36 +61,53 @@ private val PRAYER_ACCENT = mapOf(
     "isya" to PurpleNeon
 )
 
+/**
+ * Modal Bottom Sheet yang menampilkan statistik mingguan/bulanan.
+ * Dipanggil dari ProfileScreen.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatistikScreen(
-    state: MuslimLevelingData
+fun StatistikBottomSheet(
+    state: MuslimLevelingData,
+    onDismiss: () -> Unit
 ) {
+    val modalSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
 
-    // ─── Compute stats ───
-    val last7Days = remember(state.prayerLog) { getLast7DaysCompletion(state.prayerLog) }
-    val winRates = remember(state.prayerLog) { getWinRatePerPrayer(state.prayerLog) }
-    val longestStreak = remember(state.prayerLog) { getLongestHeroStreak(state.prayerLog) }
-    val xpThisMonth = remember(state.prayerLog) { getXpThisMonth(state.prayerLog) }
-    val xpByWeek = remember(state.prayerLog) { getXpByWeek(state.prayerLog) }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .futuristicBackground()
-            .windowInsetsPadding(WindowInsets.statusBars)
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = modalSheetState,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        containerColor = DarkBackground,
+        dragHandle = {
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 12.dp)
+                    .width(40.dp)
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(TextMuted.copy(alpha = 0.5f))
+            )
+        }
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp)
-                .padding(top = 16.dp, bottom = 100.dp)
+                .padding(bottom = 40.dp)
         ) {
             // ─── Header ───
             StatistikHeader()
 
             Spacer(modifier = Modifier.height(20.dp))
+
+            // ─── Compute stats ───
+            val last7Days = remember(state.prayerLog) { getLast7DaysCompletion(state.prayerLog) }
+            val winRates = remember(state.prayerLog) { getWinRatePerPrayer(state.prayerLog) }
+            val longestStreak = remember(state.prayerLog) { getLongestHeroStreak(state.prayerLog) }
+            val xpThisMonth = remember(state.prayerLog) { getXpThisMonth(state.prayerLog) }
+            val xpByWeek = remember(state.prayerLog) { getXpByWeek(state.prayerLog) }
 
             // ─── Weekly Bar Chart ───
             WeeklyBarChartCard(last7Days = last7Days)
