@@ -47,7 +47,7 @@ object LearningContent {
                     title = "Kenapa Harus Percaya Ada Tuhan?",
                     icon = "🌌",
                     estimatedMinutes = 4,
-                    xpReward = 40
+                    xpReward = 200
                 ),
                 LearningModule(
                     id = "akidah_1.2",
@@ -55,7 +55,7 @@ object LearningContent {
                     title = "Kenapa Allah Itu Esa (Tauhid)?",
                     icon = "☝️",
                     estimatedMinutes = 5,
-                    xpReward = 40
+                    xpReward = 200
                 ),
                 LearningModule(
                     id = "akidah_1.3",
@@ -63,7 +63,7 @@ object LearningContent {
                     title = "Al-Quran: Firman Tuhan, Bukan Karangan Manusia",
                     icon = "📖",
                     estimatedMinutes = 6,
-                    xpReward = 40
+                    xpReward = 200
                 ),
                 LearningModule(
                     id = "akidah_1.4",
@@ -71,7 +71,7 @@ object LearningContent {
                     title = "Siapa Itu Nabi Muhammad ﷺ?",
                     icon = "🫶",
                     estimatedMinutes = 4,
-                    xpReward = 40
+                    xpReward = 200
                 ),
                 LearningModule(
                     id = "akidah_1.5",
@@ -79,7 +79,7 @@ object LearningContent {
                     title = "Apa Itu Iman dan Rukun Iman?",
                     icon = "💎",
                     estimatedMinutes = 5,
-                    xpReward = 40
+                    xpReward = 200
                 )
             )
         ),
@@ -94,7 +94,7 @@ object LearningContent {
                     title = "5 Rukun Islam: Fondasi Hidup Seorang Muslim",
                     icon = "⭐",
                     estimatedMinutes = 5,
-                    xpReward = 40
+                    xpReward = 200
                 ),
                 LearningModule(
                     id = "rukun_2.2",
@@ -102,7 +102,7 @@ object LearningContent {
                     title = "Syahadat: Gerbang Pertama",
                     icon = "🚪",
                     estimatedMinutes = 4,
-                    xpReward = 40
+                    xpReward = 200
                 ),
                 LearningModule(
                     id = "rukun_2.3",
@@ -110,7 +110,7 @@ object LearningContent {
                     title = "Kenapa Harus Puasa Ramadan?",
                     icon = "🌙",
                     estimatedMinutes = 5,
-                    xpReward = 40
+                    xpReward = 200
                 ),
                 LearningModule(
                     id = "rukun_2.4",
@@ -118,7 +118,7 @@ object LearningContent {
                     title = "Zakat: Kenapa Harus Berbagi?",
                     icon = "💰",
                     estimatedMinutes = 4,
-                    xpReward = 40
+                    xpReward = 200
                 ),
                 LearningModule(
                     id = "rukun_2.5",
@@ -126,7 +126,7 @@ object LearningContent {
                     title = "Haji: Perjalanan Sekali Seumur Hidup",
                     icon = "🕋",
                     estimatedMinutes = 4,
-                    xpReward = 40
+                    xpReward = 200
                 )
             )
         ),
@@ -141,7 +141,7 @@ object LearningContent {
                     title = "Wudhu: Bersih-Bersih Sebelum Menghadap Allah",
                     icon = "💧",
                     estimatedMinutes = 5,
-                    xpReward = 60
+                    xpReward = 200
                 ),
                 LearningModule(
                     id = "praktik_3.2",
@@ -149,7 +149,7 @@ object LearningContent {
                     title = "Syarat Sah & Rukun Sholat",
                     icon = "📋",
                     estimatedMinutes = 4,
-                    xpReward = 60
+                    xpReward = 200
                 ),
                 LearningModule(
                     id = "praktik_3.3",
@@ -157,7 +157,7 @@ object LearningContent {
                     title = "Tata Cara Sholat Step-by-Step",
                     icon = "🧎",
                     estimatedMinutes = 8,
-                    xpReward = 60
+                    xpReward = 200
                 ),
                 LearningModule(
                     id = "praktik_3.4",
@@ -165,7 +165,7 @@ object LearningContent {
                     title = "Bacaan-Bacaan Penting dalam Sholat",
                     icon = "📝",
                     estimatedMinutes = 5,
-                    xpReward = 60
+                    xpReward = 200
                 ),
                 LearningModule(
                     id = "praktik_3.5",
@@ -173,7 +173,7 @@ object LearningContent {
                     title = "Sholat 5 Waktu: Kapan dan Berapa Rakaat?",
                     icon = "⏰",
                     estimatedMinutes = 3,
-                    xpReward = 60
+                    xpReward = 200
                 ),
                 LearningModule(
                     id = "praktik_3.6",
@@ -181,7 +181,7 @@ object LearningContent {
                     title = "Hal-Hal yang Sering Bikin Bingung Pemula",
                     icon = "❓",
                     estimatedMinutes = 5,
-                    xpReward = 60
+                    xpReward = 200
                 )
             )
         )
