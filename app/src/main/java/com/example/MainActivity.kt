@@ -83,8 +83,8 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     } else {
-                        // Game Main Screen with 4 tabs switcher
-                        var activeTab by remember { mutableStateOf("home") } // home, jadwal, belajar, profil
+                        // Game Main Screen with 5 tabs switcher
+                        var activeTab by remember { mutableStateOf("home") } // home, jadwal, belajar, statistik, profil
 
                         Scaffold(
                             modifier = Modifier.fillMaxSize(),
@@ -121,6 +121,9 @@ class MainActivity : ComponentActivity() {
                                         )
                                         "belajar" -> BelajarScreen(
                                             viewModel = gameViewModel,
+                                            state = gameState
+                                        )
+                                        "statistik" -> StatistikScreen(
                                             state = gameState
                                         )
                                         "profil" -> ProfileScreen(
@@ -215,7 +218,16 @@ fun CustomGameBottomNavbar(
                     onClick = { onTabSelected("belajar") }
                 )
 
-                // Tab 4: Profil
+                // Tab 4: Statistik
+                BottomTabItem(
+                    tag = "statistik",
+                    label = "Stats",
+                    iconString = "📊",
+                    isActive = activeTab == "statistik",
+                    onClick = { onTabSelected("statistik") }
+                )
+
+                // Tab 5: Profil
                 BottomTabItem(
                     tag = "profil",
                     label = "Profil",
