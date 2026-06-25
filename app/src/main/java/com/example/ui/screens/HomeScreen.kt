@@ -122,7 +122,12 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // ═══ RITUAL RINGS ═══
+            // Hero Streak Card
+            HeroStreakCard(state = state, isSantaiMode = isSantaiMode)
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // ═══ QUEST PROGRESS (RITUAL RINGS) ═══
             SectionPill(text = "⚔ DAILY QUEST", gradient = GradientGreenGold)
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -189,10 +194,10 @@ fun HomeScreen(
                             RingLabelRow(color = RingRed, name = "Wajib", value = "$checkedTrackedWajibToday/$wajibDenominator")
                             if (isSultanMode || isStandarMode) {
                                 Spacer(modifier = Modifier.height(6.dp))
-                                RingLabelRow(color = RingGreen, name = "Sunnah", value = "$sunnahCount/8")
+                                RingLabelRow(color = GoldAccent, name = "Sunnah", value = "$sunnahCount/8")
                             }
                             Spacer(modifier = Modifier.height(6.dp))
-                            RingLabelRow(color = RingBlue, name = "Tilawah", value = if (tilawahLogged) "Lengkap" else "Belum")
+                            RingLabelRow(color = IslamicGreen, name = "Tilawah", value = if (tilawahLogged) "Lengkap" else "Belum")
                         }
                     }
                 }
@@ -200,11 +205,6 @@ fun HomeScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Hero Streak Card
-            HeroStreakCard(state = state, isSantaiMode = isSantaiMode)
-
-            Spacer(modifier = Modifier.height(20.dp))
 
             // ═══ JADWAL SHOLAT ═══
             Row(
@@ -1142,20 +1142,20 @@ fun RitualRingsCanvas(
             val r = (size.minDimension / 2) - 22.dp.toPx()
             // Glow
             drawCircle(
-                color = RingGreen.copy(alpha = 0.12f),
+                color = GoldAccent.copy(alpha = 0.12f),
                 radius = r + 4.dp.toPx(),
                 center = center,
                 style = Stroke(width = strokeWidth + 6.dp.toPx())
             )
             drawCircle(
-                color = RingGreen.copy(alpha = 0.1f),
+                color = GoldAccent.copy(alpha = 0.1f),
                 radius = r,
                 center = center,
                 style = Stroke(width = strokeWidth)
             )
             if (sunnahProgress > 0f) {
                 drawArc(
-                    color = RingGreen,
+                    color = GoldAccent,
                     startAngle = -90f,
                     sweepAngle = sunnahProgress * 360f,
                     useCenter = false,
@@ -1169,7 +1169,7 @@ fun RitualRingsCanvas(
             outerRadius
         }
 
-        // Inner Ring: Tilawah (Blue Neon)
+        // Inner Ring: Tilawah (Blue Tosca)
         val innerRadius = if (showSunnahRing) {
             (size.minDimension / 2) - 36.dp.toPx()
         } else {
@@ -1177,20 +1177,20 @@ fun RitualRingsCanvas(
         }
 
         drawCircle(
-            color = RingBlue.copy(alpha = 0.12f),
+            color = IslamicGreen.copy(alpha = 0.12f),
             radius = innerRadius + 4.dp.toPx(),
             center = center,
             style = Stroke(width = strokeWidth + 6.dp.toPx())
         )
         drawCircle(
-            color = RingBlue.copy(alpha = 0.1f),
+            color = IslamicGreen.copy(alpha = 0.1f),
             radius = innerRadius,
             center = center,
             style = Stroke(width = strokeWidth)
         )
         if (tilawahProgress > 0f) {
             drawArc(
-                color = RingBlue,
+                color = IslamicGreen,
                 startAngle = -90f,
                 sweepAngle = tilawahProgress * 360f,
                 useCenter = false,
