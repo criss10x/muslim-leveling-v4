@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.rotate
 import androidx.compose.foundation.border
 import com.example.viewmodel.RewardRevealState
+import com.example.viewmodel.TierUpData
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.minDimension
@@ -281,6 +282,377 @@ fun LevelUpCelebrationOverlay(
                     Text(
                         text = "Level $unlockedLevel tercapai!",
                         fontSize = 16.sp,
+                        color = TextLight.copy(alpha = 0.8f),
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(40.dp))
+
+                    Text(
+                        text = "TAP DI MANA AJA BUAT LANJUT 🎮",
+                        fontSize = 11.sp,
+                        color = TextMuted,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TIER UP CELEBRATION — Epic tier transition with beam & emblem
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Returns the primary and secondary colors for a given tier name.
+ * Used to theme the TierUpCelebrationOverlay per tier.
+ */
+private fun getTierColors(tierName: String): Pair<Color, Color> {
+    return when (tierName) {
+        "Warrior"           -> Color(0xFF8B5CF6) to Color(0xFF6366F1)  // Purple→Indigo
+        "Elite"             -> Color(0xFF3B82F6) to Color(0xFF06B6D4)  // Blue→Cyan
+        "Master"            -> Color(0xFF14E8C8) to Color(0xFF10B981)  // Teal→Emerald
+        "Grandmaster"       -> Color(0xFFFFB627) to Color(0xFFFF8A00)  // Gold→Amber
+        "Epic"              -> Color(0xFFFF3D5A) to Color(0xFFEC4899)  // Crimson→Pink
+        "Legend"            -> Color(0xFFE8EDF5) to Color(0xFFFFB627)  // White→Gold
+        "Mythic"            -> Color(0xFFFF3D5A) to Color(0xFFFFB627)  // Crimson→Gold
+        "Mythic Honor"      -> Color(0xFFFFB627) to Color(0xFFFF3D5A)  // Gold→Crimson
+        "Mythic Glory"      -> Color(0xFFE8EDF5) to Color(0xFFFF3D5A)  // White→Crimson
+        "Mythic Immortal"   -> Color(0xFFFFB627) to Color(0xFFE8EDF5)  // Gold→White
+        else                -> Color(0xFF14E8C8) to Color(0xFFFFB627)  // Default teal→gold
+    }
+}
+
+/**
+ * Returns a single emoji/icon symbol for the tier (rendered as text in the emblem).
+ */
+private fun getTierEmoji(tierName: String): String {
+    return when (tierName) {
+        "Warrior"           -> "⚔️"
+        "Elite"             -> "🛡️"
+        "Master"            -> "🎓"
+        "Grandmaster"       -> "👑"
+        "Epic"              -> "🔥"
+        "Legend"            -> "⭐"
+        "Mythic"            -> "💎"
+        "Mythic Honor"      -> "💎"
+        "Mythic Glory"      -> "🏆"
+        "Mythic Immortal"   -> "🌟"
+        else                -> "✨"
+    }
+}
+
+@Composable
+fun TierUpCelebrationOverlay(
+    tierUpData: TierUpData,
+    onDismiss: () -> Unit
+) {
+    var phase by remember { mutableStateOf(0) }
+    // 0 = dark w/ subtle glow + "TIER UP" text incoming
+    // 1 = old tier name fades out, beam sweeps
+    // 2 = burst particles + new tier emblem slams in
+    // 3 = full reveal with congratulatory text
+
+    val (primaryColor, secondaryColor) = getTierColors(tierUpData.newTierName)
+    val tierEmoji = getTierEmoji(tierUpData.newTierName)
+
+    LaunchedEffect(Unit) {
+        delay(400)
+        phase = 1   // old tier fade out + beam
+        delay(600)
+        phase = 2   // burst + emblem
+        delay(800)
+        phase = 3   // reveal
+    }
+
+    // Emblem scale (slam-in effect)
+    val emblemScale by animateFloatAsState(
+        targetValue = when (phase) {
+            0, 1 -> 0f
+            2 -> 1.4f
+            else -> 1f
+        },
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        label = "tier_emblem_scale"
+    )
+
+    // Emblem rotation (slight tilt on slam, settle to 0)
+    val emblemRotation by animateFloatAsState(
+        targetValue = when (phase) {
+            2 -> -8f
+            else -> 0f
+        },
+        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+        label = "tier_emblem_rotation"
+    )
+
+    // Particle burst progress
+    val particleProgress by animateFloatAsState(
+        targetValue = if (phase >= 2) 1f else 0f,
+        animationSpec = tween(durationMillis = 900, easing = LinearOutSlowInEasing),
+        label = "tier_particle_progress"
+    )
+
+    // Rotating glow ring (infinite, visible from phase 2)
+    val infiniteTransition = rememberInfiniteTransition(label = "tier_overlay_glow")
+    val ringRotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 8000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "tier_ring_rotation"
+    )
+
+    // Beam sweep (phase 1 → 2 transition)
+    val beamProgress by animateFloatAsState(
+        targetValue = when (phase) {
+            0 -> 0f
+            1 -> 0.5f
+            else -> 1f
+        },
+        animationSpec = tween(durationMillis = 800, easing = LinearOutSlowInEasing),
+        label = "tier_beam_progress"
+    )
+
+    // Old tier alpha (fades out during phase 1)
+    val oldTierAlpha by animateFloatAsState(
+        targetValue = when (phase) {
+            0 -> 1f
+            1 -> 0f
+            else -> 0f
+        },
+        animationSpec = tween(durationMillis = 500),
+        label = "old_tier_alpha"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.92f))
+            .clickable { if (phase == 3) onDismiss() }
+            .testTag("tier_up_overlay"),
+        contentAlignment = Alignment.Center
+    ) {
+        // ── Radial glow background (tier-colored) ──
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .drawBehind {
+                    val glowIntensity = when {
+                        phase >= 2 -> 0.55f
+                        phase >= 1 -> 0.35f
+                        else -> 0.15f
+                    }
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                primaryColor.copy(alpha = glowIntensity),
+                                secondaryColor.copy(alpha = glowIntensity * 0.4f),
+                                Color.Transparent
+                            ),
+                            center = center,
+                            radius = size.width / 1.3f
+                        )
+                    )
+                }
+        )
+
+        // ── Beam sweep (diagonal light, phase 1→2) ──
+        if (beamProgress in 0.01f..0.99f) {
+            Canvas(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .testTag("tier_beam")
+            ) {
+                val beamWidth = size.width * 0.3f
+                val beamX = -beamWidth + (size.width + beamWidth * 2) * beamProgress
+                drawRect(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            primaryColor.copy(alpha = 0.15f),
+                            Color.White.copy(alpha = 0.3f),
+                            primaryColor.copy(alpha = 0.15f),
+                            Color.Transparent
+                        ),
+                        start = Offset(beamX - beamWidth, 0f),
+                        end = Offset(beamX + beamWidth, size.height)
+                    ),
+                    size = size
+                )
+            }
+        }
+
+        // ── Particle burst (phase ≥ 2) ──
+        if (phase >= 2) {
+            Canvas(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .testTag("tier_particles")
+            ) {
+                drawParticleBurst(
+                    center = center,
+                    progress = particleProgress,
+                    teal = primaryColor,
+                    gold = secondaryColor
+                )
+            }
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(32.dp)
+                .testTag("tier_up_container")
+        ) {
+            // ── Old tier name (fades out in phase 1) ──
+            if (oldTierAlpha > 0.01f) {
+                Text(
+                    text = tierUpData.oldTierName.uppercase(),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = TextMuted.copy(alpha = oldTierAlpha),
+                    letterSpacing = 3.sp,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // ── Tier Emblem (phase ≥ 2) ──
+            if (phase >= 2) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.size(240.dp)
+                ) {
+                    // Rotating glow ring (outer)
+                    Canvas(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .rotate(ringRotation)
+                    ) {
+                        drawRotatingGlowRing(
+                            center = center,
+                            radius = size.minDimension / 2f * 0.95f,
+                            teal = primaryColor,
+                            gold = secondaryColor
+                        )
+                    }
+
+                    // Emblem disc (scales & rotates in)
+                    Canvas(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .scale(emblemScale)
+                            .rotate(emblemRotation)
+                    ) {
+                        // Outer ring
+                        drawCircle(
+                            color = primaryColor.copy(alpha = 0.3f),
+                            radius = size.minDimension / 2f * 0.85f,
+                            style = Stroke(width = 3.dp.toPx())
+                        )
+                        // Filled disc with gradient
+                        drawCircle(
+                            brush = Brush.radialGradient(
+                                colors = listOf(
+                                    secondaryColor.copy(alpha = 0.4f),
+                                    primaryColor.copy(alpha = 0.2f),
+                                    DarkSurface.copy(alpha = 0.9f)
+                                ),
+                                center = center,
+                                radius = size.minDimension / 2f * 0.78f
+                            ),
+                            radius = size.minDimension / 2f * 0.78f
+                        )
+                        // Inner decorative ring
+                        drawCircle(
+                            color = primaryColor.copy(alpha = 0.5f),
+                            radius = size.minDimension / 2f * 0.65f,
+                            style = Stroke(width = 1.5.dp.toPx())
+                        )
+                    }
+
+                    // Tier emoji in center (scales with emblem)
+                    Text(
+                        text = tierEmoji,
+                        fontSize = 56.sp,
+                        modifier = Modifier.scale(emblemScale)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
+            // ── TIER UP banner (phase ≥ 2) ──
+            AnimatedVisibility(
+                visible = phase >= 2,
+                enter = fadeIn(animationSpec = tween(500)) + scaleIn(
+                    initialScale = 0.5f,
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                )
+            ) {
+                Text(
+                    text = "TIER UP!",
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Black,
+                    color = primaryColor,
+                    letterSpacing = 4.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            // ── New tier name + rank (phase 3) ──
+            AnimatedVisibility(
+                visible = phase == 3,
+                enter = fadeIn(animationSpec = tween(400)) + slideInVertically(
+                    initialOffsetY = { it / 2 },
+                    animationSpec = tween(500, easing = FastOutSlowInEasing)
+                )
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "SELAMAT, PEJUANG! 🎉",
+                        fontSize = 14.sp,
+                        color = TextLight,
+                        fontWeight = FontWeight.Medium,
+                        letterSpacing = 1.5.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // New tier name (big)
+                    Text(
+                        text = tierUpData.newTierName.uppercase(),
+                        fontSize = 32.sp,
+                        color = secondaryColor,
+                        fontWeight = FontWeight.Black,
+                        textAlign = TextAlign.Center,
+                        letterSpacing = 2.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    // Full rank title
+                    Text(
+                        text = tierUpData.rankTitle,
+                        fontSize = 18.sp,
+                        color = primaryColor,
+                        fontWeight = FontWeight.ExtraBold,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Tier baru tercapai di Level ${tierUpData.unlockedLevel}!",
+                        fontSize = 14.sp,
                         color = TextLight.copy(alpha = 0.8f),
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center

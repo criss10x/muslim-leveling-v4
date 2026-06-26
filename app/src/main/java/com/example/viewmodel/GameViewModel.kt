@@ -38,6 +38,18 @@ data class RewardRevealState(
     val rewardIndex: Int = 1
 )
 
+/**
+ * Tier-up celebration data. Triggered when player crosses a tier boundary
+ * (e.g. Warrior→Elite, Elite→Master, Master→Grandmaster, Grandmaster→Epic,
+ * Epic→Legend, Legend→Mythic, Mythic→Mythic Honor, etc.)
+ */
+data class TierUpData(
+    val newTierName: String,      // e.g. "Elite", "Master", "Mythic Honor"
+    val oldTierName: String,      // e.g. "Warrior", "Elite"
+    val unlockedLevel: Int,       // The level at which the tier-up occurred
+    val rankTitle: String         // Full rank title e.g. "Muslim Elite V"
+)
+
 class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: GameRepository
@@ -54,6 +66,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     // Celebration events
     val levelUpAnimationEvent = MutableStateFlow<Int?>(null)
+    val tierUpAnimationEvent = MutableStateFlow<TierUpData?>(null)
     val rewardRevealEvent = MutableStateFlow<RewardRevealState?>(null)
 
     // For KEMENAG prayer time loading state
@@ -625,6 +638,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             if (didLevelUp) {
                 // If causes level-up, we show Level-up celebration screen first!
                 levelUpAnimationEvent.value = newLevelInfo.level
+                // Tier-up celebration (triggered alongside level-up, shown after)
+                checkTierUp(oldLevelInfo.level, newLevelInfo.level)?.let { tierData ->
+                    tierUpAnimationEvent.value = tierData
+                }
             }
 
             // Gacha reveal sequence
@@ -821,6 +838,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
             if (newLevelInfo.level > oldLevelInfo.level) {
                 levelUpAnimationEvent.value = newLevelInfo.level
+                checkTierUp(oldLevelInfo.level, newLevelInfo.level)?.let { tierData ->
+                    tierUpAnimationEvent.value = tierData
+                }
             }
 
             _toastEvent.emit("Quest '${quest.desc}' diklaim! +${quest.xpReward} XP")
@@ -1326,6 +1346,43 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Extracts the base tier name from a level, ignoring division/suffix.
+     * Returns one of: "Warrior", "Elite", "Master", "Grandmaster", "Epic",
+     * "Legend", "Mythic", "Mythic Honor", "Mythic Glory", "Mythic Immortal"
+     */
+    fun getTierName(level: Int): String {
+        return when {
+            level in 1..9 -> "Warrior"
+            level in 10..19 -> "Elite"
+            level in 20..29 -> "Master"
+            level in 30..39 -> "Grandmaster"
+            level in 40..59 -> "Epic"
+            level in 60..79 -> "Legend"
+            level in 80..84 -> "Mythic"
+            level in 85..89 -> "Mythic Honor"
+            level in 90..94 -> "Mythic Glory"
+            else -> "Mythic Immortal" // 95+
+        }
+    }
+
+    /**
+     * Checks whether leveling from oldLevel to newLevel crosses a tier boundary.
+     * Returns TierUpData if so, null otherwise.
+     */
+    private fun checkTierUp(oldLevel: Int, newLevel: Int): TierUpData? {
+        if (newLevel <= oldLevel) return null
+        val oldTier = getTierName(oldLevel)
+        val newTier = getTierName(newLevel)
+        if (oldTier == newTier) return null
+        return TierUpData(
+            newTierName = newTier,
+            oldTierName = oldTier,
+            unlockedLevel = newLevel,
+            rankTitle = getRankTitle(newLevel)
+        )
+    }
+
     // ═══════════════════════════════════════════
     // LEARNING SYSTEM — Belajar Tab Methods
     // ═══════════════════════════════════════════
@@ -1414,6 +1471,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
             if (finalLevelInfo.level > oldLevelInfo.level) {
                 levelUpAnimationEvent.value = finalLevelInfo.level
+                checkTierUp(oldLevelInfo.level, finalLevelInfo.level)?.let { tierData ->
+                    tierUpAnimationEvent.value = tierData
+                }
             }
 
             _toastEvent.emit("Modul selesai! +$xpAmount XP 🎓$bonusMsg")

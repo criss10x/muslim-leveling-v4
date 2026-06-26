@@ -134,6 +134,7 @@ class MainActivity : ComponentActivity() {
 
                         // Celebrate and rewards reveal dialogs overlays
                         val levelUpEvent by gameViewModel.levelUpAnimationEvent.collectAsStateWithLifecycle()
+                        val tierUpEvent by gameViewModel.tierUpAnimationEvent.collectAsStateWithLifecycle()
                         val rewardRevealEvent by gameViewModel.rewardRevealEvent.collectAsStateWithLifecycle()
 
                         if (levelUpEvent != null) {
@@ -143,10 +144,14 @@ class MainActivity : ComponentActivity() {
                                 rankTitle = gameViewModel.getRankTitle(lv),
                                 onDismiss = { gameViewModel.levelUpAnimationEvent.value = null }
                             )
-                        }
-
-                        if (rewardRevealEvent != null && levelUpEvent == null) {
-                            // If level-up exists, complete it first, then show reward reveal sequence
+                        } else if (tierUpEvent != null) {
+                            // Tier-up shown after level-up dismissed
+                            TierUpCelebrationOverlay(
+                                tierUpData = tierUpEvent!!,
+                                onDismiss = { gameViewModel.tierUpAnimationEvent.value = null }
+                            )
+                        } else if (rewardRevealEvent != null) {
+                            // Reward reveal sequence shown last
                             RewardRevealOverlay(
                                 state = rewardRevealEvent!!,
                                 onDismiss = { gameViewModel.rewardRevealEvent.value = null }
