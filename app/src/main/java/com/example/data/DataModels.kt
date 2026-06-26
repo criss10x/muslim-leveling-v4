@@ -92,6 +92,7 @@ data class MuslimLevelingData(
     val quests: QuestState = QuestState(),
     val badges: List<String> = emptyList(),
     val rewards: List<String> = emptyList(),
+    val dailyChestOpenedDate: String = "",   // yyyy-MM-dd when chest last opened ("" = never)
     val zikirCounter: ZikirCounter = ZikirCounter(),
     val comebackCount: Int = 0,
     val lastCheckedDate: String = "",

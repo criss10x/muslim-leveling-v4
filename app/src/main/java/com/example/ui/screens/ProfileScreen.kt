@@ -217,10 +217,8 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ─── REWARDS ───
-            ArenaSectionPill(text = "REWARD MINGGU INI 🎁", gradient = GradientGoldAmber, modifier = Modifier.align(Alignment.Start))
-            Spacer(modifier = Modifier.height(10.dp))
-            RewardCollectorGallery(collectedRewards = state.rewards)
+            // Reward Collector Gallery removed — replaced by Daily Reward Chest (Quest tab)
+            // Rewards list tetap disimpan di data model, tapi tidak ditampilkan di Profile lagi.
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -847,102 +845,8 @@ fun BadgeItemView(badge: Badge, isUnlocked: Boolean, modifier: Modifier) {
     }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// REWARD COLLECTOR GALLERY
-// ═══════════════════════════════════════════════════════════════
-@Composable
-fun RewardCollectorGallery(collectedRewards: List<String>) {
-    val poolOfTen = listOf(
-        "Lencana Bulan Sabit Menyala",
-        "Efek Aura Sultan",
-        "Bingkai Penjelajah Subuh",
-        "Gelar Pembasmi Sunyi Tahajjud",
-        "Ikon Ramuan Mana Dzikir",
-        "Segel Penjaga Maghrib",
-        "Jejak Api Istiqomah",
-        "Jubah Bijak Al-Qur'an",
-        "Sayap Gacha Malaikat",
-        "Pedang Sholat Mitik"
-    )
-
-    val galleryShape = RoundedCornerShape(18.dp)
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(10.dp, galleryShape, ambientColor = GoldAccent.copy(alpha = 0.15f))
-            .background(DarkSurface, galleryShape)
-            .border(BorderStroke(1.dp, ArenaBorder), galleryShape)
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Gacha Loot (${collectedRewards.size}/10):",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = GoldAccent,
-            fontFamily = FontFamily.Monospace,
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
-
-        Row(
-            modifier = Modifier.horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            poolOfTen.forEachIndexed { idx, item ->
-                val isUnlocked = collectedRewards.contains(item)
-                val textCol = if (isUnlocked) TextLight else TextMuted
-                val badgeEmoji = when (idx) {
-                    0 -> "🌙"
-                    1 -> "🔱"
-                    2 -> "🖼️"
-                    3 -> "⚔️"
-                    4 -> "🧪"
-                    5 -> "🌌"
-                    6 -> "☄️"
-                    7 -> "🥋"
-                    8 -> "👼"
-                    else -> "🗡️"
-                }
-
-                Box(
-                    modifier = Modifier
-                        .width(96.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .then(
-                            if (isUnlocked) Modifier.shadow(8.dp, RoundedCornerShape(12.dp), ambientColor = GoldAccent.copy(alpha = 0.35f))
-                            else Modifier
-                        )
-                        .background(
-                            if (isUnlocked) Brush.verticalGradient(listOf(GoldAccent.copy(alpha = 0.10f), DarkSurfaceVariant))
-                            else Brush.verticalGradient(GradientDarkSurface)
-                        )
-                        .border(
-                            BorderStroke(1.dp,
-                                if (isUnlocked) Brush.linearGradient(listOf(GoldAccent.copy(alpha = 0.5f), GoldAccent.copy(alpha = 0.15f)))
-                                else Brush.linearGradient(listOf(ArenaBorder, ArenaBorder))
-                            ),
-                            RoundedCornerShape(12.dp)
-                        )
-                        .padding(10.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = if (isUnlocked) badgeEmoji else "🎁", fontSize = 24.sp)
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text(
-                            text = item,
-                            fontSize = 9.sp,
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Medium,
-                            color = textCol,
-                            lineHeight = 11.sp,
-                            maxLines = 2
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
+// Reward Collector Gallery removed — gacha system replaced by Daily Reward Chest
+// (rewards list tetap disimpan di data model, tapi tidak ditampilkan di ProfileScreen lagi)
 
 // ═══════════════════════════════════════════════════════════════
 // SETTINGS PANEL

@@ -14,10 +14,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -33,9 +36,18 @@ data class RewardRevealState(
     val prayerName: String,
     val xpGained: Int,
     val isFiveOfFiveCompleted: Boolean,
-    val isTimelyBonus: Boolean = false,
-    val unlockedRewardName: String? = null,
-    val rewardIndex: Int = 1
+    val isTimelyBonus: Boolean = false
+)
+
+/**
+ * State for Daily Reward Chest reveal animation.
+ * Triggered when user clicks "Buka Peti!" after completing 5/5 wajib prayers.
+ */
+data class ChestRevealState(
+    val xpReward: Int,
+    val rewardName: String,
+    val rewardEmoji: String,
+    val isDuplicate: Boolean = false  // true kalau item sudah dimiliki sebelumnya
 )
 
 /**
@@ -80,19 +92,38 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val _isLoadingCities = MutableStateFlow(false)
     val isLoadingCities: StateFlow<Boolean> = _isLoadingCities.asStateFlow()
 
-    // 10 Gacha reward pool
-    val rewardPool = listOf(
-        "Lencana Bulan Sabit Menyala",
-        "Efek Aura Sultan",
-        "Bingkai Penjelajah Subuh",
-        "Gelar Pembasmi Sunyi Tahajjud",
-        "Ikon Ramuan Mana Dzikir",
-        "Segel Penjaga Maghrib",
-        "Jejak Api Istiqomah",
-        "Jubah Bijak Al-Qur'an",
-        "Sayap Gacha Malaikat",
-        "Pedang Sholat Mitik"
+    // Daily Reward Chest pool — chest berisi XP bonus + random cosmetic reward
+    val chestRewardPool = listOf(
+        "Lencana Bulan Sabit Menyala" to "🌙",
+        "Efek Aura Sultan" to "🔱",
+        "Bingkai Penjelajah Subuh" to "🖼️",
+        "Gelar Pembasmi Sunyi Tahajjud" to "⚔️",
+        "Ikon Ramuan Mana Dzikir" to "🧪",
+        "Segel Penjaga Maghrib" to "🌌",
+        "Jejak Api Istiqomah" to "☄️",
+        "Jubah Bijak Al-Qur'an" to "🥋",
+        "Sayap Malaikat Istiqomah" to "👼",
+        "Pedang Sholat Mitik" to "🗡️"
     )
+
+    // Chest reveal animation event
+    private val _chestRevealEvent = MutableStateFlow<ChestRevealState?>(null)
+    val chestRevealEvent: StateFlow<ChestRevealState?> = _chestRevealEvent.asStateFlow()
+
+    // Daily chest availability — true kalau 5 sholat wajib hari ini komplit & chest belum dibuka
+    val isDailyChestAvailable: StateFlow<Boolean> = _gameData
+        .map { data ->
+            val todayStr = LocalDate.now().toString()
+            val wajibList = listOf("subuh", "dzuhur", "ashar", "maghrib", "isya")
+            val allFiveDone = wajibList.all { p ->
+                data.prayerLog.any { it.date == todayStr && it.prayer == p }
+            }
+            allFiveDone && data.dailyChestOpenedDate != todayStr
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    private val _isChestOpenedToday = MutableStateFlow(false)
+    val isChestOpenedToday: StateFlow<Boolean> = _isChestOpenedToday.asStateFlow()
 
     init {
         database = AppDatabase.getDatabase(application)
@@ -542,22 +573,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
             val didLevelUp = newLevelInfo.level > oldLevelInfo.level
 
-            // 3. Roll 30% Gacha reward item
-            var unlockedReward: String? = null
-            var rewardIdx = 1
-            if (Random.nextFloat() <= 0.30f) {
-                val unacquired = rewardPool.filter { !state.rewards.contains(it) }
-                if (unacquired.isNotEmpty()) {
-                    unlockedReward = unacquired.random()
-                    rewardIdx = rewardPool.indexOf(unlockedReward) + 1
-                }
-            }
-
-            val updatedRewards = if (unlockedReward != null) {
-                state.rewards + unlockedReward
-            } else {
-                state.rewards
-            }
+            // Gacha system removed — replaced by Daily Reward Chest (claim via QuestScreen)
 
             // 4. Update Streaks for active logged days
             var hero = state.heroStreak
@@ -671,7 +687,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 heroStreak = hero,
                 perPrayerStreaks = trackerMap,
                 tilawahStreak = tilawahStrk,
-                rewards = updatedRewards,
                 quests = state.quests.copy(list = questList)
             )
 
@@ -692,14 +707,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
 
-            // Gacha reveal sequence
+            // Gacha reveal sequence — gacha removed, only XP/timely/5-of-5 steps shown
             rewardRevealEvent.value = RewardRevealState(
                 prayerName = prayer.capitalizeCompat(),
                 xpGained = xpGained,
                 isFiveOfFiveCompleted = isHeroCompletor,
-                isTimelyBonus = isTimelyBonus,
-                unlockedRewardName = unlockedReward,
-                rewardIndex = rewardIdx
+                isTimelyBonus = isTimelyBonus
             )
         }
     }
@@ -911,6 +924,82 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             repository.saveGameState(updatedData)
             _toastEvent.emit("Doa udah kelar! Quest selesai 🎉")
         }
+    }
+
+    /**
+     * Claim Daily Reward Chest — berlaku kalau 5 sholat wajib hari ini sudah komplit & chest belum dibuka.
+     * Reward: 50-150 XP bonus + 1 random cosmetic item dari chestRewardPool.
+     */
+    fun claimDailyChest() {
+        viewModelScope.launch {
+            val state = _gameData.value
+            val todayStr = LocalDate.now().toString()
+
+            // Cek 5/5 sholat wajib komplit hari ini
+            val wajibList = listOf("subuh", "dzuhur", "ashar", "maghrib", "isya")
+            val allFiveDone = wajibList.all { p ->
+                state.prayerLog.any { it.date == todayStr && it.prayer == p }
+            }
+            if (!allFiveDone) {
+                _toastEvent.emit("Selesaikan 5 sholat wajib dulu ya buat buka peti! 🙏")
+                return@launch
+            }
+            if (state.dailyChestOpenedDate == todayStr) {
+                _toastEvent.emit("Peti harian sudah dibuka hari ini 📦")
+                return@launch
+            }
+
+            // Roll reward: 50-150 XP bonus + 1 cosmetic item (prioritas yang belum dimiliki)
+            val xpReward = (50..150).random()
+            val unacquired = chestRewardPool.filter { (name, _) -> !state.rewards.contains(name) }
+            val (rewardName, rewardEmoji) = if (unacquired.isNotEmpty()) {
+                unacquired.random()
+            } else {
+                // Semua item sudah dimiliki — kasih duplicate (XP tetap dapet)
+                chestRewardPool.random()
+            }
+            val isDuplicate = state.rewards.contains(rewardName)
+
+            // Update XP + rewards list + mark chest opened today
+            val oldXp = state.user.xp
+            val newXp = oldXp + xpReward
+            val oldLevelInfo = getLevelInfo(oldXp)
+            val newLevelInfo = getLevelInfo(newXp)
+
+            val updatedRewards = if (!isDuplicate) state.rewards + rewardName else state.rewards
+            val updatedData = state.copy(
+                user = state.user.copy(xp = newXp, level = newLevelInfo.level),
+                rewards = updatedRewards,
+                dailyChestOpenedDate = todayStr
+            )
+
+            val badgesList = evaluateBadges(updatedData)
+            val finalData = updatedData.copy(badges = badgesList)
+
+            _gameData.value = finalData
+            repository.saveGameState(finalData)
+            _isChestOpenedToday.value = true
+
+            // Trigger chest reveal animation
+            _chestRevealEvent.value = ChestRevealState(
+                xpReward = xpReward,
+                rewardName = rewardName,
+                rewardEmoji = rewardEmoji,
+                isDuplicate = isDuplicate
+            )
+
+            // Level-up celebration if applicable
+            if (newLevelInfo.level > oldLevelInfo.level) {
+                levelUpAnimationEvent.value = newLevelInfo.level
+                checkTierUp(oldLevelInfo.level, newLevelInfo.level)?.let { tierData ->
+                    tierUpAnimationEvent.value = tierData
+                }
+            }
+        }
+    }
+
+    fun clearChestReveal() {
+        _chestRevealEvent.value = null
     }
 
     /**

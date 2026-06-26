@@ -136,7 +136,9 @@ class MainActivity : ComponentActivity() {
                         val levelUpEvent by gameViewModel.levelUpAnimationEvent.collectAsStateWithLifecycle()
                         val tierUpEvent by gameViewModel.tierUpAnimationEvent.collectAsStateWithLifecycle()
                         val rewardRevealEvent by gameViewModel.rewardRevealEvent.collectAsStateWithLifecycle()
+                        val chestRevealEvent by gameViewModel.chestRevealEvent.collectAsStateWithLifecycle()
 
+                        // Overlay priority: LevelUp → TierUp → RewardReveal → DailyChest
                         if (levelUpEvent != null) {
                             val lv = levelUpEvent!!
                             LevelUpCelebrationOverlay(
@@ -155,6 +157,12 @@ class MainActivity : ComponentActivity() {
                             RewardRevealOverlay(
                                 state = rewardRevealEvent!!,
                                 onDismiss = { gameViewModel.rewardRevealEvent.value = null }
+                            )
+                        } else if (chestRevealEvent != null) {
+                            // Daily Reward Chest reveal — gacha-style glow+shake+burst animation
+                            DailyChestOverlay(
+                                state = chestRevealEvent!!,
+                                onDismiss = { gameViewModel.clearChestReveal() }
                             )
                         }
                     }

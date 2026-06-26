@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -134,6 +135,12 @@ fun QuestScreen(
                     }
                 }
             }
+
+            // ─── DAILY REWARD CHEST ───
+            // Muncul setelah 5 sholat wajib komplit. Buka peti → animasi gacha reveal.
+            Spacer(modifier = Modifier.height(24.dp))
+            ArenaSectionHeaderLine(text = "DAILY REWARD CHEST 🎁")
+            DailyRewardChest(viewModel = viewModel, state = state)
         }
     }
 }
@@ -570,6 +577,171 @@ fun InteractiveDoaWidget(
             ) {
                 Text("Selesai", fontSize = 12.sp, fontWeight = FontWeight.Black, color = Color.Black)
             }
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DAILY REWARD CHEST
+// State: LOCKED (belum 5/5) → READY (5/5 komplit, belum dibuka) → OPENED (sudah dibuka hari ini)
+// ═══════════════════════════════════════════════════════════════
+@Composable
+fun DailyRewardChest(
+    viewModel: GameViewModel,
+    state: MuslimLevelingData
+) {
+    val isAvailable by viewModel.isDailyChestAvailable.collectAsState()
+    val todayStr = java.time.LocalDate.now().toString()
+    val isOpenedToday = state.dailyChestOpenedDate == todayStr
+
+    // Hitung progress 5/5 sholat wajib hari ini
+    val wajibList = listOf("subuh", "dzuhur", "ashar", "maghrib", "isya")
+    val completedCount = wajibList.count { p ->
+        state.prayerLog.any { it.date == todayStr && it.prayer == p }
+    }
+
+    val chestShape = RoundedCornerShape(20.dp)
+    val accentColor = when {
+        isOpenedToday -> TextMuted
+        isAvailable -> GoldAccent
+        else -> TextMuted
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                12.dp, chestShape,
+                ambientColor = if (isAvailable) GoldAccent.copy(alpha = 0.4f) else Color.Transparent
+            ),
+        shape = chestShape,
+        colors = CardDefaults.cardColors(containerColor = DarkSurface),
+        border = BorderStroke(
+            2.dp,
+            if (isAvailable) Brush.linearGradient(GradientGoldAmber)
+            else Brush.linearGradient(listOf(ArenaBorder, ArenaBorder))
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // ─── Chest emoji + status ───
+            val chestEmoji = when {
+                isOpenedToday -> "📭"
+                isAvailable -> "🎁"
+                else -> "🔒"
+            }
+
+            Text(
+                text = chestEmoji,
+                fontSize = 56.sp
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = when {
+                    isOpenedToday -> "PETI SUDAH DIBUKA"
+                    isAvailable -> "PETI SIAP DIBUKA!"
+                    else -> "PETI TERKUNCI"
+                },
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Black,
+                color = accentColor,
+                letterSpacing = 1.5.sp
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // ─── Progress 5/5 sholat ───
+            if (!isOpenedToday) {
+                Text(
+                    text = "Sholat wajib: $completedCount/5",
+                    fontSize = 12.sp,
+                    color = TextMuted,
+                    fontFamily = FontFamily.Monospace
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Progress bar 5 dots
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    wajibList.forEachIndexed { idx, prayer ->
+                        val isDone = state.prayerLog.any {
+                            it.date == todayStr && it.prayer == prayer
+                        }
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    if (isDone) Brush.horizontalGradient(GradientGreenGold)
+                                    else Brush.verticalGradient(GradientDarkSurface)
+                                )
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // ─── CTA Button / Status text ───
+            when {
+                isAvailable -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .shadow(10.dp, RoundedCornerShape(12.dp), ambientColor = GoldAccent.copy(alpha = 0.5f))
+                            .background(
+                                Brush.horizontalGradient(GradientGoldAmber),
+                                RoundedCornerShape(12.dp)
+                            )
+                            .clickable { viewModel.claimDailyChest() }
+                            .padding(horizontal = 16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "🔓 BUKA PETI!",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color.Black,
+                            letterSpacing = 2.sp
+                        )
+                    }
+                }
+                isOpenedToday -> {
+                    Text(
+                        text = "Balik lagi besok ya buat peti baru! 🌅",
+                        fontSize = 11.sp,
+                        color = TextMuted,
+                        textAlign = TextAlign.Center
+                    )
+                }
+                else -> {
+                    Text(
+                        text = "Selesaikan 5 sholat wajib dulu buat unlock peti harian!",
+                        fontSize = 11.sp,
+                        color = TextMuted,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 15.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Hint text
+            Text(
+                text = "🎁 Reward: 50-150 XP bonus + 1 random cosmetic item",
+                fontSize = 9.sp,
+                color = GoldAccent.copy(alpha = 0.6f),
+                textAlign = TextAlign.Center,
+                fontFamily = FontFamily.Monospace
+            )
         }
     }
 }

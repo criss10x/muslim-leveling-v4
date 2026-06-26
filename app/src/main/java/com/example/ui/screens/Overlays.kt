@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.foundation.border
 import com.example.viewmodel.RewardRevealState
 import com.example.viewmodel.TierUpData
+import com.example.viewmodel.ChestRevealState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.minDimension
@@ -774,14 +775,13 @@ fun RewardRevealOverlay(
     state: RewardRevealState,
     onDismiss: () -> Unit
 ) {
-    // We have 5 steps. Step 3 (timely bonus) is conditional (only if ≤30min after adzan),
-    // Step 4 (5/5 bonus) is conditional, Step 5 (gacha) is conditional.
-    // Step index goes from 1 to 5
+    // We have 4 steps. Step 3 (timely bonus) is conditional (only if ≤30min after adzan),
+    // Step 4 (5/5 bonus) is conditional. Gacha step removed — replaced by Daily Reward Chest.
+    // Step index goes from 1 to 4
     val stepsSequence = remember(state) {
         val list = mutableListOf(1, 2)
         if (state.isTimelyBonus) list.add(3)
         if (state.isFiveOfFiveCompleted) list.add(4)
-        if (state.unlockedRewardName != null) list.add(5)
         list
     }
 
@@ -843,7 +843,6 @@ fun RewardRevealOverlay(
                     2 -> RewardStepCard_Xp(state.prayerName, state.xpGained, isLastStep)
                     3 -> RewardStepCard_TimelyBonus(isLastStep)
                     4 -> RewardStepCard_FiveOfFive(isLastStep)
-                    5 -> RewardStepCard_GachaUnlock(state.unlockedRewardName ?: "", state.rewardIndex, isLastStep)
                     else -> Box(modifier = Modifier.size(1.dp))
                 }
             }
@@ -1206,86 +1205,219 @@ fun RewardStepCard_FiveOfFive(isLastStep: Boolean) {
     }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// DAILY REWARD CHEST OVERLAY
+// Triggered when user claims daily chest after completing 5/5 wajib prayers.
+// 3-phase animation: 1) Glow + shake build-up  2) Chest burst open  3) Reward reveal
+// ═══════════════════════════════════════════════════════════════
 @Composable
-fun RewardStepCard_GachaUnlock(rewardName: String, iconIndex: Int, isLastStep: Boolean) {
-    val bEmoji = when (iconIndex) {
-        1 -> "🌙"
-        2 -> "🔱"
-        3 -> "🖼️"
-        4 -> "⚔️"
-        5 -> "🧪"
-        6 -> "🌌"
-        7 -> "☄️"
-        8 -> "🥋"
-        9 -> "👼"
-        else -> "🗡️"
+fun DailyChestOverlay(
+    state: ChestRevealState,
+    onDismiss: () -> Unit
+) {
+    // Phase: 0 = glow+shake build-up (2s), 1 = burst reveal (rest)
+    var phase by remember { mutableStateOf(0) }
+    LaunchedEffect(state) {
+        delay(2000)
+        phase = 1
     }
 
-    Card(
+    // Shake animation during phase 0
+    val shakeTransition = rememberInfiniteTransition(label = "chest_shake")
+    val shakeOffset by shakeTransition.animateFloat(
+        initialValue = -3f,
+        targetValue = 3f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(80, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "shake_x"
+    )
+    val glowAlpha by shakeTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glow_pulse"
+    )
+
+    // Burst scale animation during phase 1
+    val burstScale by animateFloatAsState(
+        targetValue = if (phase == 1) 1f else 0.3f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "burst_scale"
+    )
+    val revealAlpha by animateFloatAsState(
+        targetValue = if (phase == 1) 1f else 0f,
+        animationSpec = tween(400, delayMillis = 200),
+        label = "reveal_alpha"
+    )
+
+    Box(
         modifier = Modifier
-            .width(310.dp)
-            .padding(16.dp)
-            .testTag("reward_step_4"),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = DarkSurface),
-        border = BorderStroke(2.dp, Brush.linearGradient(GradientGoldAmber))
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.85f))
+            .clickable {
+                if (phase == 1) onDismiss()
+            },
+        contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(24.dp)
         ) {
+            // ─── Chest emoji / Reward emoji ───
             Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .shadow(12.dp, CircleShape, ambientColor = GoldAccent.copy(alpha = 0.4f))
-                    .background(
-                        Brush.radialGradient(listOf(GoldAccent.copy(alpha = 0.2f), Color.Transparent)),
-                        CircleShape
-                    )
-                    .border(BorderStroke(2.dp, Brush.linearGradient(GradientGoldAmber)), CircleShape),
+                modifier = Modifier.size(180.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = bEmoji, fontSize = 40.sp)
+                if (phase == 0) {
+                    // Phase 0: shaking chest with glow
+                    Box(
+                        modifier = Modifier
+                            .offset(x = shakeOffset.dp)
+                            .size(140.dp)
+                            .shadow(
+                                24.dp,
+                                RoundedCornerShape(24.dp),
+                                ambientColor = GoldAccent.copy(alpha = glowAlpha * 0.6f)
+                            )
+                            .background(
+                                Brush.radialGradient(
+                                    listOf(
+                                        GoldAccent.copy(alpha = glowAlpha * 0.3f),
+                                        Color.Transparent
+                                    )
+                                ),
+                                RoundedCornerShape(24.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "📦", fontSize = 80.sp)
+                    }
+                } else {
+                    // Phase 1: burst reveal — reward emoji with spring scale
+                    Box(
+                        modifier = Modifier
+                            .scale(burstScale)
+                            .size(140.dp)
+                            .shadow(
+                                32.dp,
+                                CircleShape,
+                                ambientColor = GoldAccent.copy(alpha = 0.5f)
+                            )
+                            .background(
+                                Brush.radialGradient(
+                                    listOf(GoldAccent.copy(alpha = 0.25f), Color.Transparent)
+                                ),
+                                CircleShape
+                            )
+                            .border(
+                                BorderStroke(3.dp, Brush.linearGradient(GradientGoldAmber)),
+                                CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = state.rewardEmoji, fontSize = 72.sp)
+                    }
+                }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-            Text(
-                text = "🎁 UNLOCK BONUS LOOT!",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = GoldAccent,
-                letterSpacing = 1.5.sp
-            )
+            if (phase == 0) {
+                // Phase 0: build-up text
+                Text(
+                    text = "MEMBUKA PETI...",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Black,
+                    color = GoldAccent,
+                    letterSpacing = 3.sp
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "🎁 ✨ 🎁",
+                    fontSize = 24.sp,
+                    color = TextMuted
+                )
+            } else {
+                // Phase 1: reveal content
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.alpha(revealAlpha)
+                ) {
+                    Text(
+                        text = "🎉 PETI DIBUKA! 🎉",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Black,
+                        color = GoldAccent,
+                        letterSpacing = 2.sp
+                    )
 
-            Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = rewardName,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Black,
-                color = TextLight,
-                textAlign = TextAlign.Center
-            )
+                    // XP reward pill
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                Brush.horizontalGradient(GradientGreenGold),
+                                RoundedCornerShape(100.dp)
+                            )
+                            .padding(horizontal = 20.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = "+${state.xpReward} XP BONUS",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color.Black
+                        )
+                    }
 
-            Text(
-                text = "Item langka udah masuk koleksi profil kamu! Cek di tab Profil ya 🎁",
-                fontSize = 11.sp,
-                color = TextMuted,
-                textAlign = TextAlign.Center,
-                lineHeight = 15.sp,
-                modifier = Modifier.padding(top = 10.dp)
-            )
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(20.dp))
+                    // Reward name
+                    Text(
+                        text = state.rewardName,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextLight,
+                        textAlign = TextAlign.Center
+                    )
 
-            Text(
-                text = if (isLastStep) "👇 TAP DI MANA AJA BUAT TUTUP" else "👇 TAP DI MANA AJA BUAT LANJUT",
-                fontSize = 10.sp,
-                color = GoldAccent.copy(alpha = 0.7f),
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.sp
-            )
+                    if (state.isDuplicate) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = "(Item duplikat — koleksi kamu udah lengkap!)",
+                            fontSize = 11.sp,
+                            color = TextMuted,
+                            textAlign = TextAlign.Center
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = "✨ Item baru masuk koleksi! Cek di tab Profil ✨",
+                            fontSize = 11.sp,
+                            color = TextMuted,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(28.dp))
+
+                    Text(
+                        text = "👇 TAP DI MANA AJA BUAT TUTUP",
+                        fontSize = 10.sp,
+                        color = GoldAccent.copy(alpha = 0.7f),
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
+                    )
+                }
+            }
         }
     }
 }
