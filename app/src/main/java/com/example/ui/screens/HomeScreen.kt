@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -227,12 +228,14 @@ fun HomeScreen(
                     val lowerName = name.lowercase()
                     val isChecked = state.prayerLog.any { it.date == todayStr && it.prayer == lowerName }
                     val isActive = isCurrentOrUpcoming(lowerName, timings)
+                    val isLocked = !isChecked && !isPrayerWindowOpen(lowerName, timings)
 
                     PrayerRowCard(
                         name = name,
                         time = time,
                         isChecked = isChecked,
                         isActive = isActive,
+                        isLocked = isLocked,
                         onCheckedChange = { check ->
                             if (check) {
                                 viewModel.logPrayer(lowerName, "wajib")
@@ -1337,12 +1340,14 @@ fun PrayerRowCard(
     time: String,
     isChecked: Boolean,
     isActive: Boolean,
+    isLocked: Boolean = false,
     onCheckedChange: (Boolean) -> Unit
 ) {
     // Arena Hikmah states:
     //  - Done    = teal border + glow
     //  - Active  = gold border + pulse
-    //  - Locked  = muted
+    //  - Locked  = muted + 🔒 (di luar window waktu sholat)
+    //  - Default = muted
     val infiniteTransition = rememberInfiniteTransition(label = "prayer_active_pulse")
     val activePulse by infiniteTransition.animateFloat(
         initialValue = 0.5f,
@@ -1357,33 +1362,37 @@ fun PrayerRowCard(
     val borderStroke = when {
         isChecked -> BorderStroke(1.5.dp, Brush.linearGradient(listOf(IslamicGreen, CyanAccent)))
         isActive -> BorderStroke(1.5.dp, Brush.linearGradient(GradientGoldAmber))
+        isLocked -> BorderStroke(1.dp, DarkSurfaceVariant.copy(alpha = 0.5f))
         else -> BorderStroke(1.dp, DarkSurfaceVariant)
     }
 
     val containerColor = when {
         isChecked -> Brush.verticalGradient(listOf(IslamicGreen.copy(alpha = 0.12f), DarkSurface))
         isActive -> Brush.verticalGradient(listOf(GoldAccent.copy(alpha = 0.08f), DarkSurface))
+        isLocked -> Brush.verticalGradient(listOf(DarkBackground.copy(alpha = 0.4f), DarkSurface.copy(alpha = 0.6f)))
         else -> Brush.verticalGradient(GradientDarkSurface)
     }
 
     val timeColor = when {
         isChecked -> IslamicGreen.copy(alpha = 0.7f)
         isActive -> GoldAccent
+        isLocked -> TextMuted.copy(alpha = 0.4f)
         else -> TextMuted
     }
 
     val prayerEmoji = when (name.lowercase()) {
-        "subuh" -> "🌙"
-        "dzuhur" -> "☀️"
-        "ashar" -> "🌤"
-        "maghrib" -> "🌇"
-        "isya" -> "🌃"
-        else -> "🕌"
+        "subuh" -> if (isLocked) "🔒" else "🌙"
+        "dzuhur" -> if (isLocked) "🔒" else "☀️"
+        "ashar" -> if (isLocked) "🔒" else "🌤"
+        "maghrib" -> if (isLocked) "🔒" else "🌇"
+        "isya" -> if (isLocked) "🔒" else "🌃"
+        else -> if (isLocked) "🔒" else "🕌"
     }
 
     val accentBarColor = when {
         isChecked -> IslamicGreen
         isActive -> GoldAccent
+        isLocked -> DarkSurfaceVariant.copy(alpha = 0.3f)
         else -> DarkSurfaceVariant
     }
 
@@ -1483,12 +1492,21 @@ fun PrayerRowCard(
                             color = if (isChecked) IslamicGreen else if (isActive) GoldAccent else TextLight
                         )
                     }
-                    Text(
-                        text = "Jam $time WIB",
-                        fontSize = 11.sp,
-                        color = TextMuted,
-                        fontFamily = FontFamily.Monospace
-                    )
+                    if (isLocked && !isChecked) {
+                        Text(
+                            text = "🔒 Belum waktunya",
+                            fontSize = 11.sp,
+                            color = TextMuted.copy(alpha = 0.5f),
+                            fontFamily = FontFamily.Monospace
+                        )
+                    } else {
+                        Text(
+                            text = "Jam $time WIB",
+                            fontSize = 11.sp,
+                            color = timeColor,
+                            fontFamily = FontFamily.Monospace
+                        )
+                    }
                 }
             }
 
@@ -1498,28 +1516,30 @@ fun PrayerRowCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(end = 14.dp)
             ) {
-                // XP pill
-                Box(
-                    modifier = Modifier
-                        .background(
-                            if (isChecked) IslamicGreen.copy(alpha = 0.15f)
-                            else GoldAccent.copy(alpha = 0.1f),
-                            RoundedCornerShape(100.dp)
+                // XP pill — hidden when locked
+                if (!isLocked || isChecked) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                if (isChecked) IslamicGreen.copy(alpha = 0.15f)
+                                else GoldAccent.copy(alpha = 0.1f),
+                                RoundedCornerShape(100.dp)
+                            )
+                            .border(
+                                1.dp,
+                                if (isChecked) IslamicGreen.copy(alpha = 0.3f)
+                                else GoldAccent.copy(alpha = 0.25f),
+                                RoundedCornerShape(100.dp)
+                            )
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    ) {
+                        Text(
+                            text = if (isChecked) "+XP ✓" else "+XP",
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = if (isChecked) IslamicGreen else GoldAccent
                         )
-                        .border(
-                            1.dp,
-                            if (isChecked) IslamicGreen.copy(alpha = 0.3f)
-                            else GoldAccent.copy(alpha = 0.25f),
-                            RoundedCornerShape(100.dp)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 3.dp)
-                ) {
-                    Text(
-                        text = if (isChecked) "+XP ✓" else "+XP",
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = if (isChecked) IslamicGreen else GoldAccent
-                    )
+                    }
                 }
 
                 // Gaming check circle
@@ -1533,7 +1553,7 @@ fun PrayerRowCard(
                                 RoundedCornerShape(10.dp),
                                 ambientColor = IslamicGreen.copy(alpha = 0.6f)
                             )
-                            else if (isActive) Modifier.shadow(
+                            else if (isActive && !isLocked) Modifier.shadow(
                                 4.dp,
                                 RoundedCornerShape(10.dp),
                                 ambientColor = GoldAccent.copy(alpha = 0.4f * activePulse)
@@ -1544,11 +1564,23 @@ fun PrayerRowCard(
                         .border(
                             BorderStroke(
                                 width = if (isChecked) 0.dp else 2.dp,
-                                color = if (isActive) GoldAccent else DarkSurfaceVariant
+                                color = when {
+                                    isChecked -> Color.Transparent
+                                    isLocked -> DarkSurfaceVariant.copy(alpha = 0.4f)
+                                    isActive -> GoldAccent
+                                    else -> DarkSurfaceVariant
+                                }
                             ),
                             RoundedCornerShape(10.dp)
                         )
-                        .clickable { onCheckedChange(!isChecked) },
+                        .then(
+                            if (isLocked && !isChecked) {
+                                // Locked & not checked yet → not clickable
+                                Modifier
+                            } else {
+                                Modifier.clickable { onCheckedChange(!isChecked) }
+                            }
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     if (isChecked) {
@@ -1557,6 +1589,13 @@ fun PrayerRowCard(
                             contentDescription = null,
                             tint = Color.Black,
                             modifier = Modifier.size(20.dp)
+                        )
+                    } else if (isLocked) {
+                        Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = "Belum waktunya",
+                            tint = TextMuted.copy(alpha = 0.5f),
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }
@@ -1711,6 +1750,47 @@ fun getNextPrayerCountdown(timings: Timings, currentWajib: Int, denominator: Int
         }
     }
     return "Sholat fardhu hari ini udah lengkap! Subuh besok jam ${timings.subuh} ✨"
+}
+
+/**
+ * Window waktu tiap sholat wajib — kapan bisa diceklis.
+ *
+ * - Subuh: dari masuk subuh sampai 2 jam setelahnya
+ * - Dzuhur: dari masuk dzuhur sampai masuk maghrib
+ * - Ashar:  dari masuk dzuhur sampai masuk maghrib  (Dzuhur & Ashar share window)
+ * - Maghrib: dari masuk maghrib sampai masuk subuh (besok)
+ * - Isya:   dari masuk maghrib sampai masuk subuh   (Maghrib & Isya share window)
+ */
+fun isPrayerWindowOpen(prayer: String, timings: Timings): Boolean {
+    val now = LocalTime.now()
+
+    val subuh = tryParsing(timings.subuh, LocalTime.of(4, 30))
+    val dzuhur = tryParsing(timings.dzuhur, LocalTime.of(12, 0))
+    val maghrib = tryParsing(timings.maghrib, LocalTime.of(17, 50))
+
+    return when (prayer) {
+        "subuh" -> {
+            // Dari masuk subuh sampai 2 jam setelahnya
+            val windowEnd = subuh.plusHours(2)
+            if (windowEnd.isAfter(subuh)) {
+                // Normal case: tidak melewati tengah malam
+                !now.isBefore(subuh) && now.isBefore(windowEnd)
+            } else {
+                // Subuh sangat awal di tahun tertentu (edge case) — skip
+                !now.isBefore(subuh) || now.isBefore(windowEnd)
+            }
+        }
+        "dzuhur", "ashar" -> {
+            // Dari masuk dzuhur sampai masuk maghrib
+            !now.isBefore(dzuhur) && now.isBefore(maghrib)
+        }
+        "maghrib", "isya" -> {
+            // Dari masuk maghrib sampai masuk subuh (besok)
+            // Maghrib selalu setelah subuh di hari yang sama, jadi window melewati tengah malam
+            !now.isBefore(maghrib) || now.isBefore(subuh)
+        }
+        else -> false
+    }
 }
 
 fun isCurrentOrUpcoming(prayer: String, timings: Timings): Boolean {
