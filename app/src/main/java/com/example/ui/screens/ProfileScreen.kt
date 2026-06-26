@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.lifecycle.viewModelScope
 import com.example.data.*
 import com.example.notifications.NotificationScheduler
 import com.example.ui.components.CityDropdownPicker
@@ -42,6 +43,7 @@ import com.example.ui.components.NeonProgressBar
 import com.example.ui.theme.*
 import com.example.viewmodel.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 // ═══════════════════════════════════════════════════════════════

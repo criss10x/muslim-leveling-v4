@@ -377,18 +377,18 @@ fun TierProfileAvatar(
                     val r = size.width / 2f - 4f
                     val cx = size.width / 2f + (r * cos(angle)).toFloat()
                     val cy = size.height / 2f + (r * sin(angle)).toFloat()
-                    val twinkle = (sin(Math.toRadians((sparklePhase + seed).toDouble())) * 0.5f + 0.5f)
-                    if (twinkle > 0.5f) {
+                    val twinkle = (sin(Math.toRadians((sparklePhase + seed).toDouble())) * 0.5 + 0.5)
+                    if (twinkle > 0.5) {
                         // Draw 4-point star
-                        val starSize = (3f + 2f * twinkle)
+                        val starSize = (3f + 2f * twinkle.toFloat())
                         drawLine(
-                            color = Color.White.copy(alpha = twinkle),
+                            color = Color.White.copy(alpha = twinkle.toFloat()),
                             start = Offset(cx - starSize, cy),
                             end = Offset(cx + starSize, cy),
                             strokeWidth = 1f
                         )
                         drawLine(
-                            color = Color.White.copy(alpha = twinkle),
+                            color = Color.White.copy(alpha = twinkle.toFloat()),
                             start = Offset(cx, cy - starSize),
                             end = Offset(cx, cy + starSize),
                             strokeWidth = 1f
