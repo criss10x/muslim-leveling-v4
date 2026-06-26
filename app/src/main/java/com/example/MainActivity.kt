@@ -78,8 +78,8 @@ class MainActivity : ComponentActivity() {
                         // Onboarding first launch
                         OnboardingScreen(
                             viewModel = gameViewModel,
-                            onComplete = { username, intensityMode, kota, kotaId ->
-                                gameViewModel.startNewGame(username, intensityMode, kota, kotaId)
+                            onComplete = { username, kota, kotaId ->
+                                gameViewModel.startNewGame(username, kota, kotaId)
                             }
                         )
                     } else {

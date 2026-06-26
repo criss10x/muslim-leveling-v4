@@ -62,19 +62,9 @@ fun HomeScreen(
         state.prayerLog.any { it.date == todayStr && it.prayer == p }
     }
 
-    val isSantaiMode = state.user.intensityMode == "santai"
-    val isStandarMode = state.user.intensityMode == "standar"
-    val isSultanMode = state.user.intensityMode == "sultan"
-
-    val wajibDenominator = if (isSantaiMode) {
-        state.user.santaiTrackedPrayers.size.coerceAtLeast(1)
-    } else 5
-
-    val checkedTrackedWajibToday = if (isSantaiMode) {
-        state.user.santaiTrackedPrayers.count { p ->
-            state.prayerLog.any { it.date == todayStr && it.prayer == p }
-        }
-    } else checkedWajibToday
+    // Intensity mode dihapus — semua user pakai mode standar (5 wajib + sunnah aktif)
+    val wajibDenominator = 5
+    val checkedTrackedWajibToday = checkedWajibToday
 
     val wajibProgress = (checkedTrackedWajibToday.toFloat() / wajibDenominator.toFloat()).coerceIn(0f, 1f)
 
@@ -123,7 +113,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             // Hero Streak Card
-            HeroStreakCard(state = state, isSantaiMode = isSantaiMode)
+            HeroStreakCard(state = state)
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -171,7 +161,7 @@ fun HomeScreen(
                                 wajibProgress = wajibProgress,
                                 sunnahProgress = sunnahProgress,
                                 tilawahProgress = tilawahProgress,
-                                showSunnahRing = isSultanMode || isStandarMode,
+                                showSunnahRing = true,
                                 modifier = Modifier.fillMaxSize().testTag("ritual_rings_canvas")
                             )
                             // Center kosong — ring tanpa text di tengah
@@ -192,10 +182,8 @@ fun HomeScreen(
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             RingLabelRow(color = RingRed, name = "Wajib", value = "$checkedTrackedWajibToday/$wajibDenominator")
-                            if (isSultanMode || isStandarMode) {
-                                Spacer(modifier = Modifier.height(6.dp))
-                                RingLabelRow(color = GoldAccent, name = "Sunnah", value = "$sunnahCount/8")
-                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            RingLabelRow(color = GoldAccent, name = "Sunnah", value = "$sunnahCount/8")
                             Spacer(modifier = Modifier.height(6.dp))
                             RingLabelRow(color = IslamicGreen, name = "Tilawah", value = if (tilawahLogged) "Lengkap" else "Belum")
                         }
@@ -215,24 +203,6 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SectionPill(text = "🕐 QUEST SHOLAT HARI INI", gradient = GradientGreenGold)
-                val modeLabel = when (state.user.intensityMode) {
-                    "santai" -> "🎮 SANTAI"
-                    "sultan" -> "👑 SULTAN"
-                    else -> "⚔ STANDAR"
-                }
-                Box(
-                    modifier = Modifier
-                        .background(IslamicGreen.copy(alpha = 0.1f), RoundedCornerShape(100.dp))
-                        .border(1.dp, IslamicGreen.copy(alpha = 0.3f), RoundedCornerShape(100.dp))
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = modeLabel,
-                        fontSize = 9.sp,
-                        color = IslamicGreen,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -257,17 +227,12 @@ fun HomeScreen(
                     val lowerName = name.lowercase()
                     val isChecked = state.prayerLog.any { it.date == todayStr && it.prayer == lowerName }
                     val isActive = isCurrentOrUpcoming(lowerName, timings)
-                    val isTrackedInSantai = if (isSantaiMode) {
-                        state.user.santaiTrackedPrayers.contains(lowerName)
-                    } else true
 
                     PrayerRowCard(
                         name = name,
                         time = time,
                         isChecked = isChecked,
                         isActive = isActive,
-                        isTrackedInSantai = isTrackedInSantai,
-                        isSantaiMode = isSantaiMode,
                         onCheckedChange = { check ->
                             if (check) {
                                 viewModel.logPrayer(lowerName, "wajib")
@@ -279,59 +244,57 @@ fun HomeScreen(
                 }
             }
 
-            if (isSultanMode || isStandarMode) {
-                Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-                // Sunnah section header
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SectionPill(
-                        text = if (isSultanMode) "🌙 BONUS QUEST — SUNNAH SULTAN" else "🌙 BONUS QUEST — SUNNAH",
-                        gradient = GradientCyanGreen
-                    )
-                }
+            // Sunnah section header
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SectionPill(
+                    text = "🌙 BONUS QUEST — SUNNAH",
+                    gradient = GradientCyanGreen
+                )
+            }
 
-                Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    val sunnahItems = listOf(
-                        Triple("dhuha", "Sholat Dhuha", "Sunnah pagi"),
-                        Triple("tahajjud", "Sholat Tahajjud", "Sunnah sepertiga malam"),
-                        Triple("rawatib_subuh_qobliyah", "Qobliyah Subuh", "2 rakaat sebelum Subuh"),
-                        Triple("rawatib_dzuhur_qobliyah", "Qobliyah Dzuhur Sebelum", "2-4 rakaat sebelum Dzuhur"),
-                        Triple("rawatib_dzuhur_ba'diyyah", "Ba'diyyah Dzuhur Sesudah", "2 rakaat sesudah Dzuhur"),
-                        Triple("rawatib_ashar_qobliyah", "Qobliyah Ashar", "2-4 rakaat sebelum Ashar"),
-                        Triple("rawatib_maghrib_ba'diyyah", "Ba'diyyah Maghrib", "2 rakaat sesudah Maghrib"),
-                        Triple("rawatib_isya_ba'diyyah", "Ba'diyyah Isya", "2 rakaat sesudah Isya")
-                    )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                val sunnahItems = listOf(
+                    Triple("dhuha", "Sholat Dhuha", "Sunnah pagi"),
+                    Triple("tahajjud", "Sholat Tahajjud", "Sunnah sepertiga malam"),
+                    Triple("rawatib_subuh_qobliyah", "Qobliyah Subuh", "2 rakaat sebelum Subuh"),
+                    Triple("rawatib_dzuhur_qobliyah", "Qobliyah Dzuhur Sebelum", "2-4 rakaat sebelum Dzuhur"),
+                    Triple("rawatib_dzuhur_ba'diyyah", "Ba'diyyah Dzuhur Sesudah", "2 rakaat sesudah Dzuhur"),
+                    Triple("rawatib_ashar_qobliyah", "Qobliyah Ashar", "2-4 rakaat sebelum Ashar"),
+                    Triple("rawatib_maghrib_ba'diyyah", "Ba'diyyah Maghrib", "2 rakaat sesudah Maghrib"),
+                    Triple("rawatib_isya_ba'diyyah", "Ba'diyyah Isya", "2 rakaat sesudah Isya")
+                )
 
-                    sunnahItems.forEach { (id, name, desc) ->
-                        val isChecked = state.prayerLog.any { it.date == todayStr && it.prayer == id }
+                sunnahItems.forEach { (id, name, desc) ->
+                    val isChecked = state.prayerLog.any { it.date == todayStr && it.prayer == id }
 
-                        SunnahRowCard(
-                            id = id,
-                            name = name,
-                            desc = desc,
-                            isChecked = isChecked,
-                            onCheckedChange = { check ->
-                                if (check) {
-                                    viewModel.logPrayer(id, "sunnah")
-                                } else {
-                                    showUnlogConfirm = id
-                                }
+                    SunnahRowCard(
+                        id = id,
+                        name = name,
+                        desc = desc,
+                        isChecked = isChecked,
+                        onCheckedChange = { check ->
+                            if (check) {
+                                viewModel.logPrayer(id, "sunnah")
+                            } else {
+                                showUnlogConfirm = id
                             }
-                        )
-                    }
+                        }
+                    )
                 }
             }
 
@@ -476,12 +439,6 @@ fun BintangSealHero(state: MuslimLevelingData, viewModel: GameViewModel) {
     // Short rank name (e.g. "MUSAFIR", "WARRIOR") — first word, uppercased
     val rankShort = rankTitle.split(" ").take(2).joinToString(" ").uppercase()
 
-    val modeLabel = when (state.user.intensityMode) {
-        "santai" -> "🎮 SANTAI"
-        "sultan" -> "👑 SULTAN"
-        else -> "⚔ STANDAR"
-    }
-
     // Rotating glow ring animation
     val infiniteTransition = rememberInfiniteTransition(label = "seal_glow")
     val ringRotation by infiniteTransition.animateFloat(
@@ -545,19 +502,6 @@ fun BintangSealHero(state: MuslimLevelingData, viewModel: GameViewModel) {
                         color = TextLight,
                         letterSpacing = 1.5.sp
                     )
-                    Box(
-                        modifier = Modifier
-                            .background(IslamicGreen.copy(alpha = 0.12f), RoundedCornerShape(100.dp))
-                            .border(1.dp, IslamicGreen.copy(alpha = 0.35f), RoundedCornerShape(100.dp))
-                            .padding(horizontal = 10.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = modeLabel,
-                            fontSize = 9.sp,
-                            color = IslamicGreen,
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(18.dp))
@@ -1231,184 +1175,151 @@ fun RingLabelView(color: Color, name: String, value: String) {
 }
 
 @Composable
-fun HeroStreakCard(state: MuslimLevelingData, isSantaiMode: Boolean) {
+fun HeroStreakCard(state: MuslimLevelingData) {
     val hero = state.heroStreak
 
-    if (isSantaiMode) {
-        Card(
+    // Arena Hikmah hero streak — crimson/gold esports gradient
+    val heroGradient = Brush.linearGradient(
+        colors = listOf(DarkSurfaceElevated, DarkSurface)
+    )
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .shadow(
+                elevation = 24.dp,
+                shape = RoundedCornerShape(24.dp),
+                ambientColor = RingRed.copy(alpha = 0.35f),
+                spotColor = GoldAccent.copy(alpha = 0.2f)
+            )
+            .testTag("hero_streak_card_active"),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        border = BorderStroke(1.5.dp, Brush.linearGradient(listOf(RingRed, GoldAccent)))
+    ) {
+        Box(
             modifier = Modifier
+                .background(heroGradient)
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .testTag("hero_streak_card_locked"),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = DarkSurface.copy(alpha = 0.5f)),
-            border = BorderStroke(1.dp, DarkSurfaceVariant)
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "🔒", fontSize = 28.sp, modifier = Modifier.padding(end = 12.dp))
+            // Background mosque icon
+            Text(
+                text = "🕋",
+                fontSize = 120.sp,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = 15.dp, y = (-25).dp),
+                color = Color.White.copy(alpha = 0.06f)
+            )
+
+            Column(
+                modifier = Modifier.padding(20.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(bottom = 12.dp)
+                ) {
+                    Text(text = "🔥", fontSize = 24.sp)
+                    Text(
+                        text = "SHOLAT 5/5 STREAK",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Black,
+                        color = TextLight,
+                        letterSpacing = 1.sp
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Column {
                         Text(
-                            text = "HERO STREAK [LOCKED]",
-                            fontSize = 14.sp,
+                            text = "${hero.current} HARI",
+                            fontSize = 36.sp,
                             fontWeight = FontWeight.Black,
-                            color = TextMuted,
-                            letterSpacing = 1.sp
+                            color = GoldAccent,
+                            letterSpacing = (-1).sp
                         )
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = "Lengkapin 5 sholat wajib dulu buat buka ini! 🔓",
-                            fontSize = 11.sp,
-                            color = TextMuted,
-                            lineHeight = 16.sp
+                            text = "🏆 REKOR: ${hero.best} HARI",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = IslamicGreen.copy(alpha = 0.9f),
+                            letterSpacing = 0.7.sp
+                        )
+                    }
+
+                    val freezeText = if (hero.freezeAvailable) "❄ FREEZE READY" else "COOLDOWN"
+                    val freezeBgColor = if (hero.freezeAvailable) RingRed.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.1f)
+
+                    Box(
+                        modifier = Modifier
+                            .background(freezeBgColor, RoundedCornerShape(100.dp))
+                            .border(BorderStroke(1.dp, if (hero.freezeAvailable) RingRed.copy(alpha = 0.5f) else Color.Transparent), RoundedCornerShape(100.dp))
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = freezeText,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = if (hero.freezeAvailable) RingRed else TextMuted
                         )
                     }
                 }
-            }
-        }
-    } else {
-        // Arena Hikmah hero streak — crimson/gold esports gradient
-        val heroGradient = Brush.linearGradient(
-            colors = listOf(DarkSurfaceElevated, DarkSurface)
-        )
 
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .shadow(
-                    elevation = 24.dp,
-                    shape = RoundedCornerShape(24.dp),
-                    ambientColor = RingRed.copy(alpha = 0.35f),
-                    spotColor = GoldAccent.copy(alpha = 0.2f)
-                )
-                .testTag("hero_streak_card_active"),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            border = BorderStroke(1.5.dp, Brush.linearGradient(listOf(RingRed, GoldAccent)))
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(heroGradient)
-                    .fillMaxWidth()
-            ) {
-                // Background mosque icon
-                Text(
-                    text = "🕋",
-                    fontSize = 120.sp,
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Per-prayer streaks
+                Box(
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 15.dp, y = (-25).dp),
-                    color = Color.White.copy(alpha = 0.06f)
-                )
-
-                Column(
-                    modifier = Modifier.padding(20.dp)
+                        .background(Color.Black.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
+                        .border(BorderStroke(1.dp, IslamicGreen.copy(alpha = 0.15f)), RoundedCornerShape(16.dp))
+                        .padding(14.dp)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    ) {
-                        Text(text = "🔥", fontSize = 24.sp)
+                    Column {
                         Text(
-                            text = "SHOLAT 5/5 STREAK",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Black,
-                            color = TextLight,
-                            letterSpacing = 1.sp
+                            text = "⚔ STREAK PER-SHOLAT:",
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = GoldAccent,
+                            letterSpacing = 1.5.sp,
+                            modifier = Modifier.padding(bottom = 10.dp)
                         )
-                    }
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column {
-                            Text(
-                                text = "${hero.current} HARI",
-                                fontSize = 36.sp,
-                                fontWeight = FontWeight.Black,
-                                color = GoldAccent,
-                                letterSpacing = (-1).sp
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = "🏆 REKOR: ${hero.best} HARI",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = IslamicGreen.copy(alpha = 0.9f),
-                                letterSpacing = 0.7.sp
-                            )
-                        }
-
-                        val freezeText = if (hero.freezeAvailable) "❄ FREEZE READY" else "COOLDOWN"
-                        val freezeBgColor = if (hero.freezeAvailable) RingRed.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.1f)
-
-                        Box(
-                            modifier = Modifier
-                                .background(freezeBgColor, RoundedCornerShape(100.dp))
-                                .border(BorderStroke(1.dp, if (hero.freezeAvailable) RingRed.copy(alpha = 0.5f) else Color.Transparent), RoundedCornerShape(100.dp))
-                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                text = freezeText,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = if (hero.freezeAvailable) RingRed else TextMuted
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Per-prayer streaks
-                    Box(
-                        modifier = Modifier
-                            .background(Color.Black.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
-                            .border(BorderStroke(1.dp, IslamicGreen.copy(alpha = 0.15f)), RoundedCornerShape(16.dp))
-                            .padding(14.dp)
-                    ) {
-                        Column {
-                            Text(
-                                text = "⚔ STREAK PER-SHOLAT:",
-                                fontSize = 9.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = GoldAccent,
-                                letterSpacing = 1.5.sp,
-                                modifier = Modifier.padding(bottom = 10.dp)
-                            )
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                listOf("subuh", "dzuhur", "ashar", "maghrib", "isya").forEach { prayer ->
-                                    val streakObj = state.perPrayerStreaks[prayer] ?: StreakState()
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        modifier = Modifier.weight(1f)
+                            listOf("subuh", "dzuhur", "ashar", "maghrib", "isya").forEach { prayer ->
+                                val streakObj = state.perPrayerStreaks[prayer] ?: StreakState()
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text(
+                                        text = prayer.substring(0, 1).uppercase() + prayer.substring(1, 3),
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TextLight.copy(alpha = 0.7f)
+                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center,
+                                        modifier = Modifier.padding(top = 2.dp)
                                     ) {
+                                        Text(text = "🔥", fontSize = 10.sp)
+                                        Spacer(modifier = Modifier.width(2.dp))
                                         Text(
-                                            text = prayer.substring(0, 1).uppercase() + prayer.substring(1, 3),
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = TextLight.copy(alpha = 0.7f)
+                                            text = "${streakObj.current}",
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = if (streakObj.current > 0) IslamicGreen else TextMuted
                                         )
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.Center,
-                                            modifier = Modifier.padding(top = 2.dp)
-                                        ) {
-                                            Text(text = "🔥", fontSize = 10.sp)
-                                            Spacer(modifier = Modifier.width(2.dp))
-                                            Text(
-                                                text = "${streakObj.current}",
-                                                fontSize = 13.sp,
-                                                fontWeight = FontWeight.ExtraBold,
-                                                color = if (streakObj.current > 0) IslamicGreen else TextMuted
-                                            )
-                                        }
                                     }
                                 }
                             }
@@ -1426,8 +1337,6 @@ fun PrayerRowCard(
     time: String,
     isChecked: Boolean,
     isActive: Boolean,
-    isTrackedInSantai: Boolean,
-    isSantaiMode: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
     // Arena Hikmah states:
@@ -1573,13 +1482,6 @@ fun PrayerRowCard(
                             fontWeight = if (isActive || isChecked) FontWeight.ExtraBold else FontWeight.SemiBold,
                             color = if (isChecked) IslamicGreen else if (isActive) GoldAccent else TextLight
                         )
-                        if (isSantaiMode && !isTrackedInSantai) {
-                            Text(
-                                text = " (bonus)",
-                                fontSize = 10.sp,
-                                color = TextMuted
-                            )
-                        }
                     }
                     Text(
                         text = "Jam $time WIB",

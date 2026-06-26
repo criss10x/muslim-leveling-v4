@@ -7,7 +7,9 @@ data class User(
     val username: String = "",
     val level: Int = 1,
     val xp: Int = 0,
-    val intensityMode: String = "standar", // "santai" | "standar" | "sultan"
+    // intensityMode & santaiTrackedPrayers removed — semua mode sama (standar: 5 wajib + sunnah aktif)
+    // Field di-keep untuk backward-compat parsing save game lama, tapi tidak dipakai lagi.
+    val intensityMode: String = "standar",
     val santaiTrackedPrayers: List<String> = listOf("subuh", "maghrib", "isya"),
     val kota: String = "",          // Nama kota (display) — e.g. "Kota Denpasar"
     val kotaId: String = "5171",    // KEMENAG city ID (default: Kota Denpasar)

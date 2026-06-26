@@ -48,13 +48,12 @@ import com.example.ui.theme.*
 @Composable
 fun OnboardingScreen(
     viewModel: com.example.viewmodel.GameViewModel,
-    onComplete: (String, String, String, String) -> Unit
+    onComplete: (String, String, String) -> Unit
 ) {
     var currentStep by remember { mutableStateOf(0) }
     var username by remember { mutableStateOf("") }
     var kota by remember { mutableStateOf("Kota Denpasar") }
     var kotaId by remember { mutableStateOf("5171") }
-    var intensityMode by remember { mutableStateOf("standar") }
     var errorMsg by remember { mutableStateOf("") }
 
     val scrollState = rememberScrollState()
@@ -133,8 +132,6 @@ fun OnboardingScreen(
                         },
                         cities = cities,
                         isLoadingCities = isLoadingCities,
-                        intensityMode = intensityMode,
-                        onIntensityModeChange = { intensityMode = it },
                         errorMsg = errorMsg,
                         onBack = { currentStep = 0 },
                         onSubmit = {
@@ -143,7 +140,7 @@ fun OnboardingScreen(
                                     errorMsg = "Oops! Nickname-nya jangan kosong ya 😅"
                                 kota.trim().isEmpty() ->
                                     errorMsg = "Pilih kota asalmu dulu biar jadwal sholatnya muncul!"
-                                else -> onComplete(username.trim(), intensityMode, kota.trim(), kotaId)
+                                else -> onComplete(username.trim(), kota.trim(), kotaId)
                             }
                         }
                     )
@@ -518,8 +515,6 @@ private fun CreateCharacterStep(
     onKotaChange: (String) -> Unit,
     cities: List<com.example.data.KemenagCity>,
     isLoadingCities: Boolean,
-    intensityMode: String,
-    onIntensityModeChange: (String) -> Unit,
     errorMsg: String,
     onBack: () -> Unit,
     onSubmit: () -> Unit
@@ -688,113 +683,6 @@ private fun CreateCharacterStep(
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
-
-                // Intensity mode chooser
-                Text(
-                    text = "Pilih Mode Leveling",
-                    color = TextLight,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    listOf("santai", "standar", "sultan").forEach { mode ->
-                        val isSelected = intensityMode == mode
-                        val displayName = when (mode) {
-                            "santai" -> "Santai"
-                            "standar" -> "Standar"
-                            "sultan" -> "Sultan"
-                            else -> mode
-                        }
-                        val modeColor = when (mode) {
-                            "santai" -> RingBlue
-                            "standar" -> IslamicGreen
-                            "sultan" -> GoldAccent
-                            else -> IslamicGreen
-                        }
-                        val modeGradient = when (mode) {
-                            "santai" -> GradientBlueCyan
-                            "standar" -> GradientGreenGold
-                            "sultan" -> GradientGoldAmber
-                            else -> GradientGreenGold
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .then(
-                                    if (isSelected) Modifier
-                                        .shadow(
-                                            elevation = 8.dp,
-                                            shape = RoundedCornerShape(12.dp),
-                                            ambientColor = modeColor.copy(alpha = 0.45f),
-                                            spotColor = modeColor.copy(alpha = 0.25f)
-                                        )
-                                    else Modifier
-                                )
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(
-                                    if (isSelected)
-                                        Brush.radialGradient(
-                                            listOf(modeColor.copy(alpha = 0.25f), DarkBackground)
-                                        )
-                                    else
-                                        Brush.verticalGradient(GradientDarkSurface)
-                                )
-                                .border(
-                                    width = if (isSelected) 2.dp else 1.dp,
-                                    brush = if (isSelected) Brush.linearGradient(modeGradient)
-                                    else Brush.linearGradient(listOf(DarkSurfaceVariant, DarkSurfaceVariant)),
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .clickable { onIntensityModeChange(mode) }
-                                .padding(vertical = 12.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = displayName,
-                                fontWeight = FontWeight.Bold,
-                                color = if (isSelected) modeColor else TextLight,
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Mode description box
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Brush.verticalGradient(listOf(DarkBackground, DarkSurfaceVariant)),
-                            RoundedCornerShape(12.dp)
-                        )
-                        .border(
-                            width = 1.dp,
-                            color = DarkSurfaceVariant,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .padding(12.dp)
-                ) {
-                    val description = when (intensityMode) {
-                        "santai" -> "🔴 Ring Wajib: 3 sholat pilihanmu (default Subuh, Maghrib, Isya). Sholat lain tetep dapet XP bonus!"
-                        "standar" -> "🔴 Ring Wajib: 5 sholat + 🟢 Ring Sunnah aktif. Balance ibadah wajib & sunnah!"
-                        "sultan" -> "🔴 Ring Wajib: 5 sholat + 🟢 Ring Sunnah aktif. Mode gamer Muslim sejati! 🔥"
-                        else -> ""
-                    }
-                    Text(
-                        text = description,
-                        fontSize = 11.sp,
-                        color = TextLight.copy(alpha = 0.8f),
-                        lineHeight = 16.sp
-                    )
-                }
 
                 if (errorMsg.isNotEmpty()) {
                     Text(

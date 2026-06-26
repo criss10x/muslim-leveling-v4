@@ -495,10 +495,6 @@ fun ProfileHeaderCard(state: MuslimLevelingData, viewModel: GameViewModel) {
                     Text(text = "LOKASI".uppercase(), fontSize = 10.sp, color = TextMuted, letterSpacing = 1.sp)
                     Text(text = state.user.kota, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextLight)
                 }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "INTENSITAS".uppercase(), fontSize = 10.sp, color = TextMuted, letterSpacing = 1.sp)
-                    Text(text = state.user.intensityMode.capitalizeCompat(), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = IslamicGreen)
-                }
             }
         }
     }
@@ -948,7 +944,6 @@ fun SettingsPanelContent(
     var username by remember { mutableStateOf(state.user.username) }
     var kota by remember { mutableStateOf(state.user.kota) }
     var kotaId by remember { mutableStateOf(state.user.kotaId) }
-    var intensityMode by remember { mutableStateOf(state.user.intensityMode) }
     var notifMode by remember { mutableStateOf(state.user.notifMode) }
 
     // Load daftar kota KEMENAG saat settings dibuka
@@ -957,7 +952,6 @@ fun SettingsPanelContent(
     }
     val cities by viewModel.kemenagCities.collectAsState()
     val isLoadingCities by viewModel.isLoadingCities.collectAsState()
-    var selectedSantaiList by remember { mutableStateOf(state.user.santaiTrackedPrayers) }
 
     val context = LocalContext.current
 
@@ -1013,73 +1007,6 @@ fun SettingsPanelContent(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // ─── Mode Leveling selectors (santai/standar/sultan) ───
-            // Per-mode gradient color + glow when selected:
-            //   santai = teal, standar = gold, sultan = violet
-            Text("Mode Leveling:", fontSize = 12.sp, color = GoldAccent, fontWeight = FontWeight.Bold)
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                listOf("santai", "standar", "sultan").forEach { m ->
-                    val isS = m == intensityMode
-                    val modeGradient = when (m) {
-                        "santai" -> GradientCyanGreen
-                        "sultan" -> listOf(PurpleNeon, PurpleNeon.copy(alpha = 0.6f))
-                        else -> GradientGoldAmber
-                    }
-                    val modeColor = when (m) {
-                        "santai" -> IslamicGreen
-                        "sultan" -> PurpleNeon
-                        else -> GoldAccent
-                    }
-                    ArenaModeSelector(
-                        label = m.capitalizeCompat(),
-                        isSelected = isS,
-                        modeGradient = modeGradient,
-                        modeColor = modeColor,
-                        modifier = Modifier.weight(1f),
-                        onClick = { intensityMode = m }
-                    )
-                }
-            }
-
-            if (intensityMode == "santai") {
-                Text(
-                    text = "Pilih 3 sholat wajib yg mau dilacak:",
-                    fontSize = 11.sp,
-                    color = TextMuted,
-                    modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    listOf("subuh", "dzuhur", "ashar", "maghrib", "isya").forEach { pray ->
-                        val isSel = selectedSantaiList.contains(pray)
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(if (isSel) IslamicGreen.copy(alpha = 0.2f) else DarkBackground)
-                                .border(BorderStroke(1.dp, if (isSel) IslamicGreen else ArenaBorder), RoundedCornerShape(8.dp))
-                                .clickable {
-                                    val currentList = selectedSantaiList.toMutableList()
-                                    if (isSel) currentList.remove(pray) else currentList.add(pray)
-                                    selectedSantaiList = currentList
-                                }
-                                .padding(vertical = 6.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = pray.substring(0, 3).uppercase(), fontSize = 10.sp, color = if (isSel) IslamicGreen else TextLight, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
             // ─── Note: Notif mode & Adzan reminder dipindah ke tab Notif ───
             Text(
                 text = "💡 Pengaturan notifikasi & adzan dipindah ke tab 'Notif' di bottom bar.",
@@ -1098,7 +1025,6 @@ fun SettingsPanelContent(
                     .shadow(10.dp, RoundedCornerShape(12.dp), ambientColor = IslamicGreen.copy(alpha = 0.45f))
                     .background(Brush.horizontalGradient(GradientGreenGold), RoundedCornerShape(12.dp))
                     .clickable {
-                        val finalSantai = if (selectedSantaiList.isEmpty()) listOf("subuh", "maghrib", "isya") else selectedSantaiList
                         // Validate kota: must match a KEMENAG city, fallback to existing
                         val match = cities.find { it.lokasi.equals(kota.trim(), ignoreCase = true) }
                         val validKota = match?.lokasi ?: state.user.kota
@@ -1107,8 +1033,6 @@ fun SettingsPanelContent(
                             username = username.trim(),
                             kota = validKota,
                             kotaId = validKotaId,
-                            intensityMode = intensityMode,
-                            santaiPrayers = finalSantai,
                             notifMode = notifMode,
                             theme = "dark"
                         )
@@ -1135,49 +1059,6 @@ fun SettingsPanelContent(
                 Text("⚠️ Hapus Semua Data Karakter ⚠️", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = RingRed)
             }
         }
-    }
-}
-
-// ─── Reusable per-mode gradient selector with glow when selected ───
-@Composable
-private fun ArenaModeSelector(
-    label: String,
-    isSelected: Boolean,
-    modeGradient: List<Color>,
-    modeColor: Color,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    val shape = RoundedCornerShape(10.dp)
-    Box(
-        modifier = modifier
-            .clip(shape)
-            .then(
-                if (isSelected) Modifier.shadow(10.dp, shape, ambientColor = modeColor.copy(alpha = 0.5f))
-                else Modifier
-            )
-            .background(
-                if (isSelected) Brush.verticalGradient(listOf(modeColor.copy(alpha = 0.22f), DarkSurface))
-                else Brush.verticalGradient(GradientDarkSurface)
-            )
-            .border(
-                BorderStroke(
-                    if (isSelected) 1.5.dp else 1.dp,
-                    if (isSelected) Brush.linearGradient(modeGradient)
-                    else Brush.linearGradient(listOf(ArenaBorder, ArenaBorder))
-                ),
-                shape
-            )
-            .clickable { onClick() }
-            .padding(vertical = 12.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = label,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = if (isSelected) modeColor else TextLight
-        )
     }
 }
 

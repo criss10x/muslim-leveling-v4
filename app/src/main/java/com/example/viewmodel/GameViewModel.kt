@@ -104,15 +104,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Start the game with onboarding data
      */
-    fun startNewGame(username: String, intensityMode: String, kota: String, kotaId: String = "5171") {
+    fun startNewGame(username: String, kota: String, kotaId: String = "5171") {
         viewModelScope.launch {
             val defaultData = MuslimLevelingData(
                 user = User(
                     username = username,
-                    intensityMode = intensityMode,
                     kota = kota,
-                    kotaId = kotaId,
-                    santaiTrackedPrayers = listOf("subuh", "maghrib", "isya")
+                    kotaId = kotaId
                 ),
                 lastCheckedDate = LocalDate.now().toString()
             )
@@ -171,8 +169,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         username: String,
         kota: String,
         kotaId: String,
-        intensityMode: String,
-        santaiPrayers: List<String>,
         notifMode: String,
         theme: String
     ) {
@@ -184,8 +180,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 username = username,
                 kota = kota,
                 kotaId = kotaId,
-                intensityMode = intensityMode,
-                santaiTrackedPrayers = santaiPrayers,
                 notifMode = notifMode,
                 theme = theme
             )
@@ -876,31 +870,29 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 )
             )
 
-            // Modes extensions
-            if (state.user.intensityMode == "sultan" || state.user.intensityMode == "standar") {
-                pool.add(
-                    Quest(
-                        "quest_dhuha_before_dzuhur",
-                        "Sholat Dhuha sebelum Dzuhur",
-                        xpReward = 40,
-                        target = 1,
-                        progress = 0,
-                        completed = false,
-                        claimed = false
-                    )
+            // Modes extensions — selalu aktif (intensity mode dihapus)
+            pool.add(
+                Quest(
+                    "quest_dhuha_before_dzuhur",
+                    "Sholat Dhuha sebelum Dzuhur",
+                    xpReward = 40,
+                    target = 1,
+                    progress = 0,
+                    completed = false,
+                    claimed = false
                 )
-                pool.add(
-                    Quest(
-                        "quest_rawatib_two",
-                        "Rawatib 2x hari ini",
-                        xpReward = 45,
-                        target = 2,
-                        progress = 0,
-                        completed = false,
-                        claimed = false
-                    )
+            )
+            pool.add(
+                Quest(
+                    "quest_rawatib_two",
+                    "Rawatib 2x hari ini",
+                    xpReward = 45,
+                    target = 2,
+                    progress = 0,
+                    completed = false,
+                    claimed = false
                 )
-            }
+            )
 
             if (state.heroStreak.current >= 6) {
                 pool.add(
