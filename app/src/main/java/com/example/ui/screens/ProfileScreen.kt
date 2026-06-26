@@ -3,6 +3,7 @@ package com.example.ui.screens
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
@@ -32,12 +34,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.compose.rememberLauncherForActivityResult
 import com.example.data.*
 import com.example.notifications.NotificationScheduler
 import com.example.ui.components.CityDropdownPicker
 import com.example.ui.components.NeonProgressBar
 import com.example.ui.theme.*
 import com.example.viewmodel.*
+import kotlinx.coroutines.Dispatchers
 import java.time.LocalDate
 
 // ═══════════════════════════════════════════════════════════════
@@ -328,32 +332,45 @@ private fun ArenaSectionPill(
 
 // ═══════════════════════════════════════════════════════════════
 // PROFILE HEADER CARD
-// Avatar with rotating gradient arc ring (8s rotation) + pulsing glow.
+// Avatar with tier-progressive border system (TierProfileAvatar) + photo upload.
+// Border style & effects scale with tier (Warrior→Mythic Immortal).
 // ═══════════════════════════════════════════════════════════════
 @Composable
 fun ProfileHeaderCard(state: MuslimLevelingData, viewModel: GameViewModel) {
     val levelInfo = viewModel.getLevelInfo(state.user.xp)
     val rankTitle = viewModel.getRankTitle(levelInfo.level)
+    val tierName = viewModel.getTierName(levelInfo.level)
+    val context = LocalContext.current
 
-    val transition = rememberInfiniteTransition(label = "avatar_ring")
-    val ringRotation by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 8000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "ring_rotation"
-    )
-    val pulseScale by transition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.06f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2200, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "pulse_scale"
-    )
+    // Image picker launcher
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            // Decode + crop to square (center crop), downscale to max 512px
+            viewModel.viewModelScope.launch(Dispatchers.IO) {
+                runCatching {
+                    val inputStream = context.contentResolver.openInputStream(uri)
+                    val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
+                    inputStream?.close()
+                    if (bitmap != null) {
+                        // Center crop to square
+                        val size = minOf(bitmap.width, bitmap.height)
+                        val startX = (bitmap.width - size) / 2
+                        val startY = (bitmap.height - size) / 2
+                        val cropped = android.graphics.Bitmap.createBitmap(bitmap, startX, startY, size, size)
+                        // Downscale if larger than 512
+                        val finalBitmap = if (cropped.width > 512) {
+                            android.graphics.Bitmap.createScaledBitmap(cropped, 512, 512, true)
+                        } else {
+                            cropped
+                        }
+                        viewModel.saveProfileImage(finalBitmap)
+                    }
+                }.onFailure { it.printStackTrace() }
+            }
+        }
+    }
 
     val headerShape = RoundedCornerShape(22.dp)
     Card(
@@ -382,40 +399,37 @@ fun ProfileHeaderCard(state: MuslimLevelingData, viewModel: GameViewModel) {
                     )
                 }
                 .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Avatar with rotating gradient arc + pulsing glow
+            // Tier Profile Avatar with progressive border
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.size(90.dp)
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .clickable { imagePickerLauncher.launch("image/*") }
             ) {
-                Canvas(
+                com.example.ui.components.TierProfileAvatar(
+                    profileImagePath = state.user.profileImagePath,
+                    tierName = tierName,
+                    sizeDp = 120.dp,
+                    showEditBadge = true
+                )
+            }
+
+            // Long-press hint to remove photo
+            if (state.user.profileImagePath != null) {
+                Text(
+                    text = "tahan untuk hapus foto",
+                    fontSize = 9.sp,
+                    color = TextMuted,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer { rotationZ = ringRotation }
-                ) {
-                    val strokeWidth = 3.dp.toPx()
-                    drawArc(
-                        brush = Brush.sweepGradient(listOf(IslamicGreen, GoldAccent, PurpleNeon, IslamicGreen)),
-                        startAngle = 0f,
-                        sweepAngle = 270f,
-                        useCenter = false,
-                        style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .size(72.dp * pulseScale)
-                        .shadow(18.dp, CircleShape, ambientColor = GoldAccent.copy(alpha = 0.55f))
-                        .background(
-                            Brush.radialGradient(listOf(GoldAccent.copy(alpha = 0.22f), DarkBackground)),
-                            CircleShape
-                        )
-                        .border(BorderStroke(2.dp, Brush.linearGradient(GradientGoldAmber)), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "👑", fontSize = 36.sp)
-                }
+                        .padding(bottom = 4.dp)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onLongPress = { viewModel.clearProfileImage() }
+                            )
+                        }
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))

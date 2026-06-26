@@ -210,6 +210,54 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
+     * Save uploaded profile photo to internal storage and store its path in user data.
+     * Decodes + compresses the bitmap to JPEG (quality 85), saves to filesDir/profile.jpg
+     */
+    fun saveProfileImage(bitmap: android.graphics.Bitmap) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val context = getApplication<Application>()
+            val file = java.io.File(context.filesDir, "profile.jpg")
+            try {
+                file.outputStream().use { out ->
+                    bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, out)
+                }
+                val currentData = _gameData.value
+                val updatedUser = currentData.user.copy(profileImagePath = file.absolutePath)
+                val updatedData = currentData.copy(user = updatedUser)
+                _gameData.value = updatedData
+                repository.saveGameState(updatedData)
+                withContext(Dispatchers.Main) {
+                    viewModelScope.launch { _toastEvent.emit("Foto profil terpasang! 📸") }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    viewModelScope.launch { _toastEvent.emit("Gagal simpan foto: ${e.message}") }
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove profile photo from storage and clear path in user data.
+     */
+    fun clearProfileImage() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentData = _gameData.value
+            currentData.user.profileImagePath?.let { path ->
+                runCatching { java.io.File(path).delete() }
+            }
+            val updatedUser = currentData.user.copy(profileImagePath = null)
+            val updatedData = currentData.copy(user = updatedUser)
+            _gameData.value = updatedData
+            repository.saveGameState(updatedData)
+            withContext(Dispatchers.Main) {
+                viewModelScope.launch { _toastEvent.emit("Foto profil dihapus 🗑️") }
+            }
+        }
+    }
+
+    /**
      * Run daily streak check and quest reset
      */
     fun runDailyCheckAndRefresh() {

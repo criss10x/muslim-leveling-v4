@@ -14,7 +14,8 @@ data class User(
     val kota: String = "",          // Nama kota (display) — e.g. "Kota Denpasar"
     val kotaId: String = "5171",    // KEMENAG city ID (default: Kota Denpasar)
     val theme: String = "dark", // "dark" | "light"
-    val notifMode: String = "seimbang" // "fokus" | "seimbang" | "intensif"
+    val notifMode: String = "seimbang", // "fokus" | "seimbang" | "intensif"
+    val profileImagePath: String? = null  // Local file path to uploaded profile photo (null = use default 👑 avatar)
 )
 
 @JsonClass(generateAdapter = true)
