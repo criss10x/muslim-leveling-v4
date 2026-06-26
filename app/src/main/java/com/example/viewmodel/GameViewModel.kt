@@ -1433,21 +1433,20 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     // Catatan: isya bisa malam, imsak pagi → cross-midnight, jadi OR
                 }
                 "rawatib_subuh_qobliyah" -> {
-                    // Qobliyah Subuh: setelah imsak → sebelum subuh
-                    isTimeAfter(currentTime, timings.imsak) && isTimeBefore(currentTime, timings.subuh)
+                    // Qobliyah Subuh: samakan dengan sholat wajib subuh (subuh → terbit)
+                    isTimeAfter(currentTime, timings.subuh) && isTimeBefore(currentTime, timings.terbit)
                 }
                 "rawatib_dzuhur_qobliyah" -> {
-                    // Qobliyah Dzuhur: setelah terbit+15min → sebelum dzuhur
-                    val earliestStart = addMinutes(timings.terbit, 15)
-                    isTimeAfter(currentTime, earliestStart) && isTimeBefore(currentTime, timings.dzuhur)
+                    // Qobliyah Dzuhur: dari dzuhur sampai ashar
+                    isTimeAfter(currentTime, timings.dzuhur) && isTimeBefore(currentTime, timings.ashar)
                 }
                 "rawatib_dzuhur_ba'diyyah" -> {
                     // Ba'diyah Dzuhur: setelah dzuhur → sebelum ashar
                     isTimeAfter(currentTime, timings.dzuhur) && isTimeBefore(currentTime, timings.ashar)
                 }
                 "rawatib_ashar_qobliyah" -> {
-                    // Qobliyah Ashar: setelah dzuhur → sebelum ashar
-                    isTimeAfter(currentTime, timings.dzuhur) && isTimeBefore(currentTime, timings.ashar)
+                    // Qobliyah Ashar: setelah adzan ashar sampai adzan maghrib
+                    isTimeAfter(currentTime, timings.ashar) && isTimeBefore(currentTime, timings.maghrib)
                 }
                 "rawatib_maghrib_ba'diyyah" -> {
                     // Ba'diyah Maghrib: setelah maghrib → sebelum isya
@@ -1499,10 +1498,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         return when (prayer) {
             "dhuha" -> "Dhuha bisa setelah matahari naik (±15 min setelah terbit) sampai sebelum Dzuhur."
             "tahajjud" -> "Tahajjud waktu setelah Isya sampai sebelum Imsak (utamanya sepertiga malam terakhir)."
-            "rawatib_subuh_qobliyah" -> "Qobliyah Subuh waktunya setelah Imsak sampai sebelum Subuh."
-            "rawatib_dzuhur_qobliyah" -> "Qobliyah Dzuhur waktunya sebelum Dzuhur masuk."
+            "rawatib_subuh_qobliyah" -> "Qobliyah Subuh waktunya sama dengan sholat Subuh (dari Subuh sampai Terbit)."
+            "rawatib_dzuhur_qobliyah" -> "Qobliyah Dzuhur waktunya dari Dzuhur sampai Ashar."
             "rawatib_dzuhur_ba'diyyah" -> "Ba'diyah Dzuhur waktunya setelah Dzuhur sampai sebelum Ashar."
-            "rawatib_ashar_qobliyah" -> "Qobliyah Ashar waktunya setelah Dzuhur sampai sebelum Ashar."
+            "rawatib_ashar_qobliyah" -> "Qobliyah Ashar waktunya setelah adzan Ashar sampai adzan Maghrib."
             "rawatib_maghrib_ba'diyyah" -> "Ba'diyah Maghrib waktunya setelah Maghrib sampai sebelum Isya."
             "rawatib_isya_ba'diyyah" -> "Ba'diyah Isya waktunya setelah Isya sampai tengah malam."
             else -> "Coba lagi nanti ya."
