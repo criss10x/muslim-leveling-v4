@@ -8,9 +8,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -33,6 +31,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -41,15 +40,14 @@ import com.example.ui.theme.*
 import kotlinx.coroutines.delay
 
 /**
- * Futuristic splash screen with animated neon glow rings, rotating arc,
- * pulse animation, and shimmer reveal of logo + app name.
+ * Nur Quest splash — shield glow + gradient title + "MEMUAT DATA PEJUANG..."
  *
  * Phases:
- *   - Phase 1 (0–700ms):   outer ring scales in, glow pulses
- *   - Phase 2 (700–1400ms): rotating arc sweeps around
- *   - Phase 3 (1400–2100ms): logo + app name fade/scale in
- *   - Phase 4 (2100–2700ms): tagline appears
- *   - Phase 5 (2700ms):     onTimeout invoked
+ *   0 (0–600ms):   shield glow pulses, background grid
+ *   1 (600–1200ms): "MUSLIM LEVELING" gradient title fade+scale in
+ *   2 (1200–1800ms): tagline "Level Up Imanmu, Level Up Kehidupanmu" fade in
+ *   3 (1800–2400ms): "MEMUAT DATA PEJUANG..." status text + progress bar
+ *   4 (2400ms):     onTimeout invoked
  */
 @Composable
 fun SplashScreen(
@@ -57,36 +55,42 @@ fun SplashScreen(
 ) {
     var phase by remember { mutableStateOf(0) }
 
-    // Drive phase progression
     LaunchedEffect(Unit) {
-        delay(700);   phase = 1
-        delay(700);   phase = 2
-        delay(700);   phase = 3
-        delay(600);   phase = 4
-        delay(400);   onTimeout()
+        delay(600);   phase = 1
+        delay(600);   phase = 2
+        delay(600);   phase = 3
+        delay(800);   onTimeout()
     }
 
-    // Rotating arc infinite animation (starts once phase >= 1)
-    val infiniteTransition = rememberInfiniteTransition(label = "splash_arc")
+    // Shield glow pulse
+    val infiniteTransition = rememberInfiniteTransition(label = "splash")
+    val glowPulse by infiniteTransition.animateFloat(
+        initialValue = 0.4f,
+        targetValue = 0.85f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1400, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glow_pulse"
+    )
     val arcRotation by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1800, easing = LinearEasing),
+            animation = tween(2400, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
         label = "arc_rotation"
     )
-
-    // Pulse glow infinite animation
-    val pulseGlow by infiniteTransition.animateFloat(
-        initialValue = 0.45f,
-        targetValue = 0.85f,
+    // Loading dots animation
+    val dotAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1400, easing = LinearEasing),
+            animation = tween(700, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "pulse_glow"
+        label = "dot_alpha"
     )
 
     Box(
@@ -99,35 +103,27 @@ fun SplashScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // ── Hero logo container with rotating neon ring + glow ──
+            // ── Shield icon with rotating glow ring ──
             Box(
                 modifier = Modifier
-                    .size(180.dp)
+                    .size(140.dp)
                     .drawBehind {
                         val radius = size.minDimension / 2f
                         val center = Offset(size.width / 2f, size.height / 2f)
 
-                        // Outer radial glow (pulsing)
+                        // Pulsing radial glow
                         drawCircle(
                             brush = Brush.radialGradient(
                                 colors = listOf(
-                                    IslamicGreen.copy(alpha = pulseGlow * 0.5f),
+                                    IslamicGreen.copy(alpha = glowPulse * 0.5f),
                                     IslamicGreen.copy(alpha = 0.05f),
                                     Color.Transparent
                                 ),
                                 center = center,
-                                radius = radius * 1.3f
+                                radius = radius * 1.4f
                             ),
                             center = center,
-                            radius = radius * 1.3f
-                        )
-
-                        // Dashed outer ring (subtle)
-                        drawCircle(
-                            color = IslamicGreen.copy(alpha = 0.25f),
-                            radius = radius * 1.05f,
-                            center = center,
-                            style = Stroke(width = 1.5.dp.toPx())
+                            radius = radius * 1.4f
                         )
 
                         // Rotating gradient arc
@@ -136,7 +132,6 @@ fun SplashScreen(
                                 colors = listOf(
                                     Color.Transparent,
                                     IslamicGreen,
-                                    GoldAccent,
                                     CyanAccent,
                                     Color.Transparent
                                 )
@@ -146,148 +141,129 @@ fun SplashScreen(
                             useCenter = false,
                             topLeft = Offset(center.x - radius, center.y - radius),
                             size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
-                            style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round)
-                        )
-
-                        // Inner counter-rotating ring (gold)
-                        drawArc(
-                            color = GoldAccent.copy(alpha = 0.6f),
-                            startAngle = -arcRotation * 1.5f,
-                            sweepAngle = 60f,
-                            useCenter = false,
-                            topLeft = Offset(center.x - radius * 0.85f, center.y - radius * 0.85f),
-                            size = androidx.compose.ui.geometry.Size(radius * 1.7f, radius * 1.7f),
-                            style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
+                            style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round)
                         )
                     },
                 contentAlignment = Alignment.Center
             ) {
-                // Inner logo box (animated reveal)
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = phase >= 2,
-                    enter = scaleIn(animationSpec = tween(600)) + fadeIn(),
-                    exit = scaleOut() + fadeOut()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(108.dp)
-                            .shadow(
-                                elevation = 24.dp,
-                                shape = CircleShape,
-                                ambientColor = IslamicGreen.copy(alpha = 0.6f),
-                                spotColor = GoldAccent.copy(alpha = 0.4f)
-                            )
-                            .background(
-                                brush = Brush.verticalGradient(
-                                    listOf(DarkSurface, DarkSurfaceElevated)
-                                ),
-                                CircleShape
-                            )
-                            .border(
-                                width = 2.dp,
-                                brush = Brush.linearGradient(GradientGreenGold),
-                                shape = CircleShape
-                            )
-                            .clip(CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "⭐",
-                            fontSize = 56.sp
+                Box(
+                    modifier = Modifier
+                        .size(96.dp)
+                        .shadow(
+                            elevation = 20.dp,
+                            shape = RoundedCornerShape(20.dp),
+                            ambientColor = IslamicGreen.copy(alpha = 0.6f),
+                            spotColor = CyanAccent.copy(alpha = 0.3f)
                         )
-                    }
+                        .background(
+                            brush = Brush.verticalGradient(listOf(DarkSurface, DarkSurfaceElevated)),
+                            RoundedCornerShape(20.dp)
+                        )
+                        .border(
+                            width = 2.dp,
+                            brush = Brush.linearGradient(listOf(IslamicGreen, CyanAccent)),
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .clip(RoundedCornerShape(20.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Shield emoji per mockup
+                    Text(text = "🛡️", fontSize = 44.sp)
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-            // ── App name (animated reveal) ──
+            // ── MUSLIM LEVELING (gradient text) ──
             AnimatedVisibility(
-                visible = phase >= 3,
+                visible = phase >= 1,
                 enter = fadeIn(tween(500)) + scaleIn(tween(500), initialScale = 0.85f)
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "MUSLIM LEVELING",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Black,
-                        color = TextLight,
-                        letterSpacing = 4.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.drawBehind {
-                            // Subtle gradient text shadow glow
-                            drawRect(Brush.verticalGradient(
-                                listOf(IslamicGreenGlow.copy(alpha = 0.1f), Color.Transparent)
-                            ))
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = "ARENA HIKMAH",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = GoldAccent,
-                        letterSpacing = 8.sp,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // ── Tagline (phase 4) ──
-            AnimatedVisibility(
-                visible = phase >= 4,
-                enter = fadeIn(tween(500))
-            ) {
                 Text(
-                    text = "Level Up Iman, Level Up Kehidupanmu",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = TextMuted,
+                    text = "MUSLIM LEVELING",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Black,
+                    color = CyanAccent,
+                    letterSpacing = 2.sp,
                     textAlign = TextAlign.Center
                 )
             }
-        }
 
-        // ── Loading dots bottom indicator ──
-        if (phase < 4) {
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 64.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // ── Tagline ──
+            AnimatedVisibility(
+                visible = phase >= 2,
+                enter = fadeIn(tween(500))
             ) {
-                repeat(3) { index ->
-                    val bounce = infiniteTransition.animateFloat(
-                        initialValue = 0.3f,
-                        targetValue = 1f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(
-                                durationMillis = 700,
-                                delayMillis = index * 200,
-                                easing = LinearEasing
-                            ),
-                            repeatMode = RepeatMode.Reverse
-                        ),
-                        label = "dot_$index"
-                    )
+                Text(
+                    text = "Level Up Imanmu, Level Up Kehidupanmu",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = TextLight,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(modifier = Modifier.height(36.dp))
+
+            // ── Loading status + progress bar ──
+            AnimatedVisibility(
+                visible = phase >= 3,
+                enter = fadeIn(tween(400))
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // "MEMUAT DATA PEJUANG..." monospace
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "MEMUAT DATA PEJUANG",
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = IslamicGreen.copy(alpha = 0.7f),
+                            letterSpacing = 1.5.sp
+                        )
+                        // Animated dots (3 dots cycling)
+                        repeat(3) { i ->
+                            Text(
+                                text = ".",
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = IslamicGreen.copy(
+                                    alpha = if ((phase + i) % 3 == 0) dotAlpha else 0.3f
+                                )
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Progress bar track (indeterminate-style fill)
                     Box(
                         modifier = Modifier
-                            .size(8.dp)
-                            .shadow(
-                                elevation = 6.dp,
-                                shape = CircleShape,
-                                ambientColor = IslamicGreen.copy(alpha = 0.6f),
-                                spotColor = IslamicGreen.copy(alpha = 0.4f)
-                            )
-                            .background(
-                                IslamicGreen.copy(alpha = bounce.value),
-                                CircleShape
-                            )
-                    )
+                            .width(180.dp)
+                            .height(4.dp)
+                            .clip(RoundedCornerShape(100.dp))
+                            .background(DarkSurfaceVariant)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .fillMaxWidth(glowPulse)
+                                .clip(RoundedCornerShape(100.dp))
+                                .background(
+                                    Brush.horizontalGradient(
+                                        listOf(IslamicGreen, CyanAccent)
+                                    )
+                                )
+                        )
+                    }
                 }
             }
         }
