@@ -3,6 +3,7 @@ package com.example.ui.screens
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -13,59 +14,38 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.*
 import com.example.ui.theme.*
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.TextStyle
-import java.util.Locale
 
 // ═══════════════════════════════════════════════════════════════
-// ARENA HIKMAH — STATISTIK BOTTOM SHEET (Weekly Recap)
-// Dipanggil dari ProfileScreen via tombol "Lihat Statistik 📊"
-// Gen Z vibes: bar chart konsistensi, win rate per sholat,
-// streak terpanjang, total XP bulan ini.
-// All charts drawn with Canvas (no external lib).
+// STATISTIK MINGGUAN — BOTTOM SHEET (Nur Quest redesign 2026-06-28)
+// Matches Stitch mockup statistik_mingguan_bottom_sheet:
+// drag handle + teal title + X close, XP HARIAN bar chart,
+// 2-col Win Rate / Streak, Total XP Bulan Ini with trend.
+// All charts Canvas-drawn (no external lib).
 // ═══════════════════════════════════════════════════════════════
 
-private val ArenaBorder = TextLight.copy(alpha = 0.08f)
+private val GlassBorder = OutlineVariant.copy(alpha = 0.3f)
 
 private val WAJIB_PRAYERS = listOf("subuh", "dzuhur", "ashar", "maghrib", "isya")
-private val PRAYER_LABELS = mapOf(
-    "subuh" to "Subuh",
-    "dzuhur" to "Dzuhur",
-    "ashar" to "Ashar",
-    "maghrib" to "Maghrib",
-    "isya" to "Isya"
-)
-private val PRAYER_EMOJI = mapOf(
-    "subuh" to "🌅",
-    "dzuhur" to "☀️",
-    "ashar" to "🌇",
-    "maghrib" to "🌆",
-    "isya" to "🌙"
-)
-private val PRAYER_ACCENT = mapOf(
-    "subuh" to GoldAccent,
-    "dzuhur" to IslamicGreen,
-    "ashar" to CyanAccent,
-    "maghrib" to RingRed,
-    "isya" to PurpleNeon
-)
+
+// Day labels in Stitch mockup order (oldest → today). Bahasa Indonesia.
+private val DAY_LABELS_ID = listOf("SEN", "SEL", "RAB", "KAM", "JUM", "SAB", "MIN")
+
+// Day-of-week index for last 7 days, used to find "today" bar.
+private fun todayDayOfWeekIndex(): Int = LocalDate.now().dayOfWeek.value - 1 // MON=0..SUN=6
 
 /**
- * Modal Bottom Sheet yang menampilkan statistik mingguan/bulanan.
- * Dipanggil dari ProfileScreen.
+ * Modal Bottom Sheet — statistik mingguan.
+ * Dipanggil dari ProfileScreen via tombol "Lihat Statistik 📊".
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,16 +59,16 @@ fun StatistikBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = modalSheetState,
-        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        containerColor = DarkBackground,
+        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+        containerColor = DarkSurface,
         dragHandle = {
             Box(
                 modifier = Modifier
                     .padding(vertical = 12.dp)
-                    .width(40.dp)
-                    .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(TextMuted.copy(alpha = 0.5f))
+                    .width(64.dp)
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(OutlineVariant)
             )
         }
     ) {
@@ -96,131 +76,131 @@ fun StatistikBottomSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 40.dp)
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 32.dp)
         ) {
-            // ─── Header ───
-            StatistikHeader()
+            // ─── Header (teal title + subtitle + close button) ───
+            StatistikHeader(onClose = onDismiss)
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // ─── Compute stats ───
             val last7Days = remember(state.prayerLog) { getLast7DaysCompletion(state.prayerLog) }
-            val winRates = remember(state.prayerLog) { getWinRatePerPrayer(state.prayerLog) }
-            val longestStreak = remember(state.prayerLog) { getLongestHeroStreak(state.prayerLog) }
+            val winRate = remember(state.prayerLog) { getOverallWinRate(state.prayerLog) }
+            val streak = remember(state.prayerLog) { getLongestHeroStreak(state.prayerLog) }
             val xpThisMonth = remember(state.prayerLog) { getXpThisMonth(state.prayerLog) }
-            val xpByWeek = remember(state.prayerLog) { getXpByWeek(state.prayerLog) }
+            val xpTrendPct = remember(state.prayerLog) { getXpTrendPercent(state.prayerLog) }
 
-            // ─── Weekly Bar Chart ───
-            WeeklyBarChartCard(last7Days = last7Days)
+            // ─── XP HARIAN (7 HARI TERAKHIR) ───
+            XpDailyChartCard(last7Days = last7Days)
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // ─── Win Rate per Sholat ───
-            WinRatePerPrayerCard(winRates = winRates)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // ─── Streak & XP Month cards (2 col) ───
+            // ─── 2-col: Win Rate + Streak ───
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                LongestStreakCard(
-                    streak = longestStreak,
+                WinRateCard(
+                    winRate = winRate,
                     modifier = Modifier.weight(1f)
                 )
-                XpThisMonthCard(
-                    xp = xpThisMonth,
+                StreakCard(
+                    streak = streak,
                     modifier = Modifier.weight(1f)
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // ─── XP by Week (4 minggu terakhir) ───
-            XpByWeekCard(weeklyXp = xpByWeek)
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // ─── Insight / Recommendation ───
-            InsightCard(
-                winRates = winRates,
-                last7Days = last7Days
+            // ─── Total XP Bulan Ini (with trend) ───
+            TotalXpMonthCard(
+                xp = xpThisMonth,
+                trendPct = xpTrendPct
             )
         }
     }
 }
 
 // ═══════════════════════════════════════════════════════════════
-// HEADER
+// HEADER — Statistik Mingguan + subtitle + X close button
 // ═══════════════════════════════════════════════════════════════
 
 @Composable
-private fun StatistikHeader() {
-    Column(
+private fun StatistikHeader(onClose: () -> Unit) {
+    Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "📊",
-            fontSize = 40.sp
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = "STATISTIK",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Black,
-            color = TextLight,
-            letterSpacing = 2.sp
-        )
-        Text(
-            text = "Recap performa sholat kamu",
-            fontSize = 12.sp,
-            color = TextMuted
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Statistik Mingguan",
+                style = MaterialTheme.typography.headlineMedium,
+                color = IslamicGreen,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Laporan Perjalanan Spiritual",
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextMuted,
+                fontSize = 14.sp
+            )
+        }
+        // Close button (circular, X)
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(DarkSurfaceVariant)
+                .border(1.dp, OutlineVariant.copy(alpha = 0.5f), CircleShape)
+                .clickable(onClick = onClose),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "✕",
+                color = TextLight,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
 // ═══════════════════════════════════════════════════════════════
-// WEEKLY BAR CHART — 7 hari terakhir
+// XP HARIAN CHART CARD — 7 bars SEN..MIN, today = teal
 // ═══════════════════════════════════════════════════════════════
 
 @Composable
-private fun WeeklyBarChartCard(last7Days: List<DayCompletion>) {
-    val today = LocalDate.now()
-    val dayLabels = (0..6).map { offset ->
-        val date = today.minusDays((6 - offset).toLong())
-        date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale("id", "ID"))
-            .take(3)
-            .uppercase()
-    }
+private fun XpDailyChartCard(last7Days: List<DayCompletion>) {
+    val todayIdx = todayDayOfWeekIndex()
+    // Map last-7-day bars to day labels: bar index 0 = 6 days ago, bar 6 = today.
+    // Each bar's day-of-week = (todayIdx - (6 - barIndex) + 7) % 7 → matches DAY_LABELS_ID index.
+    val barDayIndices = (0..6).map { i -> (todayIdx - (6 - i) + 7) % 7 }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(DarkSurface.copy(alpha = 0.6f))
-            .border(1.dp, ArenaBorder, RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(16.dp))
+            .background(DarkSurface)
+            .border(1.dp, GlassBorder, RoundedCornerShape(16.dp))
             .padding(20.dp)
     ) {
+        // Label-caps header: 📈 XP HARIAN (7 HARI TERAKHIR)
         Text(
-            text = "KONSISTENSI 7 HARI",
-            fontSize = 11.sp,
+            text = "📈 XP HARIAN (7 HARI TERAKHIR)",
+            style = MaterialTheme.typography.labelMedium,
+            color = TextMuted,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
-            color = IslamicGreen,
-            letterSpacing = 1.5.sp
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = "Berapa sholat wajib kamu lengkapi tiap hari",
-            fontSize = 11.sp,
-            color = TextMuted
+            letterSpacing = 1.2.sp
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Bar chart canvas
+        // Bar chart canvas — height matches mockup (h-40 = 160px)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -228,23 +208,10 @@ private fun WeeklyBarChartCard(last7Days: List<DayCompletion>) {
         ) {
             WeeklyBarChart(
                 values = last7Days.map { it.completedCount.toFloat() },
-                labels = dayLabels,
+                dayIndices = barDayIndices,
+                todayIdx = todayIdx,
                 maxValue = 5f
             )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Summary row
-        val totalCompleted = last7Days.sumOf { it.completedCount }
-        val totalPossible = 35
-        val percent = if (totalPossible > 0) (totalCompleted * 100 / totalPossible) else 0
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            SummaryMiniStat(label = "Minggu ini", value = "$totalCompleted/$totalPossible")
-            SummaryMiniStat(label = "Completion", value = "$percent%", accent = IslamicGreen)
         }
     }
 }
@@ -252,7 +219,8 @@ private fun WeeklyBarChartCard(last7Days: List<DayCompletion>) {
 @Composable
 private fun WeeklyBarChart(
     values: List<Float>,
-    labels: List<String>,
+    dayIndices: List<Int>,
+    todayIdx: Int,
     maxValue: Float
 ) {
     val animProgress = remember { Animatable(0f) }
@@ -261,9 +229,7 @@ private fun WeeklyBarChart(
         animProgress.animateTo(1f, tween(900, easing = FastOutSlowInEasing))
     }
 
-    Canvas(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Canvas(modifier = Modifier.fillMaxSize()) {
         val barCount = values.size
         val canvasWidth = size.width
         val canvasHeight = size.height
@@ -272,73 +238,54 @@ private fun WeeklyBarChart(
         val barSpacing = 12f
         val barWidth = (canvasWidth - barSpacing * (barCount + 1)) / barCount
 
-        // Grid lines (dashed)
-        val gridColor = TextLight.copy(alpha = 0.05f)
-        for (i in 0..5) {
-            val y = chartHeight - (chartHeight * i / 5f)
-            drawLine(
-                color = gridColor,
-                start = Offset(0f, y),
-                end = Offset(canvasWidth, y),
-                strokeWidth = 1f
-            )
-        }
-
-        // Bars
         values.forEachIndexed { index, value ->
             val animatedValue = value * animProgress.value
             val barHeight = (animatedValue / maxValue) * chartHeight
             val x = barSpacing + index * (barWidth + barSpacing)
             val y = chartHeight - barHeight
 
-            // Bar with gradient
-            val isToday = index == barCount - 1
+            // Today's bar = teal+cyan gradient, others = dim teal
+            val isToday = dayIndices[index] == todayIdx
             val barColor = if (isToday) IslamicGreen else IslamicGreenDim
             val barGradient = Brush.verticalGradient(
-                colors = listOf(
-                    barColor,
-                    barColor.copy(alpha = 0.3f)
-                ),
+                colors = if (isToday) {
+                    listOf(CyanAccent, IslamicGreen)
+                } else {
+                    listOf(barColor, barColor.copy(alpha = 0.3f))
+                },
                 startY = y,
                 endY = chartHeight
             )
 
+            // Track background (surface-container-highest)
             drawRoundRect(
-                brush = barGradient,
-                topLeft = Offset(x, y),
-                size = Size(barWidth, barHeight),
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(6f, 6f)
+                color = DarkSurfaceVariant.copy(alpha = 0.5f),
+                topLeft = Offset(x, 0f),
+                size = Size(barWidth, chartHeight),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(4f, 4f)
             )
 
-            // Value label on top of bar
-            if (animatedValue > 0) {
-                drawIntoCanvas {
-                    val paint = android.graphics.Paint().apply {
-                        color = barColor.toArgb()
-                        textSize = 28f
-                        isAntiAlias = true
-                        textAlign = android.graphics.Paint.Align.CENTER
-                        typeface = android.graphics.Typeface.DEFAULT_BOLD
-                    }
-                    it.nativeCanvas.drawText(
-                        "${value.toInt()}",
-                        x + barWidth / 2f,
-                        y - 6f,
-                        paint
-                    )
-                }
+            // Bar fill
+            if (barHeight > 0f) {
+                drawRoundRect(
+                    brush = barGradient,
+                    topLeft = Offset(x, y),
+                    size = Size(barWidth, barHeight),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(4f, 4f)
+                )
             }
 
-            // Day label below
+            // Day label below — today in cyan, others muted
             drawIntoCanvas {
                 val paint = android.graphics.Paint().apply {
-                    color = (if (isToday) IslamicGreen else TextMuted).toArgb()
+                    color = (if (isToday) CyanAccent else TextMuted).toArgb()
                     textSize = 26f
                     isAntiAlias = true
                     textAlign = android.graphics.Paint.Align.CENTER
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
                 }
                 it.nativeCanvas.drawText(
-                    labels[index],
+                    DAY_LABELS_ID[dayIndices[index]],
                     x + barWidth / 2f,
                     canvasHeight - 4f,
                     paint
@@ -348,484 +295,199 @@ private fun WeeklyBarChart(
     }
 }
 
-@Composable
-private fun SummaryMiniStat(label: String, value: String, accent: Color = TextLight) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = value,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = accent
-        )
-        Text(
-            text = label,
-            fontSize = 10.sp,
-            color = TextMuted
-        )
-    }
-}
-
 // ═══════════════════════════════════════════════════════════════
-// WIN RATE PER SHOLAT
+// WIN RATE CARD — ✓ + 95% + "Wajib Sholat"
 // ═══════════════════════════════════════════════════════════════
 
 @Composable
-private fun WinRatePerPrayerCard(winRates: List<PrayerWinRate>) {
+private fun WinRateCard(winRate: Float, modifier: Modifier = Modifier) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(DarkSurface.copy(alpha = 0.6f))
-            .border(1.dp, ArenaBorder, RoundedCornerShape(20.dp))
-            .padding(20.dp)
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(DarkSurface)
+            .border(1.dp, GlassBorder, RoundedCornerShape(16.dp))
+            .padding(16.dp),
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = "WIN RATE PER SHOLAT",
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            color = GoldAccent,
-            letterSpacing = 1.5.sp
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = "Persentase kehadiran 7 hari terakhir",
-            fontSize = 11.sp,
-            color = TextMuted
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Find worst prayer (most missed)
-        val worstPrayer = winRates.minByOrNull { it.winRate }
-
-        winRates.forEach { rate ->
-            Spacer(modifier = Modifier.height(8.dp))
-            WinRateRow(rate = rate)
-        }
-
-        if (worstPrayer != null && worstPrayer.winRate < 100f) {
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(RingRed.copy(alpha = 0.1f))
-                    .border(1.dp, RingRed.copy(alpha = 0.3f), RoundedCornerShape(10.dp))
-                    .padding(10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "⚠️",
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Text(
-                    text = "${PRAYER_LABELS[worstPrayer.prayer]} paling sering miss (${worstPrayer.winRate.toInt()}%). Gas semangat lagi! 💪",
-                    fontSize = 11.sp,
-                    color = TextLight
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun WinRateRow(rate: PrayerWinRate) {
-    val accentColor = PRAYER_ACCENT[rate.prayer] ?: IslamicGreen
-    val animProgress = remember { Animatable(0f) }
-    LaunchedEffect(rate.winRate) {
-        animProgress.snapTo(0f)
-        animProgress.animateTo(1f, tween(700, easing = FastOutSlowInEasing))
-    }
-
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+        // Header: ✓ Win Rate
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = PRAYER_EMOJI[rate.prayer] ?: "🕌",
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(end = 6.dp)
-                )
-                Text(
-                    text = PRAYER_LABELS[rate.prayer] ?: rate.prayer,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = TextLight
-                )
-            }
+            Text(text = "✓", color = TextMuted, fontSize = 16.sp)
             Text(
-                text = "${rate.winRate.toInt()}%",
-                fontSize = 14.sp,
+                text = "Win Rate",
+                style = MaterialTheme.typography.labelMedium,
+                color = TextMuted,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (rate.winRate >= 80f) IslamicGreen else if (rate.winRate >= 50f) GoldAccent else RingRed
+                letterSpacing = 1.sp
             )
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        // Progress bar
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(8.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(TextLight.copy(alpha = 0.06f))
+        Column {
+            Text(
+                text = "${winRate.toInt()}%",
+                style = MaterialTheme.typography.headlineMedium,
+                color = TextLight,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Wajib Sholat",
+                style = MaterialTheme.typography.bodyMedium,
+                color = IslamicGreen,
+                fontSize = 14.sp
+            )
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STREAK CARD — gold border, 🔥, "7 HARI" gold, "Menyala 🔥"
+// ═══════════════════════════════════════════════════════════════
+
+@Composable
+private fun StreakCard(streak: Int, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(DarkSurface, DarkSurfaceElevated)
+                )
+            )
+            .border(1.dp, GoldAccent.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+            .padding(16.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        // Header: 🔥 Streak (gold)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(text = "🔥", fontSize = 16.sp)
+            Text(
+                text = "Streak",
+                style = MaterialTheme.typography.labelMedium,
+                color = GoldAccent,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Column {
+            Text(
+                text = "$streak HARI",
+                style = MaterialTheme.typography.headlineMedium,
+                color = GoldAccent,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Menyala 🔥",
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextMuted,
+                fontSize = 14.sp
+            )
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOTAL XP BULAN INI — label + "2,450 XP" (XP teal) + 📈 +12%
+// ═══════════════════════════════════════════════════════════════
+
+@Composable
+private fun TotalXpMonthCard(xp: Int, trendPct: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(DarkSurface)
+            .border(1.dp, GlassBorder, RoundedCornerShape(16.dp))
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        // Left: ⭐ icon + label + value
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(rate.winRate / 100f * animProgress.value)
-                    .fillMaxHeight()
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(
-                        Brush.horizontalGradient(
-                            colors = listOf(accentColor.copy(alpha = 0.6f), accentColor)
-                        )
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(DarkSurfaceVariant)
+                    .border(1.dp, IslamicGreen.copy(alpha = 0.2f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "⭐", fontSize = 22.sp)
+            }
+            Column {
+                Text(
+                    text = "Total XP Bulan Ini",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = TextMuted,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = formatXp(xp),
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = TextLight,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold
                     )
+                    Text(
+                        text = "XP",
+                        color = IslamicGreen,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                }
+            }
+        }
+
+        // Right: 📈 + trend %
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(text = "📈", fontSize = 18.sp)
+            Text(
+                text = "+$trendPct%",
+                style = MaterialTheme.typography.labelSmall,
+                color = CyanAccent,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
             )
         }
-    }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// LONGEST STREAK CARD
-// ═══════════════════════════════════════════════════════════════
-
-@Composable
-private fun LongestStreakCard(streak: Int, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(DarkSurface.copy(alpha = 0.6f))
-            .border(1.dp, ArenaBorder, RoundedCornerShape(16.dp))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "🔥",
-            fontSize = 28.sp
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = "STREAK TERPANJANG",
-            fontSize = 9.sp,
-            fontWeight = FontWeight.Bold,
-            color = GoldAccent,
-            textAlign = TextAlign.Center,
-            letterSpacing = 1.sp
-        )
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = "$streak",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Black,
-            color = GoldAccent
-        )
-        Text(
-            text = "hari berturut-turut",
-            fontSize = 10.sp,
-            color = TextMuted,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// XP THIS MONTH CARD
-// ═══════════════════════════════════════════════════════════════
-
-@Composable
-private fun XpThisMonthCard(xp: Int, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(DarkSurface.copy(alpha = 0.6f))
-            .border(1.dp, ArenaBorder, RoundedCornerShape(16.dp))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "⚡",
-            fontSize = 28.sp
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = "XP BULAN INI",
-            fontSize = 9.sp,
-            fontWeight = FontWeight.Bold,
-            color = IslamicGreen,
-            textAlign = TextAlign.Center,
-            letterSpacing = 1.sp
-        )
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = formatXp(xp),
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Black,
-            color = IslamicGreen
-        )
-        Text(
-            text = "XP didapat",
-            fontSize = 10.sp,
-            color = TextMuted,
-            textAlign = TextAlign.Center
-        )
     }
 }
 
 private fun formatXp(xp: Int): String {
-    return if (xp >= 1000) "${xp / 1000}.${(xp % 1000) / 100}K" else "$xp"
+    return "%,d".format(xp)
 }
 
 // ═══════════════════════════════════════════════════════════════
-// XP BY WEEK (4 minggu terakhir) — mini line chart
-// ═══════════════════════════════════════════════════════════════
-
-@Composable
-private fun XpByWeekCard(weeklyXp: List<Int>) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(DarkSurface.copy(alpha = 0.6f))
-            .border(1.dp, ArenaBorder, RoundedCornerShape(20.dp))
-            .padding(20.dp)
-    ) {
-        Text(
-            text = "XP 4 MINGGU TERAKHIR",
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            color = CyanAccent,
-            letterSpacing = 1.5.sp
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = "Tren XP yang kamu kumpulkan per minggu",
-            fontSize = 11.sp,
-            color = TextMuted
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp)
-        ) {
-            XpLineChart(values = weeklyXp.map { it.toFloat() })
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Week labels
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            weeklyXp.indices.forEach { i ->
-                Text(
-                    text = "W${i + 1}",
-                    fontSize = 10.sp,
-                    color = TextMuted
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun XpLineChart(values: List<Float>) {
-    val animProgress = remember { Animatable(0f) }
-    LaunchedEffect(values) {
-        animProgress.snapTo(0f)
-        animProgress.animateTo(1f, tween(900, easing = FastOutSlowInEasing))
-    }
-
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        val canvasWidth = size.width
-        val canvasHeight = size.height
-        val padding = 20f
-        val chartWidth = canvasWidth - padding * 2
-        val chartHeight = canvasHeight - padding * 2
-
-        val maxValue = (values.maxOrNull() ?: 1f).coerceAtLeast(1f)
-
-        // Grid lines
-        val gridColor = TextLight.copy(alpha = 0.05f)
-        for (i in 0..3) {
-            val y = padding + chartHeight * i / 3f
-            drawLine(
-                color = gridColor,
-                start = Offset(padding, y),
-                end = Offset(canvasWidth - padding, y),
-                strokeWidth = 1f
-            )
-        }
-
-        if (values.size < 2) return@Canvas
-
-        // Points
-        val points = values.mapIndexed { index, value ->
-            val x = padding + (chartWidth * index / (values.size - 1))
-            val y = padding + chartHeight - (chartHeight * value / maxValue) * animProgress.value
-            Offset(x, y)
-        }
-
-        // Filled area under line
-        val path = Path().apply {
-            moveTo(points.first().x, canvasHeight - padding)
-            points.forEach { lineTo(it.x, it.y) }
-            lineTo(points.last().x, canvasHeight - padding)
-            close()
-        }
-        val areaGradient = Brush.verticalGradient(
-            colors = listOf(
-                IslamicGreen.copy(alpha = 0.3f),
-                IslamicGreen.copy(alpha = 0.0f)
-            ),
-            startY = padding,
-            endY = canvasHeight - padding
-        )
-        drawPath(path = path, brush = areaGradient)
-
-        // Line
-        val linePath = Path().apply {
-            moveTo(points.first().x, points.first().y)
-            points.forEach { lineTo(it.x, it.y) }
-        }
-        drawPath(
-            path = linePath,
-            color = IslamicGreen,
-            style = Stroke(width = 3f, cap = StrokeCap.Round)
-        )
-
-        // Dots
-        points.forEach { point ->
-            drawCircle(
-                color = IslamicGreen,
-                radius = 5f,
-                center = point
-            )
-            drawCircle(
-                color = Color.White,
-                radius = 2f,
-                center = point
-            )
-        }
-
-        // Value labels
-        drawIntoCanvas {
-            val paint = android.graphics.Paint().apply {
-                color = TextLight.toArgb()
-                textSize = 26f
-                isAntiAlias = true
-                textAlign = android.graphics.Paint.Align.CENTER
-                typeface = android.graphics.Typeface.DEFAULT_BOLD
-            }
-            points.forEachIndexed { i, point ->
-                it.nativeCanvas.drawText(
-                    "${values[i].toInt()}",
-                    point.x,
-                    point.y - 12f,
-                    paint
-                )
-            }
-        }
-    }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// INSIGHT CARD — smart recommendation
-// ═══════════════════════════════════════════════════════════════
-
-@Composable
-private fun InsightCard(
-    winRates: List<PrayerWinRate>,
-    last7Days: List<DayCompletion>
-) {
-    val avgCompletion = if (last7Days.isNotEmpty()) {
-        last7Days.map { it.completedCount }.sum().toFloat() / (last7Days.size * 5f) * 100f
-    } else 0f
-
-    val insight = when {
-        avgCompletion >= 90f -> InsightData(
-            icon = "🏆",
-            title = "Konsisten Banget!",
-            message = "Kamu konsisten 90%+ minggu ini. Pertahankan hero streak kamu ya! 🔥",
-            color = GoldAccent
-        )
-        avgCompletion >= 70f -> InsightData(
-            icon = "💪",
-            title = "Mantap, Lanjutkan!",
-            message = "Kamu di jalur yang benar. Sedikit lagi buat capai 100% konsistensi! 🎯",
-            color = IslamicGreen
-        )
-        avgCompletion >= 40f -> InsightData(
-            icon = "📈",
-            title = "Lagi Naik Kok",
-            message = "Ada progress bagus. Fokus ke sholat yang paling sering miss ya! 💪",
-            color = CyanAccent
-        )
-        else -> InsightData(
-            icon = "🚀",
-            title = "Gas Dimulai Hari Ini!",
-            message = "Mulai dari sholat hari ini. Setiap perjalanan dimulai dari langkah pertama! 🌱",
-            color = PurpleNeon
-        )
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        insight.color.copy(alpha = 0.15f),
-                        DarkSurface.copy(alpha = 0.6f)
-                    )
-                )
-            )
-            .border(1.dp, insight.color.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
-            .padding(20.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = insight.icon,
-                fontSize = 28.sp,
-                modifier = Modifier.padding(end = 12.dp)
-            )
-            Column {
-                Text(
-                    text = insight.title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = insight.color
-                )
-                Text(
-                    text = insight.message,
-                    fontSize = 12.sp,
-                    color = TextLight
-                )
-            }
-        }
-    }
-}
-
-private data class InsightData(
-    val icon: String,
-    val title: String,
-    val message: String,
-    val color: Color
-)
-
-// ═══════════════════════════════════════════════════════════════
-// DATA COMPUTATION FUNCTIONS
+// DATA COMPUTATION
 // ═══════════════════════════════════════════════════════════════
 
 data class DayCompletion(
@@ -833,15 +495,8 @@ data class DayCompletion(
     val completedCount: Int  // 0..5 (out of 5 wajib prayers)
 )
 
-data class PrayerWinRate(
-    val prayer: String,
-    val winRate: Float,  // 0..100
-    val completedDays: Int,
-    val totalDays: Int
-)
-
 /**
- * Get completion count per day for the last 7 days (oldest first).
+ * Completion count per day for the last 7 days (oldest first).
  */
 fun getLast7DaysCompletion(log: List<PrayerLog>): List<DayCompletion> {
     val today = LocalDate.now()
@@ -860,40 +515,34 @@ fun getLast7DaysCompletion(log: List<PrayerLog>): List<DayCompletion> {
 }
 
 /**
- * Get win rate per sholat wajib for the last 7 days.
+ * Overall win rate for wajib prayers over last 7 days (0..100).
+ * = total completed / (5 prayers × 7 days) × 100.
  */
-fun getWinRatePerPrayer(log: List<PrayerLog>): List<PrayerWinRate> {
+fun getOverallWinRate(log: List<PrayerLog>): Float {
     val today = LocalDate.now()
     val last7Dates = (0..6).map { today.minusDays(it.toLong()).toString() }.toSet()
-
-    return WAJIB_PRAYERS.map { prayer ->
-        val completed = last7Dates.count { dateStr ->
+    val completed = WAJIB_PRAYERS.sumOf { prayer ->
+        last7Dates.count { dateStr ->
             log.any { it.date == dateStr && it.prayer == prayer && it.type == "wajib" }
         }
-        val winRate = (completed.toFloat() / 7f) * 100f
-        PrayerWinRate(
-            prayer = prayer,
-            winRate = winRate,
-            completedDays = completed,
-            totalDays = 7
-        )
     }
+    return (completed.toFloat() / (WAJIB_PRAYERS.size * 7f)) * 100f
 }
 
 /**
- * Get longest hero streak (consecutive days where all 5 wajib prayers completed).
- * Computed from entire prayer log history.
+ * Longest hero streak (consecutive days all 5 wajib completed).
+ * ponytail: longest-streak shown in the "Streak" card. Real "current"
+ * streak needs a separate helper when product wants live streak —
+ * longest streak is a fine stand-in until then.
  */
 fun getLongestHeroStreak(log: List<PrayerLog>): Int {
     if (log.isEmpty()) return 0
 
-    // Group by date, check if all 5 wajib completed per day
     val wajibByDate = log
         .filter { it.type == "wajib" && WAJIB_PRAYERS.contains(it.prayer) }
         .groupBy { it.date }
         .mapValues { (_, entries) -> entries.map { it.prayer }.toSet() }
 
-    // Find dates with all 5 prayers
     val fullDates = wajibByDate
         .filter { (_, prayers) -> WAJIB_PRAYERS.all { it in prayers } }
         .keys
@@ -918,7 +567,7 @@ fun getLongestHeroStreak(log: List<PrayerLog>): Int {
 }
 
 /**
- * Get total XP earned this month.
+ * Total XP earned this month.
  * XP per prayer: subuh=30, dzuhur=20, ashar=20, maghrib=25, isya=25
  * +50 bonus for 5/5 completion.
  */
@@ -929,31 +578,9 @@ fun getXpThisMonth(log: List<PrayerLog>): Int {
 
     var totalXp = 0
 
-    // Iterate days in current month up to today
     var date = firstOfMonth
     while (!date.isAfter(now)) {
-        val dateStr = date.toString()
-        val dayLogs = log.filter { it.date == dateStr && it.type == "wajib" }
-        val prayersDone = dayLogs.map { it.prayer }.toSet()
-
-        var dayXp = 0
-        prayersDone.forEach { prayer ->
-            dayXp += when (prayer) {
-                "subuh" -> 30
-                "dzuhur" -> 20
-                "ashar" -> 20
-                "maghrib" -> 25
-                "isya" -> 25
-                else -> 0
-            }
-        }
-
-        // 5/5 bonus
-        if (WAJIB_PRAYERS.all { it in prayersDone }) {
-            dayXp += 50
-        }
-
-        totalXp += dayXp
+        totalXp += dayXp(log, date.toString())
         date = date.plusDays(1)
     }
 
@@ -961,43 +588,52 @@ fun getXpThisMonth(log: List<PrayerLog>): Int {
 }
 
 /**
- * Get XP per week for the last 4 weeks (oldest first).
+ * Month-over-month XP trend percent (this month vs last month, 0 if no baseline).
+ * ponytail: returns 0 when last month had no XP — avoids div-by-zero and
+ * avoids showing a misleading +∞. Replace with a real baseline when analytics needs it.
  */
-fun getXpByWeek(log: List<PrayerLog>): List<Int> {
-    val today = LocalDate.now()
-    val result = mutableListOf<Int>()
+fun getXpTrendPercent(log: List<PrayerLog>): Int {
+    val now = LocalDate.now()
+    val thisMonth = YearMonth.now()
+    val lastMonth = thisMonth.minusMonths(1)
 
-    for (weekOffset in 3 downTo 0) {
-        val weekStart = today.minusDays((weekOffset + 1) * 7L - 1)
-        val weekEnd = today.minusDays(weekOffset * 7L)
+    val thisXp = monthXp(log, thisMonth, now)
+    val lastXp = monthXp(log, lastMonth, lastMonth.atEndOfMonth())
 
-        var weekXp = 0
-        var date = weekStart
-        while (!date.isAfter(weekEnd)) {
-            val dateStr = date.toString()
-            val dayLogs = log.filter { it.date == dateStr && it.type == "wajib" }
-            val prayersDone = dayLogs.map { it.prayer }.toSet()
+    if (lastXp <= 0) return 0
+    val pct = ((thisXp - lastXp).toFloat() / lastXp.toFloat()) * 100f
+    return pct.toInt().coerceAtLeast(0)
+}
 
-            prayersDone.forEach { prayer ->
-                weekXp += when (prayer) {
-                    "subuh" -> 30
-                    "dzuhur" -> 20
-                    "ashar" -> 20
-                    "maghrib" -> 25
-                    "isya" -> 25
-                    else -> 0
-                }
-            }
+private fun monthXp(log: List<PrayerLog>, ym: YearMonth, upTo: LocalDate): Int {
+    var xp = 0
+    var date = ym.atDay(1)
+    while (!date.isAfter(upTo)) {
+        xp += dayXp(log, date.toString())
+        date = date.plusDays(1)
+    }
+    return xp
+}
 
-            if (WAJIB_PRAYERS.all { it in prayersDone }) {
-                weekXp += 50
-            }
+private fun dayXp(log: List<PrayerLog>, dateStr: String): Int {
+    val dayLogs = log.filter { it.date == dateStr && it.type == "wajib" }
+    val prayersDone = dayLogs.map { it.prayer }.toSet()
 
-            date = date.plusDays(1)
+    var xp = 0
+    prayersDone.forEach { prayer ->
+        xp += when (prayer) {
+            "subuh" -> 30
+            "dzuhur" -> 20
+            "ashar" -> 20
+            "maghrib" -> 25
+            "isya" -> 25
+            else -> 0
         }
-
-        result.add(weekXp)
     }
 
-    return result
+    if (WAJIB_PRAYERS.all { it in prayersDone }) {
+        xp += 50
+    }
+
+    return xp
 }

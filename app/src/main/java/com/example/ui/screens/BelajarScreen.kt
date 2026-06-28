@@ -8,6 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -19,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -3083,27 +3085,28 @@ fun BelajarHubView(
             .padding(top = 28.dp, bottom = 80.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Header
+        // Header — display-caps eyebrow + headline + subtitle (Stitch: belajar_learning_hub)
         Text(
             text = "LEARNING HUB",
-            fontSize = 11.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = GoldAccent,
-            letterSpacing = 2.5.sp
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            color = IslamicGreen,
+            letterSpacing = 2.5.sp,
+            fontFamily = FontFamily.Monospace
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = "Belajar Bareng 📚",
-            fontSize = 22.sp,
+            fontSize = 28.sp,
             fontWeight = FontWeight.Black,
             color = TextLight
         )
         Text(
-            text = "Mulai dari dasar, naik pelan-pelan. Gak ada yang nyuruh buru-buru kok.",
-            fontSize = 12.sp,
+            text = "Tingkatkan ilmu, raih lebih banyak XP.",
+            fontSize = 14.sp,
             color = TextMuted,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 6.dp, bottom = 24.dp)
+            modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
         )
 
         // ─── Overall Progress Bar ───
@@ -3112,6 +3115,7 @@ fun BelajarHubView(
         val progressPercent = if (totalModules > 0) completedCount.toFloat() / totalModules else 0f
         val allCompleted = completedCount >= totalModules
 
+        // Status card — Santri Digital + X/16 modul selesai + gold star badge
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -3126,55 +3130,63 @@ fun BelajarHubView(
                 ),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = if (allCompleted) GoldAccent.copy(alpha = 0.08f) else DarkSurface
+                containerColor = DarkSurface
             ),
             border = BorderStroke(
                 1.dp,
-                if (allCompleted) Brush.linearGradient(listOf(GoldAccent.copy(alpha = 0.7f), OrangeFlame.copy(alpha = 0.4f), GoldAccent.copy(alpha = 0.7f)))
-                else Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.3f), DarkSurfaceVariant, IslamicGreen.copy(alpha = 0.3f)))
+                if (allCompleted) Brush.linearGradient(listOf(GoldAccent.copy(alpha = 0.7f), AmberFlame.copy(alpha = 0.4f), GoldAccent.copy(alpha = 0.7f)))
+                else Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.4f), OutlineVariant, IslamicGreen.copy(alpha = 0.4f)))
             )
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(18.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    Column {
                         Text(
-                            text = if (allCompleted) "🏆" else "📊",
-                            fontSize = 18.sp
+                            text = "Santri Digital",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = TextLight
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "$completedCount/$totalModules modul selesai",
-                            fontSize = 14.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (allCompleted) GoldAccent else TextLight
+                            color = IslamicGreen,
+                            letterSpacing = 1.2.sp,
+                            fontFamily = FontFamily.Monospace
                         )
                     }
-                    if (allCompleted) {
-                        Box(
-                            modifier = Modifier
-                                .background(GoldAccent.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
-                                .padding(horizontal = 10.dp, vertical = 4.dp)
-                        ) {
-                            Text(
-                                text = "✨ Santri Digital",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = GoldAccent
+                    // Gold star badge
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(DarkSurfaceElevated)
+                            .border(
+                                BorderStroke(2.dp, GoldAccent.copy(alpha = 0.5f)),
+                                CircleShape
                             )
-                        }
+                            .shadow(
+                                elevation = 8.dp,
+                                shape = CircleShape,
+                                ambientColor = GoldGlow,
+                                spotColor = GoldGlow
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("⭐", fontSize = 26.sp)
                     }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(14.dp))
                 NeonProgressBar(
                     progress = progressPercent,
                     modifier = Modifier.fillMaxWidth(),
-                    height = 9.dp,
+                    height = 8.dp,
                     brush = if (allCompleted) neonGoldBrush() else neonGreenBrush(),
                     glowColor = if (allCompleted) GoldAccent else IslamicGreen,
                     trackColor = DarkSurfaceVariant
@@ -3235,11 +3247,11 @@ fun BelajarHubView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        Color(0xFF111827).copy(alpha = 0.5f),
+                        DarkSurface.copy(alpha = 0.5f),
                         RoundedCornerShape(16.dp)
                     )
                     .border(
-                        BorderStroke(1.dp, Color(0xFF1F2937)),
+                        BorderStroke(1.dp, OutlineVariant),
                         RoundedCornerShape(16.dp)
                     )
                     .padding(32.dp),
@@ -3267,36 +3279,46 @@ fun SegmentedControl(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(DarkSurface, RoundedCornerShape(14.dp))
-            .border(1.dp, DarkSurfaceVariant, RoundedCornerShape(14.dp))
-            .padding(4.dp),
+            .background(DarkBackground.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+            .border(1.dp, OutlineVariant.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+            .padding(4.dp)
+            .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         categories.forEachIndexed { index, category ->
             val isSelected = index == selectedIndex
             Box(
                 modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(10.dp))
+                    .clip(RoundedCornerShape(8.dp))
                     .background(
-                        if (isSelected) Brush.verticalGradient(listOf(IslamicGreen.copy(alpha = 0.25f), IslamicGreen.copy(alpha = 0.08f)))
-                        else Brush.verticalGradient(listOf(Color.Transparent, Color.Transparent))
+                        if (isSelected) DarkSurfaceElevated
+                        else Color.Transparent
+                    )
+                    .then(
+                        if (isSelected) Modifier.border(
+                            1.dp, OutlineVariant,
+                            RoundedCornerShape(8.dp)
+                        ) else Modifier
                     )
                     .clickable { onSelect(index) }
-                    .padding(vertical = 10.dp),
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
                     Text(
                         text = category.icon,
-                        fontSize = 16.sp
+                        fontSize = 14.sp
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = category.label,
+                        text = category.label.uppercase(),
                         fontSize = 11.sp,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                        color = if (isSelected) IslamicGreen else TextMuted
+                        fontWeight = FontWeight.Bold,
+                        color = if (isSelected) IslamicGreen else TextMuted,
+                        letterSpacing = 1.sp,
+                        fontFamily = FontFamily.Monospace
                     )
                 }
             }
@@ -3311,20 +3333,18 @@ fun ModuleCard(
     orderNumber: Int,
     onClick: () -> Unit
 ) {
-    val borderColor = when (status) {
-        ModuleStatus.LOCKED -> DarkSurfaceVariant.copy(alpha = 0.5f)
-        ModuleStatus.AVAILABLE -> IslamicGreen.copy(alpha = 0.3f)
-        ModuleStatus.COMPLETED -> GoldAccent.copy(alpha = 0.5f)
-        ModuleStatus.CLAIMED -> DarkSurfaceVariant
+    val containerColor = when (status) {
+        ModuleStatus.LOCKED -> DarkBackground.copy(alpha = 0.6f)
+        ModuleStatus.AVAILABLE -> DarkSurface
+        ModuleStatus.COMPLETED -> DarkSurface
+        ModuleStatus.CLAIMED -> DarkSurface
     }
 
-    val containerAlpha = if (status == ModuleStatus.LOCKED) 0.5f else 1f
-
     val moduleBorderBrush = when (status) {
-        ModuleStatus.LOCKED -> Brush.linearGradient(listOf(borderColor, borderColor))
-        ModuleStatus.AVAILABLE -> Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.5f), CyanAccent.copy(alpha = 0.25f), IslamicGreen.copy(alpha = 0.5f)))
-        ModuleStatus.COMPLETED -> Brush.linearGradient(listOf(GoldAccent.copy(alpha = 0.7f), OrangeFlame.copy(alpha = 0.4f), GoldAccent.copy(alpha = 0.7f)))
-        ModuleStatus.CLAIMED -> Brush.linearGradient(listOf(borderColor, borderColor))
+        ModuleStatus.LOCKED -> Brush.linearGradient(listOf(OutlineVariant.copy(alpha = 0.5f), OutlineVariant.copy(alpha = 0.5f)))
+        ModuleStatus.AVAILABLE -> Brush.linearGradient(listOf(CyanAccent.copy(alpha = 0.6f), CyanAccent.copy(alpha = 0.2f), CyanAccent.copy(alpha = 0.6f)))
+        ModuleStatus.COMPLETED -> Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.6f), IslamicGreen.copy(alpha = 0.2f), IslamicGreen.copy(alpha = 0.6f)))
+        ModuleStatus.CLAIMED -> Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.4f), OutlineVariant, IslamicGreen.copy(alpha = 0.4f)))
     }
 
     Card(
@@ -3332,18 +3352,28 @@ fun ModuleCard(
             .fillMaxWidth()
             .clickable(enabled = status != ModuleStatus.LOCKED) { onClick() }
             .then(
-                if (status == ModuleStatus.COMPLETED) Modifier.shadow(
+                if (status == ModuleStatus.AVAILABLE) Modifier.shadow(
                     elevation = 10.dp,
-                    shape = RoundedCornerShape(18.dp),
-                    ambientColor = GoldAccent.copy(alpha = 0.2f),
-                    spotColor = GoldAccent.copy(alpha = 0.1f)
-                ) else Modifier
+                    shape = RoundedCornerShape(16.dp),
+                    ambientColor = CyanGlow,
+                    spotColor = CyanGlow
+                )
+                else if (status == ModuleStatus.COMPLETED) Modifier.shadow(
+                    elevation = 8.dp,
+                    shape = RoundedCornerShape(16.dp),
+                    ambientColor = IslamicGreenGlow,
+                    spotColor = IslamicGreenGlow
+                )
+                else Modifier
             ),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = DarkSurface.copy(alpha = containerAlpha)
+            containerColor = containerColor
         ),
-        border = BorderStroke(1.4.dp, moduleBorderBrush)
+        border = BorderStroke(
+            1.2.dp,
+            moduleBorderBrush
+        )
     ) {
         Row(
             modifier = Modifier
@@ -3351,26 +3381,38 @@ fun ModuleCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Module number / icon
+            // Status icon — ✓ completed teal / 📖 available teal / 🔒 locked grey
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(RoundedCornerShape(14.dp))
+                    .clip(CircleShape)
                     .background(
                         when (status) {
-                            ModuleStatus.LOCKED -> Brush.linearGradient(listOf(DarkSurfaceVariant, DarkSurfaceVariant))
-                            ModuleStatus.AVAILABLE -> Brush.linearGradient(listOf(IslamicGreen.copy(alpha = 0.22f), CyanAccent.copy(alpha = 0.08f)))
-                            ModuleStatus.COMPLETED -> Brush.linearGradient(listOf(GoldAccent.copy(alpha = 0.22f), OrangeFlame.copy(alpha = 0.08f)))
-                            ModuleStatus.CLAIMED -> Brush.linearGradient(listOf(DarkSurfaceVariant, DarkSurfaceVariant))
+                            ModuleStatus.LOCKED -> DarkSurfaceVariant
+                            ModuleStatus.AVAILABLE -> CyanAccent.copy(alpha = 0.1f)
+                            ModuleStatus.COMPLETED -> IslamicGreen.copy(alpha = 0.12f)
+                            ModuleStatus.CLAIMED -> IslamicGreen.copy(alpha = 0.08f)
                         }
+                    )
+                    .border(
+                        BorderStroke(
+                            1.dp,
+                            when (status) {
+                                ModuleStatus.LOCKED -> OutlineVariant.copy(alpha = 0.5f)
+                                ModuleStatus.AVAILABLE -> CyanAccent.copy(alpha = 0.4f)
+                                ModuleStatus.COMPLETED -> IslamicGreen.copy(alpha = 0.4f)
+                                ModuleStatus.CLAIMED -> OutlineVariant
+                            }
+                        ),
+                        CircleShape
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 when (status) {
-                    ModuleStatus.LOCKED -> Text("🔒", fontSize = 20.sp)
-                    ModuleStatus.COMPLETED -> Text("✅", fontSize = 20.sp)
-                    ModuleStatus.CLAIMED -> Text("✅", fontSize = 20.sp)
-                    else -> Text(module.icon, fontSize = 22.sp)
+                    ModuleStatus.LOCKED -> Text("🔒", fontSize = 18.sp)
+                    ModuleStatus.COMPLETED -> Text("✓", fontSize = 22.sp, fontWeight = FontWeight.Black, color = IslamicGreen)
+                    ModuleStatus.CLAIMED -> Text("✓", fontSize = 22.sp, fontWeight = FontWeight.Black, color = IslamicGreen)
+                    else -> Text("📖", fontSize = 20.sp)
                 }
             }
 
@@ -3380,57 +3422,67 @@ fun ModuleCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = module.title,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (status == ModuleStatus.LOCKED) TextMuted else TextLight
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (status == ModuleStatus.LOCKED) TextMuted else TextLight,
+                    lineHeight = 19.sp
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Status text
+                    // Status / time detail
                     Text(
                         text = when (status) {
-                            ModuleStatus.LOCKED -> "🔒 Terkunci"
-                            ModuleStatus.AVAILABLE -> "📖 Belum selesai"
-                            ModuleStatus.COMPLETED -> "✅ Selesai"
-                            ModuleStatus.CLAIMED -> "✅ Selesai"
+                            ModuleStatus.LOCKED -> "Terkunci"
+                            ModuleStatus.AVAILABLE -> "⏱ ${module.estimatedMinutes} m"
+                            ModuleStatus.COMPLETED -> "✓ Selesai"
+                            ModuleStatus.CLAIMED -> "✓ Selesai"
                         },
                         fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
                         color = when (status) {
-                            ModuleStatus.LOCKED -> TextMuted
-                            ModuleStatus.AVAILABLE -> IslamicGreen
-                            ModuleStatus.COMPLETED -> GoldAccent
+                            ModuleStatus.LOCKED -> OutlineDefault
+                            ModuleStatus.AVAILABLE -> CyanAccent
+                            ModuleStatus.COMPLETED -> IslamicGreen
                             ModuleStatus.CLAIMED -> TextMuted
-                        }
+                        },
+                        letterSpacing = 0.8.sp,
+                        fontFamily = FontFamily.Monospace
                     )
-                    // Estimasi baca
+                    // Divider dot
+                    Box(
+                        modifier = Modifier
+                            .size(3.dp)
+                            .background(OutlineVariant, CircleShape)
+                    )
+                    // XP reward — gold
                     Text(
-                        text = "⏱ ${module.estimatedMinutes} mnt",
-                        fontSize = 10.sp,
-                        color = TextMuted
+                        text = "+${module.xpReward} XP",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = GoldAccent,
+                        letterSpacing = 0.8.sp,
+                        fontFamily = FontFamily.Monospace
                     )
                 }
             }
 
-            // XP badge
-            Box(
-                modifier = Modifier
-                    .background(
-                        if (status == ModuleStatus.CLAIMED) DarkSurfaceVariant
-                        else IslamicGreen.copy(alpha = 0.15f),
-                        RoundedCornerShape(8.dp)
-                    )
-                    .padding(horizontal = 10.dp, vertical = 5.dp)
-            ) {
-                Text(
-                    text = if (status == ModuleStatus.CLAIMED) "✓ Claimed"
-                    else "+${module.xpReward} XP",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = if (status == ModuleStatus.CLAIMED) TextMuted else IslamicGreen
-                )
+            // Play button (only for available status)
+            if (status == ModuleStatus.AVAILABLE) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .border(
+                            BorderStroke(1.dp, CyanAccent.copy(alpha = 0.4f)),
+                            CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("▶", fontSize = 14.sp, color = CyanAccent)
+                }
             }
         }
     }
@@ -3448,6 +3500,10 @@ fun ModuleArticleView(
 ) {
     val blocks = LearningContent.getArticleContent(moduleId)
     val module = LearningContent.getAllModulesOrdered().find { it.id == moduleId }
+    val category = LearningContent.categories.find { it.id == module?.categoryId }
+    val categoryLabel = category?.label?.uppercase() ?: "MODUL"
+    val minutesLabel = "${module?.estimatedMinutes ?: 5} MENIT BACA"
+    val articleTitle = module?.title ?: "Artikel"
 
     Column(
         modifier = Modifier
@@ -3455,33 +3511,48 @@ fun ModuleArticleView(
             .background(DarkBackground)
             .windowInsetsPadding(WindowInsets.statusBars)
     ) {
-        // Top bar
+        // Top bar — back arrow + centered title + bookmark 🔖 (Stitch: belajar_article_view)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 12.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
+                    .size(40.dp)
                     .clip(CircleShape)
-                    .clickable { onBack() }
-                    .padding(8.dp)
+                    .clickable { onBack() },
+                contentAlignment = Alignment.Center
             ) {
-                Text("← Kembali", color = IslamicGreen, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text("←", color = TextMuted, fontSize = 22.sp, fontWeight = FontWeight.Bold)
             }
-            Spacer(modifier = Modifier.weight(1f))
-            module?.let {
-                Text(
-                    text = "${it.icon} ${it.title}",
-                    fontSize = 12.sp,
-                    color = TextMuted,
-                    maxLines = 1
-                )
+            Text(
+                text = articleTitle,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = TextLight,
+                maxLines = 1,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f)
+            )
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("🔖", fontSize = 18.sp)
             }
         }
 
-        HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
+        // Top progress hairline (reading HUD)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2.dp)
+                .background(DarkSurfaceElevated)
+        )
 
         // Article content
         Column(
@@ -3490,17 +3561,114 @@ fun ModuleArticleView(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 20.dp)
         ) {
+            // Hero image area + LEVEL badge (decorative, no asset available — gradient + badge only)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                DarkSurfaceVariant.copy(alpha = 0.6f),
+                                DarkBackground
+                            )
+                        )
+                    )
+                    .border(
+                        BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.5f)),
+                        RoundedCornerShape(16.dp)
+                    )
+            ) {
+                // Decorative cosmic emoji
+                Text(
+                    text = module?.icon ?: "🌌",
+                    fontSize = 64.sp,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+                // LEVEL badge
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(12.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(DarkSurfaceElevated.copy(alpha = 0.85f))
+                        .border(
+                            BorderStroke(1.dp, GoldAccent.copy(alpha = 0.4f)),
+                            RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("🏆", fontSize = 12.sp)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "LEVEL 1 KNOWLEDGE",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = GoldAccent,
+                            letterSpacing = 1.sp,
+                            fontFamily = FontFamily.Monospace
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Article header — teal gradient title + metadata caps
+            Text(
+                text = articleTitle,
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Black,
+                color = IslamicGreen,
+                lineHeight = 32.sp
+            )
+            Row(
+                modifier = Modifier.padding(top = 8.dp, bottom = 20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = categoryLabel,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = OutlineDefault,
+                    letterSpacing = 1.sp,
+                    fontFamily = FontFamily.Monospace
+                )
+                Box(
+                    modifier = Modifier
+                        .size(4.dp)
+                        .background(OutlineVariant, CircleShape)
+                )
+                Text(
+                    text = minutesLabel,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = OutlineDefault,
+                    letterSpacing = 1.sp,
+                    fontFamily = FontFamily.Monospace
+                )
+            }
+
+            // Article blocks
             blocks.forEach { block ->
                 when (block) {
                     is ArticleBlock.Heading -> {
-                        Text(
-                            text = block.text,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Black,
-                            color = TextLight,
-                            lineHeight = 32.sp,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
+                        Row(
+                            modifier = Modifier.padding(top = 4.dp, bottom = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("📖 ", fontSize = 18.sp)
+                            Text(
+                                text = block.text,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextLight,
+                                lineHeight = 26.sp
+                            )
+                        }
                     }
                     is ArticleBlock.Subheading -> {
                         Text(
@@ -3514,31 +3682,55 @@ fun ModuleArticleView(
                     is ArticleBlock.Paragraph -> {
                         Text(
                             text = block.text,
-                            fontSize = 14.sp,
-                            color = TextLight.copy(alpha = 0.9f),
-                            lineHeight = 22.sp,
-                            modifier = Modifier.padding(bottom = 12.dp)
+                            fontSize = 15.sp,
+                            color = TextMuted,
+                            lineHeight = 23.sp,
+                            modifier = Modifier.padding(bottom = 14.dp)
                         )
                     }
                     is ArticleBlock.Highlight -> {
-                        Card(
+                        // INTI AJARAN box — teal left border + cyan glow
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 12.dp),
-                            shape = RoundedCornerShape(14.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = IslamicGreen.copy(alpha = 0.08f)
-                            ),
-                            border = BorderStroke(1.dp, IslamicGreen.copy(alpha = 0.3f))
+                                .padding(vertical = 12.dp)
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(DarkSurface)
+                                .border(
+                                    BorderStroke(1.dp, CyanAccent.copy(alpha = 0.2f)),
+                                    RoundedCornerShape(14.dp)
+                                )
                         ) {
-                            Row(modifier = Modifier.padding(16.dp)) {
-                                Text("💡 ", fontSize = 16.sp)
+                            // Teal left accent bar
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .width(4.dp)
+                                    .height(120.dp)
+                                    .background(
+                                        Brush.verticalGradient(listOf(CyanAccent, IslamicGreen))
+                                    )
+                            )
+                            Column(modifier = Modifier.padding(start = 18.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("💎", fontSize = 14.sp)
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "INTI AJARAN",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = CyanAccent,
+                                        letterSpacing = 1.4.sp,
+                                        fontFamily = FontFamily.Monospace
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = block.text,
-                                    fontSize = 14.sp,
+                                    fontSize = 16.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = IslamicGreen,
-                                    lineHeight = 21.sp
+                                    color = TextLight,
+                                    lineHeight = 23.sp
                                 )
                             }
                         }
@@ -3558,9 +3750,10 @@ fun ModuleArticleView(
                                 Text(
                                     text = "📖 Catatan",
                                     fontSize = 11.sp,
-                                    fontWeight = FontWeight.ExtraBold,
+                                    fontWeight = FontWeight.Bold,
                                     color = GoldAccent,
-                                    letterSpacing = 1.sp
+                                    letterSpacing = 1.sp,
+                                    fontFamily = FontFamily.Monospace
                                 )
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
@@ -3574,13 +3767,14 @@ fun ModuleArticleView(
                         }
                     }
                     is ArticleBlock.Cta -> {
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = block.text,
                             fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = IslamicGreen,
+                            fontStyle = FontStyle.Italic,
+                            color = TextMuted,
                             textAlign = TextAlign.Center,
+                            lineHeight = 21.sp,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp)
@@ -3597,8 +3791,8 @@ fun ModuleArticleView(
                             Box(
                                 modifier = Modifier
                                     .width(40.dp)
-                                    .height(2.dp)
-                                    .background(DarkSurfaceVariant, CircleShape)
+                                    .height(1.dp)
+                                    .background(OutlineVariant, CircleShape)
                             )
                             Text(
                                 text = "  ✦  ",
@@ -3608,40 +3802,59 @@ fun ModuleArticleView(
                             Box(
                                 modifier = Modifier
                                     .width(40.dp)
-                                    .height(2.dp)
-                                    .background(DarkSurfaceVariant, CircleShape)
+                                    .height(1.dp)
+                                    .background(OutlineVariant, CircleShape)
                             )
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            // Footer motivational text italic
+            Text(
+                text = "Selesaikan quiz di bawah ini untuk mengunci pemahamanmu dan mendapatkan XP tambahan!",
+                fontSize = 14.sp,
+                fontStyle = FontStyle.Italic,
+                color = TextMuted,
+                textAlign = TextAlign.Center,
+                lineHeight = 21.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp, bottom = 20.dp)
+            )
         }
 
-        // Bottom CTA button
+        // Bottom CTA — gradient teal→cyan "Mulai Quiz 🎮"
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            color = DarkSurface,
-            shadowElevation = 12.dp
+            color = DarkBackground
         ) {
-            Button(
-                onClick = onStartQuiz,
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp, vertical = 16.dp)
-                    .height(52.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = IslamicGreen
-                ),
-                shape = RoundedCornerShape(14.dp)
+                    .height(52.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Brush.horizontalGradient(listOf(IslamicGreen, CyanAccent)))
+                    .clickable { onStartQuiz() }
+                    .shadow(
+                        elevation = 12.dp,
+                        shape = RoundedCornerShape(14.dp),
+                        ambientColor = IslamicGreenGlow,
+                        spotColor = IslamicGreenGlow
+                    ),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Lanjut ke Kuis 🎯",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Mulai Quiz",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF003828)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("🎮", fontSize = 18.sp)
+                }
             }
         }
     }
@@ -3675,6 +3888,8 @@ fun ModuleQuizView(
     var showResult by remember { mutableStateOf(false) }
 
     val question = questions[currentIndex]
+    val module = LearningContent.getAllModulesOrdered().find { it.id == moduleId }
+    val quizTitle = "Quiz: ${module?.title ?: "Modul"}"
 
     Column(
         modifier = Modifier
@@ -3682,79 +3897,155 @@ fun ModuleQuizView(
             .background(DarkBackground)
             .windowInsetsPadding(WindowInsets.statusBars)
     ) {
-        // Top bar
+        // Top bar — back arrow + centered "Quiz: <title>" (Stitch: belajar_quiz_view)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 12.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
+                    .size(40.dp)
                     .clip(CircleShape)
-                    .clickable { onBack() }
-                    .padding(8.dp)
+                    .clickable { onBack() },
+                contentAlignment = Alignment.Center
             ) {
-                Text("← Kembali", color = IslamicGreen, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text("←", color = TextMuted, fontSize = 22.sp, fontWeight = FontWeight.Bold)
             }
-            Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "Soal ${currentIndex + 1}/${questions.size}",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextLight
+                text = quizTitle,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = TextLight,
+                maxLines = 1,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f)
             )
+            Spacer(modifier = Modifier.size(40.dp))
         }
 
-        // Progress bar
-        NeonProgressBar(
-            progress = (currentIndex + 1).toFloat() / questions.size,
-            modifier = Modifier.fillMaxWidth(),
-            height = 5.dp,
-            brush = neonGreenBrush(),
-            glowColor = IslamicGreen,
-            trackColor = DarkSurfaceVariant
-        )
+        // Progress HUD — label-caps + XP+50 + segmented progress bar
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "PERTANYAAN ${currentIndex + 1} DARI ${questions.size}",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = CyanAccent,
+                    letterSpacing = 1.6.sp,
+                    fontFamily = FontFamily.Monospace
+                )
+                Text(
+                    text = "XP +50",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextMuted,
+                    letterSpacing = 1.sp,
+                    fontFamily = FontFamily.Monospace
+                )
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            // Segmented progress bar — Y segments
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(DarkBackground)
+                    .border(
+                        BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.5f)),
+                        RoundedCornerShape(4.dp)
+                    )
+                    .padding(2.dp),
+                horizontalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                repeat(questions.size) { i ->
+                    val filled = i <= currentIndex
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(2.dp))
+                            .background(
+                                if (filled) IslamicGreen
+                                else DarkSurfaceElevated
+                            )
+                            .then(
+                                if (filled) Modifier.shadow(
+                                    elevation = 4.dp,
+                                    shape = RoundedCornerShape(2.dp),
+                                    ambientColor = IslamicGreenGlow,
+                                    spotColor = IslamicGreenGlow
+                                ) else Modifier
+                            )
+                    )
+                }
+            }
+        }
 
-        HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
+        HorizontalDivider(color = OutlineVariant.copy(alpha = 0.3f), thickness = 1.dp)
 
         // Question content
         Column(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 24.dp)
+                .padding(horizontal = 20.dp, vertical = 20.dp)
         ) {
-            // Question text
+            // Question card — ? icon box + question text
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(18.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = DarkSurface),
-                border = BorderStroke(1.dp, DarkSurfaceVariant)
+                border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.4f))
             ) {
-                Text(
-                    text = question.question,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextLight,
-                    lineHeight = 24.sp,
-                    modifier = Modifier.padding(20.dp)
-                )
+                Column(modifier = Modifier.padding(18.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(IslamicGreen.copy(alpha = 0.12f))
+                            .border(
+                                BorderStroke(1.dp, IslamicGreen.copy(alpha = 0.4f)),
+                                CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("?", fontSize = 18.sp, fontWeight = FontWeight.Black, color = IslamicGreen)
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = question.question,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextLight,
+                        lineHeight = 24.sp
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // Options
+            // Options A/B/C/D
             question.options.forEachIndexed { index, option ->
                 val isSelected = selectedOption == index
                 val isCorrect = index == question.correctIndex
                 val showFeedback = showResult
 
                 val optionBorder = when {
-                    !showFeedback && isSelected -> IslamicGreen.copy(alpha = 0.6f)
+                    !showFeedback && isSelected -> IslamicGreen
                     showFeedback && isCorrect -> IslamicGreen
                     showFeedback && isSelected && !isCorrect -> RingRed
-                    else -> DarkSurfaceVariant.copy(alpha = 0.6f)
+                    else -> OutlineVariant.copy(alpha = 0.5f)
                 }
 
                 val optionBg = when {
@@ -3764,35 +4055,71 @@ fun ModuleQuizView(
                     else -> DarkSurface
                 }
 
-                Card(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 10.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(optionBg)
+                        .border(
+                            BorderStroke(
+                                if (!showFeedback && isSelected) 2.dp else 1.2.dp,
+                                optionBorder
+                            ),
+                            RoundedCornerShape(12.dp)
+                        )
                         .clickable(enabled = !showResult) {
                             selectedOption = index
-                        },
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = optionBg),
-                    border = BorderStroke(1.2.dp, optionBorder)
+                        }
                 ) {
+                    // Selected/correct left accent bar
+                    if ((!showFeedback && isSelected) || (showFeedback && isCorrect)) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .width(4.dp)
+                                .height(72.dp)
+                                .background(IslamicGreen)
+                        )
+                    } else if (showFeedback && isSelected && !isCorrect) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .width(4.dp)
+                                .height(72.dp)
+                                .background(RingRed)
+                        )
+                    }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Option letter
+                        // Option letter box — rounded rect (Stitch: rounded-md not circle)
                         Box(
                             modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(8.dp))
                                 .background(
                                     when {
                                         showFeedback && isCorrect -> IslamicGreen
                                         showFeedback && isSelected && !isCorrect -> RingRed
-                                        isSelected -> IslamicGreen.copy(alpha = 0.3f)
+                                        isSelected -> IslamicGreen.copy(alpha = 0.2f)
                                         else -> DarkSurfaceVariant
                                     }
+                                )
+                                .border(
+                                    BorderStroke(
+                                        1.dp,
+                                        when {
+                                            showFeedback && isCorrect -> IslamicGreen
+                                            showFeedback && isSelected && !isCorrect -> RingRed
+                                            isSelected -> IslamicGreen
+                                            else -> OutlineVariant.copy(alpha = 0.5f)
+                                        }
+                                    ),
+                                    RoundedCornerShape(8.dp)
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
@@ -3805,10 +4132,11 @@ fun ModuleQuizView(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = when {
-                                    showFeedback && (isCorrect || (isSelected && !isCorrect)) -> Color.Black
+                                    showFeedback && (isCorrect || (isSelected && !isCorrect)) -> Color(0xFF003828)
                                     isSelected -> IslamicGreen
                                     else -> TextMuted
-                                }
+                                },
+                                fontFamily = FontFamily.Monospace
                             )
                         }
 
@@ -3816,25 +4144,32 @@ fun ModuleQuizView(
 
                         Text(
                             text = option,
-                            fontSize = 13.sp,
+                            fontSize = 14.sp,
+                            fontWeight = if (isSelected && !showFeedback) FontWeight.SemiBold else FontWeight.Normal,
                             color = if (showFeedback && isSelected && !isCorrect)
                                 TextMuted else TextLight,
                             lineHeight = 19.sp,
                             modifier = Modifier.weight(1f)
                         )
 
-                        // Feedback icon
+                        // Selected check icon
+                        AnimatedVisibility(
+                            visible = !showFeedback && isSelected,
+                            enter = scaleIn(initialScale = 0.5f) + fadeIn()
+                        ) {
+                            Text("✓", fontSize = 16.sp, color = IslamicGreen, fontWeight = FontWeight.Bold)
+                        }
                         AnimatedVisibility(
                             visible = showFeedback && isCorrect,
                             enter = scaleIn(initialScale = 0.5f) + fadeIn()
                         ) {
-                            Text("✅", fontSize = 18.sp)
+                            Text("✅", fontSize = 16.sp)
                         }
                         AnimatedVisibility(
                             visible = showFeedback && isSelected && !isCorrect,
                             enter = scaleIn(initialScale = 0.5f) + fadeIn()
                         ) {
-                            Text("❌", fontSize = 18.sp)
+                            Text("❌", fontSize = 16.sp)
                         }
                     }
                 }
@@ -3859,9 +4194,10 @@ fun ModuleQuizView(
                         Text(
                             text = "💡 Penjelasan",
                             fontSize = 11.sp,
-                            fontWeight = FontWeight.ExtraBold,
+                            fontWeight = FontWeight.Bold,
                             color = GoldAccent,
-                            letterSpacing = 1.sp
+                            letterSpacing = 1.sp,
+                            fontFamily = FontFamily.Monospace
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
@@ -3875,70 +4211,74 @@ fun ModuleQuizView(
             }
         }
 
-        // Bottom action
+        // Bottom action — "KUNCI JAWABAN 🔒" teal gradient when answering;
+        // "Soal Berikutnya →" / "Lihat Hasil 🎯" gold when shown
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            color = DarkSurface,
-            shadowElevation = 12.dp
+            color = DarkBackground
         ) {
-            if (!showResult) {
-                Button(
-                    onClick = {
-                        if (selectedOption == -1) return@Button
-                        showResult = true
-                        if (selectedOption == question.correctIndex) {
-                            correctCount++
-                        }
-                    },
-                    enabled = selectedOption != -1,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 16.dp)
-                        .height(52.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = IslamicGreen,
-                        disabledContainerColor = DarkSurfaceVariant
-                    ),
-                    shape = RoundedCornerShape(14.dp)
-                ) {
-                    Text(
-                        text = "Jawab",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (selectedOption != -1) Color.Black else TextMuted
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 14.dp)
+                    .height(52.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(
+                        if (!showResult) Brush.horizontalGradient(listOf(IslamicGreenDim, IslamicGreen))
+                        else if (currentIndex < questions.size - 1) Brush.horizontalGradient(listOf(IslamicGreenDim, IslamicGreen))
+                        else Brush.horizontalGradient(listOf(AmberFlame, GoldAccent))
                     )
-                }
-            } else {
-                Button(
-                    onClick = {
-                        if (currentIndex < questions.size - 1) {
-                            currentIndex++
-                            selectedOption = -1
-                            showResult = false
+                    .clickable(enabled = if (!showResult) selectedOption != -1 else true) {
+                        if (!showResult) {
+                            if (selectedOption == -1) return@clickable
+                            showResult = true
+                            if (selectedOption == question.correctIndex) {
+                                correctCount++
+                            }
                         } else {
-                            val score = (correctCount * 100) / questions.size
-                            viewModel.submitModuleQuiz(moduleId, score)
-                            onFinish(score)
+                            if (currentIndex < questions.size - 1) {
+                                currentIndex++
+                                selectedOption = -1
+                                showResult = false
+                            } else {
+                                val score = (correctCount * 100) / questions.size
+                                viewModel.submitModuleQuiz(moduleId, score)
+                                onFinish(score)
+                            }
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 16.dp)
-                        .height(52.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (currentIndex < questions.size - 1)
-                            IslamicGreen else GoldAccent
+                    }
+                    .then(
+                        if ((showResult || selectedOption != -1) && (currentIndex < questions.size - 1 || !showResult)) Modifier.shadow(
+                            elevation = 10.dp,
+                            shape = RoundedCornerShape(14.dp),
+                            ambientColor = IslamicGreenGlow,
+                            spotColor = IslamicGreenGlow
+                        ) else Modifier
                     ),
-                    shape = RoundedCornerShape(14.dp)
-                ) {
-                    Text(
-                        text = if (currentIndex < questions.size - 1)
-                            "Soal Berikutnya →"
-                        else "Lihat Hasil 🎯",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
+                contentAlignment = Alignment.Center
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (!showResult) {
+                        Text(
+                            text = "KUNCI JAWABAN",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF003828),
+                            letterSpacing = 1.2.sp,
+                            fontFamily = FontFamily.Monospace
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("🔒", fontSize = 16.sp)
+                    } else {
+                        Text(
+                            text = if (currentIndex < questions.size - 1)
+                                "Soal Berikutnya →"
+                            else "Lihat Hasil 🎯",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF003828)
+                        )
+                    }
                 }
             }
         }
@@ -3960,6 +4300,8 @@ fun QuizResultView(
     val passed = score >= 70
     val module = LearningContent.getAllModulesOrdered().find { it.id == moduleId }
     val xpReward = module?.xpReward ?: 0
+    val totalQuestions = LearningContent.getQuizQuestions(moduleId).size.coerceAtLeast(1)
+    val correctCount = ((score.toLong() * totalQuestions) / 100).toInt().coerceIn(0, totalQuestions)
 
     // Animated score counter
     var animatedScore by remember { mutableIntStateOf(0) }
@@ -3982,10 +4324,14 @@ fun QuizResultView(
         }
     }
 
+    val badgeColor = if (passed) GoldAccent else RingRed
+    val badgeGlow = if (passed) GoldGlow else RingRedGlow
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkBackground)
+            .futuristicBackground(glowColor = if (passed) IslamicGreen else RingRed)
             .windowInsetsPadding(WindowInsets.statusBars)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp),
@@ -3994,25 +4340,61 @@ fun QuizResultView(
     ) {
         Spacer(modifier = Modifier.height(60.dp))
 
-        // Result icon
-        Text(
-            text = if (passed) "🎉" else "😅",
-            fontSize = 64.sp
-        )
+        // Gold diamond badge with glow aura (rotated 45°) — Stitch: belajar_result_view
+        Box(
+            modifier = Modifier
+                .size(128.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            // Outer glow
+            Box(
+                modifier = Modifier
+                    .size(128.dp)
+                    .clip(CircleShape)
+                    .background(badgeGlow.copy(alpha = 0.3f))
+            )
+            // Diamond box (rotate 45°)
+            Box(
+                modifier = Modifier
+                    .size(96.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        if (passed) Brush.linearGradient(listOf(GoldAccent, AmberFlame))
+                        else Brush.linearGradient(listOf(RingRed, RingRed.copy(alpha = 0.7f)))
+                    )
+                    .border(
+                        BorderStroke(2.dp, badgeColor),
+                        RoundedCornerShape(16.dp)
+                    )
+                    .shadow(
+                        elevation = 16.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        ambientColor = badgeGlow,
+                        spotColor = badgeGlow
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = if (passed) "🏅" else "💪",
+                    fontSize = 44.sp
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        // Heading — "Modul Selesai!" teal display
         Text(
-            text = if (passed) "Kamu Lulus!" else "Belum Lolos",
-            fontSize = 28.sp,
+            text = if (passed) "Modul Selesai!" else "Belum Selesai",
+            fontSize = 32.sp,
             fontWeight = FontWeight.Black,
-            color = if (passed) GoldAccent else RingRed
+            color = if (passed) IslamicGreen else RingRed
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = if (passed) "Keren! Kamu jawab ${score}% dengan benar."
+            text = if (passed) "Pengetahuanmu semakin bertambah."
             else "Kamu jawab ${score}% benar. Butuh minimal 70% buat lulus. Coba lagi yuk!",
             fontSize = 14.sp,
             color = TextMuted,
@@ -4022,115 +4404,174 @@ fun QuizResultView(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Score circle
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .clip(CircleShape)
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            (if (passed) IslamicGreen else RingRed).copy(alpha = 0.15f),
-                            DarkSurface
-                        )
-                    )
-                )
-                .border(
-                    3.dp,
-                    if (passed) IslamicGreen else RingRed,
-                    CircleShape
-                ),
-            contentAlignment = Alignment.Center
+        // Result card — HASIL QUIZ + score + accuracy pill
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = DarkSurface.copy(alpha = 0.9f)
+            ),
+            border = BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.5f))
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "$animatedScore%",
-                    fontSize = 36.sp,
-                    fontWeight = FontWeight.Black,
-                    color = if (passed) IslamicGreen else RingRed
-                )
-                Text(
-                    text = "skor",
-                    fontSize = 11.sp,
-                    color = TextMuted
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // XP reward card (only if passed)
-        if (passed) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = IslamicGreen.copy(alpha = 0.08f)
-                ),
-                border = BorderStroke(1.dp, IslamicGreen.copy(alpha = 0.3f))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Text(
+                    text = "HASIL QUIZ",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = GoldAccent,
+                    letterSpacing = 2.sp,
+                    fontFamily = FontFamily.Monospace
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                // Big glowing score
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.shadow(
+                        elevation = 12.dp,
+                        shape = RoundedCornerShape(8.dp),
+                        ambientColor = badgeGlow,
+                        spotColor = badgeGlow
+                    )
                 ) {
-                    Text("🎁", fontSize = 24.sp)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text(
-                            text = "+$xpReward XP",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Black,
-                            color = IslamicGreen
+                    Text(
+                        text = "$animatedScore",
+                        fontSize = 56.sp,
+                        fontWeight = FontWeight.Black,
+                        color = badgeColor
+                    )
+                    Text(
+                        text = "%",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = badgeColor
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                // Accuracy pill — X/Y Benar
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(IslamicGreen.copy(alpha = 0.1f))
+                        .border(
+                            BorderStroke(1.dp, IslamicGreen.copy(alpha = 0.4f)),
+                            RoundedCornerShape(50)
                         )
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("✓", fontSize = 14.sp, color = IslamicGreen, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Reward sudah masuk ke karaktermu!",
-                            fontSize = 12.sp,
-                            color = TextMuted
+                            text = "$correctCount/$totalQuestions Benar",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = IslamicGreen
                         )
                     }
                 }
             }
+        }
 
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Rewards display — ⚡ +200 XP + "Diperoleh" (only if passed)
+        if (passed) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(DarkSurfaceVariant.copy(alpha = 0.85f))
+                    .border(
+                        BorderStroke(1.dp, CyanAccent.copy(alpha = 0.3f)),
+                        RoundedCornerShape(50)
+                    )
+                    .padding(horizontal = 24.dp, vertical = 10.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("⚡", fontSize = 20.sp)
+                    Text(
+                        text = "+$xpReward XP",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextLight
+                    )
+                    Text(
+                        text = "Diperoleh",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextMuted,
+                        letterSpacing = 1.sp,
+                        fontFamily = FontFamily.Monospace
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(24.dp))
         }
 
         // Action buttons
-        if (!passed) {
-            Button(
-                onClick = onRetry,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = IslamicGreen),
-                shape = RoundedCornerShape(14.dp)
-            ) {
-                Text(
-                    text = "Coba Lagi 🔄",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-        }
-
-        OutlinedButton(
-            onClick = onBackToHub,
+        // Primary — "Kembali ke Hub →" teal gradient
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(14.dp),
-            border = BorderStroke(1.dp, DarkSurfaceVariant)
+                .height(52.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(Brush.horizontalGradient(listOf(IslamicGreenDim, IslamicGreen)))
+                .clickable { onBackToHub() }
+                .shadow(
+                    elevation = 10.dp,
+                    shape = RoundedCornerShape(14.dp),
+                    ambientColor = IslamicGreenGlow,
+                    spotColor = IslamicGreenGlow
+                ),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Kembali ke Learning Hub",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextLight
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Kembali ke Hub",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF003828)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("→", fontSize = 18.sp, color = Color(0xFF003828), fontWeight = FontWeight.Bold)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Secondary — "🔄 COBA LAGI" cyan outline
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(Color.Transparent)
+                .border(
+                    BorderStroke(1.dp, CyanAccent),
+                    RoundedCornerShape(14.dp)
+                )
+                .clickable { onRetry() },
+            contentAlignment = Alignment.Center
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("🔄", fontSize = 16.sp)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "COBA LAGI",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = CyanAccent,
+                    letterSpacing = 1.4.sp,
+                    fontFamily = FontFamily.Monospace
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(60.dp))

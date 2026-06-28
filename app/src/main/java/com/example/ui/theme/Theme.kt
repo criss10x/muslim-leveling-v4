@@ -37,48 +37,20 @@ import androidx.core.view.WindowCompat
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Arena background: deep midnight base + 8-point Islamic star grid
- * (subtle, 4% opacity) + arena spotlights (radial glows top + corner).
- * Replaces the old hexagonal dot grid — this is the signature texture.
+ * Nur Quest background: deep midnight surface + subtle arena spotlights
+ * (luminous layering per DESIGN.md — no Islamic star grid, just radial
+ * glows that anchor the gaming HUD atmosphere).
  */
 fun Modifier.futuristicBackground(
     baseColor: Color = DarkBackground,
     glowColor: Color = IslamicGreen
 ): Modifier = this.drawBehind {
-    // Base fill
     drawRect(color = baseColor)
 
-    // 8-point Islamic star grid — geometric pattern at 4% opacity
-    val starColor = glowColor.copy(alpha = 0.04f)
-    val starSize = 12f.dp.toPx()
-    val gap = 44.dp.toPx()
-    val halfDiag = starSize / 2f
     val width = size.width
     val height = size.height
 
-    var x = gap / 2f
-    while (x < width + gap) {
-        var y = gap / 2f
-        while (y < height + gap) {
-            // Draw 8-point star as two overlapping squares (rotated 45°)
-            val rect1 = androidx.compose.ui.geometry.Rect(
-                Offset(x - halfDiag, y - halfDiag), androidx.compose.ui.geometry.Size(starSize, starSize)
-            )
-            // Simple star: draw two rotated squares
-            drawRect(color = starColor, topLeft = Offset(x - halfDiag, y - halfDiag), size = androidx.compose.ui.geometry.Size(starSize, starSize))
-            // Rotate context for second square
-            withTransform({
-                translate(x, y)
-                rotate(45f)
-            }) {
-                drawRect(color = starColor, topLeft = Offset(-halfDiag, -halfDiag), size = androidx.compose.ui.geometry.Size(starSize, starSize))
-            }
-            y += gap
-        }
-        x += gap
-    }
-
-    // Top-center arena spotlight (teal)
+    // Top-center teal spotlight (primary bloom, ~6% opacity)
     val topGlow = glowColor.copy(alpha = 0.06f)
     drawCircle(
         brush = Brush.radialGradient(
@@ -90,8 +62,8 @@ fun Modifier.futuristicBackground(
         center = Offset(width / 2f, -50f)
     )
 
-    // Bottom-right gold spotlight (warm, like stage lighting)
-    val goldGlow = GoldAccent.copy(alpha = 0.04f)
+    // Bottom-right gold spotlight (royal gold, prestige bloom)
+    val goldGlow = GoldAccent.copy(alpha = 0.05f)
     drawCircle(
         brush = Brush.radialGradient(
             colors = listOf(goldGlow, Color.Transparent),
@@ -102,11 +74,11 @@ fun Modifier.futuristicBackground(
         center = Offset(width * 0.9f, height * 1.1f)
     )
 
-    // Bottom-left subtle crimson (depth, very faint)
-    val crimsonGlow = RingRed.copy(alpha = 0.025f)
+    // Bottom-left cyan accent (mana cyan, electric depth)
+    val cyanGlow = CyanAccent.copy(alpha = 0.04f)
     drawCircle(
         brush = Brush.radialGradient(
-            colors = listOf(crimsonGlow, Color.Transparent),
+            colors = listOf(cyanGlow, Color.Transparent),
             center = Offset(width * 0.1f, height * 0.9f),
             radius = width * 0.5f
         ),
@@ -179,16 +151,28 @@ fun darkSurfaceBrush(): Brush = Brush.verticalGradient(GradientDarkSurface)
 
 private val DarkColorScheme = darkColorScheme(
     primary = IslamicGreen,
-    onPrimary = Color.Black,
+    onPrimary = Color(0xFF003828),          // on-primary
+    primaryContainer = IslamicGreenDim,
+    onPrimaryContainer = Color(0xFF004D38),
     secondary = GoldAccent,
-    onSecondary = Color.Black,
+    onSecondary = Color(0xFF3A3000),
+    secondaryContainer = AmberFlame,
+    onSecondaryContainer = Color(0xFF725F00),
     tertiary = CyanAccent,
+    onTertiary = Color(0xFF00363A),
+    tertiaryContainer = Color(0xFF00C3CF),
+    onTertiaryContainer = Color(0xFF004B50),
     background = DarkBackground,
     onBackground = TextLight,
     surface = DarkSurface,
     onSurface = TextLight,
     surfaceVariant = DarkSurfaceVariant,
-    onSurfaceVariant = TextMuted
+    onSurfaceVariant = TextMuted,
+    surfaceTint = IslamicGreen,
+    outline = OutlineDefault,
+    outlineVariant = OutlineVariant,
+    error = RingRed,
+    onError = Color(0xFF690005)
 )
 
 private val LightColorScheme = lightColorScheme(

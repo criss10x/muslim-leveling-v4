@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -93,38 +94,48 @@ fun ProfileScreen(
             ProfileHeaderCard(state = state, viewModel = viewModel)
             Spacer(modifier = Modifier.height(16.dp))
 
-            // ─── STATS ROW: streak (teal), level (gold), freeze (crimson), total (violet) ───
+            // ─── STATS 2x2 GRID per Nur Quest mockup: 🔥 STREAK, 📖 TILAWAH, ❄️ FREEZE, ⭐ TOTAL XP ───
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 SmallStatCard(
                     modifier = Modifier.weight(1f),
-                    title = "Streak 5/5",
+                    title = "STREAK",
+                    iconEmoji = "🔥",
                     value = "${state.heroStreak.current}",
                     sub = "Hari · Rekor ${state.heroStreak.best}",
                     accentColor = IslamicGreen
                 )
                 SmallStatCard(
                     modifier = Modifier.weight(1f),
-                    title = "Tilawah",
+                    title = "TILAWAH",
+                    iconEmoji = "📖",
                     value = "${state.tilawahStreak.current}",
                     sub = "Hari · Rekor ${state.tilawahStreak.best}",
                     accentColor = GoldAccent
                 )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 SmallStatCard(
                     modifier = Modifier.weight(1f),
-                    title = "Freeze",
+                    title = "STREAK FREEZE",
+                    iconEmoji = "❄️",
                     value = if (state.heroStreak.freezeAvailable) "1" else "0",
                     sub = "Tersedia",
-                    accentColor = RingRed
+                    accentColor = CyanAccent
                 )
                 SmallStatCard(
                     modifier = Modifier.weight(1f),
-                    title = "Total XP",
+                    title = "TOTAL XP",
+                    iconEmoji = "⭐",
                     value = "${state.user.xp}",
                     sub = "Akumulasi",
-                    accentColor = PurpleNeon
+                    accentColor = GoldAccent
                 )
             }
 
@@ -525,7 +536,8 @@ fun SmallStatCard(
     title: String,
     value: String,
     sub: String,
-    accentColor: Color = IslamicGreen
+    accentColor: Color = IslamicGreen,
+    iconEmoji: String = ""
 ) {
     val cardShape = RoundedCornerShape(14.dp)
     Card(
@@ -551,13 +563,23 @@ fun SmallStatCard(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Column {
-                Text(
-                    text = title.uppercase(),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = TextMuted,
-                    letterSpacing = 1.sp
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (iconEmoji.isNotEmpty()) {
+                        Text(
+                            text = iconEmoji,
+                            fontSize = 14.sp
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+                    Text(
+                        text = title.uppercase(),
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextMuted,
+                        letterSpacing = 1.sp
+                    )
+                }
                 Text(
                     text = value,
                     fontSize = 22.sp,

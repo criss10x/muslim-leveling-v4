@@ -3,59 +3,67 @@ package com.example.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ═══════════════════════════════════════════════════════════════
-// ARENA HIKMAH THEME — Esports Arena × Islamic Illumination
-// v3 redesign (2026-06-24). Palette pulled from ML championship
-// stage lighting + gold-leaf Islamic geometric art.
+// NUR QUEST THEME — Gaming-Infused Modernism
+// Redesign (2026-06-28). Tokens dari DESIGN.md Stitch.
+// Palette: deep midnight surface + emerald quest + royal gold +
+// mana cyan + epic red. Variable names dipertahankan untuk compat
+// dengan 8 file Compose yang sudah reference nama lama.
 // ═══════════════════════════════════════════════════════════════
 
-// ─── Core Backgrounds (deep midnight blue, NOT pure black) ───
-val DarkBackground = Color(0xFF0A0E1A)       // Midnight Arena
-val DarkSurface = Color(0xFF121729)          // Card surface (with blue undertone)
-val DarkSurfaceVariant = Color(0xFF1A2040)   // Inner surface / borders
-val DarkSurfaceElevated = Color(0xFF1E2647)  // Elevated cards
+// ─── Core Surfaces (deep midnight green-black, NOT pure black) ───
+val DarkBackground = Color(0xFF0E1512)        // surface / background
+val DarkSurface = Color(0xFF1A211E)           // surface-container
+val DarkSurfaceVariant = Color(0xFF2F3632)    // surface-variant
+val DarkSurfaceElevated = Color(0xFF242C28)   // surface-container-high
 
-// ─── Electric Teal (primary energy/XP — ML effect vibe) ───
-val IslamicGreen = Color(0xFF14E8C8)         // Electric Teal (kept name for compat)
-val IslamicGreenDim = Color(0xFF0FA88F)      // Muted teal
-val IslamicGreenGlow = Color(0x5514E8C8)     // Teal glow effect
+// ─── Primary: Emerald Quest (success, log, level-up) ───
+val IslamicGreen = Color(0xFF42E5B1)          // primary (kept name)
+val IslamicGreenDim = Color(0xFF00C897)       // primary-container
+val IslamicGreenGlow = Color(0x5542E5B1)
 
-// ─── Solar Gold (level/achievement — warm gold leaf) ───
-val GoldAccent = Color(0xFFFFB627)           // Solar Gold (kept name for compat)
-val GoldGlow = Color(0x40FFB627)             // Gold glow
-val AmberFlame = Color(0xFFFF8A00)           // Deep amber
-val AmberGlow = Color(0x35FF8A00)
+// ─── Secondary: Royal Gold (rank, prestige, streak) ───
+val GoldAccent = Color(0xFFFFE16D)            // secondary-fixed (kept name)
+val GoldGlow = Color(0x40FFE16D)
+val AmberFlame = Color(0xFFFFDB3C)            // secondary-container
+val AmberGlow = Color(0x35FFDB3C)
 
-// ─── Ritual Ring Colors (Crimson Pulse = low HP bar ML) ───
-val RingRed = Color(0xFFFF3D5A)              // Crimson Pulse
-val RingRedGlow = Color(0x50FF3D5A)
-val RingGreen = Color(0xFF14E8C8)            // Electric teal
-val RingGreenGlow = Color(0x5014E8C8)
-val RingBlue = Color(0xFF14E8C8)             // Unified to teal (was cyan, too many colors)
-val RingBlueGlow = Color(0x5014E8C8)
+// ─── Tertiary: Mana Cyan (prayer times, electric UI) ───
+val CyanAccent = Color(0xFF00E1EF)            // tertiary (kept name)
+val CyanGlow = Color(0x4000E1EF)
+
+// ─── Status: Epic Red (missed, low energy, warning) ───
+val RingRed = Color(0xFFFFB4AB)               // error (kept name)
+val RingRedGlow = Color(0x50FFB4AB)
+val RingGreen = Color(0xFF42E5B1)             // unified to primary
+val RingGreenGlow = Color(0x5042E5B1)
+val RingBlue = Color(0xFF00E1EF)              // unified to tertiary
+val RingBlueGlow = Color(0x5000E1EF)
 
 // ─── Text Colors ───
-val TextLight = Color(0xFFE8EDF5)            // Mist (cool white)
-val TextMuted = Color(0xFF6B7494)            // Muted slate
-val TextGold = Color(0xFFFFB627)
+val TextLight = Color(0xFFDCE4DE)             // on-surface
+val TextMuted = Color(0xFFBACAC1)             // on-surface-variant
+val TextGold = Color(0xFFFFE16D)
 
-// ─── Accent Colors (reduced palette — discipline) ───
-val CyanAccent = Color(0xFF14E8C8)           // Unified to teal (was separate cyan)
-val CyanGlow = Color(0x4014E8C8)
-val OrangeFlame = Color(0xFFFF8A00)          // Deep amber
-val PurpleNeon = Color(0xFF8B5CF6)           // Muted violet (was neon purple)
-val PurpleGlow = Color(0x408B5CF6)
-val PinkNeon = Color(0xFFFF3D5A)             // Unified to crimson (was pink)
-val PinkGlow = Color(0x40FF3D5A)
+// ─── Accent Colors (kept for compat; redirect ke palette baru) ───
+val OrangeFlame = Color(0xFFFFDB3C)
+val PurpleNeon = Color(0xFF42E5B1)            // ponytail: redirect ke primary, gak dipakai di mockup
+val PurpleGlow = Color(0x4042E5B1)
+val PinkNeon = Color(0xFFFFB4AB)              // ponytail: redirect ke error
+val PinkGlow = Color(0x40FFB4AB)
 
 // ─── XP and Level Colors ───
-val XpBarGreen = Color(0xFF14E8C8)
-val XpBarTrack = Color(0xFF1A2040)
-val LevelUpGold = Color(0xFFFFB627)
+val XpBarGreen = Color(0xFF42E5B1)
+val XpBarTrack = Color(0xFF2F3632)            // surface-container-highest
+val LevelUpGold = Color(0xFFFFE16D)
 
 // ─── Card Gradient Colors ───
-val CardGradientStart = Color(0xFF121729)
-val CardGradientEnd = Color(0xFF1A2040)
-val CardBorderGlow = Color(0x2214E8C8)
+val CardGradientStart = Color(0xFF1A211E)     // surface-container
+val CardGradientEnd = Color(0xFF242C28)       // surface-container-high
+val CardBorderGlow = Color(0x2242E5B1)
+
+// ─── Outline (borders) ───
+val OutlineDefault = Color(0xFF85948C)        // outline
+val OutlineVariant = Color(0xFF3C4A43)        // outline-variant
 
 // ═══════════════════════════════════════════════════════════════
 // GRADIENT COLOR SETS (for Brush construction)
@@ -63,7 +71,7 @@ val CardBorderGlow = Color(0x2214E8C8)
 
 val GradientGreenGold = listOf(IslamicGreen, GoldAccent)
 val GradientCyanGreen = listOf(CyanAccent, IslamicGreen)
-val GradientPurplePink = listOf(PurpleNeon, PinkNeon)
+val GradientPurplePink = listOf(IslamicGreen, CyanAccent)   // ponytail: redirect ke teal-cyan, gak dipakai di mockup
 val GradientGoldAmber = listOf(GoldAccent, AmberFlame)
 val GradientBlueCyan = listOf(RingBlue, CyanAccent)
 val GradientRedPink = listOf(RingRed, PinkNeon)

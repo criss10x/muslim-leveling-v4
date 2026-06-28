@@ -54,84 +54,62 @@ fun LevelUpCelebrationOverlay(
     rankTitle: String,
     onDismiss: () -> Unit
 ) {
-    var phase by remember { mutableStateOf(0) } // 0=seal forming, 1=crack, 2=burst, 3=reveal
-
+    // ponytail: mockup is a static reveal card (rank up + rewards + claim).
+    // Kept one lightweight reveal animation (fade+slide). Seal/crack/burst
+    // choreography removed — not in mockup, add back when motion spec lands.
+    var revealed by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        delay(300)
-        phase = 1 // crack
-        delay(500)
-        phase = 2 // burst
-        delay(700)
-        phase = 3 // reveal new seal
+        delay(120)
+        revealed = true
     }
 
-    // Seal scale & rotation
-    val sealScale by animateFloatAsState(
-        targetValue = when (phase) {
-            0 -> 0.4f
-            1 -> 1.1f
-            2 -> 1.3f
-            else -> 1f
-        },
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
-        label = "seal_scale"
+    val revealAlpha by animateFloatAsState(
+        targetValue = if (revealed) 1f else 0f,
+        animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing),
+        label = "rankup_alpha"
     )
-    val sealRotation by animateFloatAsState(
-        targetValue = when (phase) {
-            0 -> -45f
-            1 -> 0f
-            2 -> 15f
-            else -> 0f
-        },
-        animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
-        label = "seal_rotation"
+    val revealOffset by animateFloatAsState(
+        targetValue = if (revealed) 0f else 40f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow),
+        label = "rankup_offset"
     )
 
-    // Particle burst animation
-    val particleProgress by animateFloatAsState(
-        targetValue = if (phase >= 2) 1f else 0f,
-        animationSpec = tween(durationMillis = 800, easing = LinearOutSlowInEasing),
-        label = "particle_progress"
+    // Medal idle float + aura pulse (subtle, matches mockup's animate-float / glow)
+    val infiniteTransition = rememberInfiniteTransition(label = "rankup_medal")
+    val floatY by infiniteTransition.animateFloat(
+        initialValue = 0f, targetValue = -8f,
+        animationSpec = infiniteRepeatable(tween(2800, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        label = "medal_float"
     )
-
-    // Rotating glow ring (background, always on after reveal)
-    val infiniteTransition = rememberInfiniteTransition(label = "overlay_seal_glow")
+    val auraScale by infiniteTransition.animateFloat(
+        initialValue = 0.92f, targetValue = 1.08f,
+        animationSpec = infiniteRepeatable(tween(2200, easing = LinearEasing), RepeatMode.Reverse),
+        label = "medal_aura"
+    )
     val ringRotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 6000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "overlay_ring_rotation"
-    )
-
-    // Crack alpha (visible only in phase 1)
-    val crackAlpha by animateFloatAsState(
-        targetValue = if (phase == 1) 1f else if (phase >= 2) 0f else 0f,
-        animationSpec = tween(durationMillis = 300),
-        label = "crack_alpha"
+        initialValue = 0f, targetValue = 360f,
+        animationSpec = infiniteRepeatable(tween(10000, easing = LinearEasing), RepeatMode.Restart),
+        label = "medal_ring"
     )
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.88f))
-            .clickable { if (phase == 3) onDismiss() }
+            .clickable { if (revealed) onDismiss() }
             .testTag("level_up_overlay"),
         contentAlignment = Alignment.Center
     ) {
-        // Radial glow background — gold/teal burst
+        // ── Soft radial glow behind card (gold→teal) ──
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .drawBehind {
-                    val glowIntensity = if (phase >= 2) 0.45f else 0.2f
                     drawCircle(
                         brush = Brush.radialGradient(
                             colors = listOf(
-                                GoldAccent.copy(alpha = glowIntensity),
-                                IslamicGreen.copy(alpha = glowIntensity * 0.5f),
+                                GoldGlow,
+                                IslamicGreenGlow,
                                 Color.Transparent
                             ),
                             center = center,
@@ -141,166 +119,249 @@ fun LevelUpCelebrationOverlay(
                 }
         )
 
-        // Particle burst canvas (behind seal)
-        if (phase >= 2) {
-            Canvas(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .testTag("level_up_particles")
-            ) {
-                drawParticleBurst(
-                    center = center,
-                    progress = particleProgress,
-                    teal = IslamicGreen,
-                    gold = GoldAccent
-                )
-            }
-        }
-
+        // ── Card ──
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .padding(32.dp)
+                .padding(20.dp)
+                .fillMaxWidth()
+                .offset(y = revealOffset.dp)
+                .alpha(revealAlpha)
+                .clip(RoundedCornerShape(28.dp))
+                .background(
+                    Brush.verticalGradient(GradientDarkSurface)
+                )
+                .border(
+                    BorderStroke(1.dp, OutlineVariant.copy(alpha = 0.6f)),
+                    RoundedCornerShape(28.dp)
+                )
+                .padding(horizontal = 24.dp, vertical = 28.dp)
                 .testTag("level_up_container")
         ) {
-            // ── Bintang Seal (cracks then bursts) ──
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.size(220.dp)
-            ) {
-                // Rotating glow ring (visible from phase 1)
-                if (phase >= 1) {
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .rotate(ringRotation)
-                    ) {
-                        drawRotatingGlowRing(
-                            center = center,
-                            radius = size.minDimension / 2f * 0.92f,
-                            teal = IslamicGreen,
-                            gold = GoldAccent
+            // ── RANK UP! header (gold gradient) + teal rank title ──
+            Text(
+                text = "RANK UP!",
+                style = MaterialTheme.typography.displayMedium,
+                fontSize = 40.sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 3.sp,
+                textAlign = TextAlign.Center,
+                color = GoldAccent,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .drawBehind {
+                        // ponytail: gold drop-shadow glow approximated via drawBehind blur substitute
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                listOf(GoldGlow, Color.Transparent)
+                            )
                         )
                     }
-                }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = rankTitle.uppercase(),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = IslamicGreen,
+                letterSpacing = 2.sp,
+                textAlign = TextAlign.Center
+            )
 
-                // The seal itself (scales/rotates through phases)
+            // ── Central medal icon (gold-glow aura + rotating ring + ribbon) ──
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .padding(vertical = 20.dp)
+                    .size(160.dp)
+                    .offset(y = floatY.dp)
+            ) {
+                // Gold glow aura (pulsing)
                 Canvas(
                     modifier = Modifier
                         .fillMaxSize()
-                        .scale(sealScale)
-                        .rotate(sealRotation)
+                        .scale(auraScale)
                 ) {
-                    drawBintangSeal(
-                        center = center,
-                        outerRadius = size.minDimension / 2f * 0.78f,
-                        innerRadius = size.minDimension / 2f * 0.42f,
-                        teal = IslamicGreen,
-                        gold = GoldAccent,
-                        surface = DarkSurface
-                    )
-                }
-
-                // Crack overlay (jagged gold lines, phase 1 only)
-                if (crackAlpha > 0f) {
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .scale(sealScale)
-                    ) {
-                        drawCracks(
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                GoldAccent.copy(alpha = 0.45f),
+                                GoldAccent.copy(alpha = 0.12f),
+                                Color.Transparent
+                            ),
                             center = center,
-                            radius = size.minDimension / 2f * 0.78f,
-                            alpha = crackAlpha,
-                            gold = GoldAccent
+                            radius = size.minDimension / 2f
                         )
-                    }
+                    )
                 }
-
-                // Center level number (visible in phase 0 + phase 3)
-                if (phase == 0 || phase == 3) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .scale(sealScale)
-                    ) {
-                        Text(
-                            text = "LEVEL",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Black,
-                            color = GoldAccent,
-                            letterSpacing = 2.sp
+                // Rotating glow ring (teal/gold) — reuse existing helper
+                Canvas(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .rotate(ringRotation)
+                ) {
+                    drawRotatingGlowRing(
+                        center = center,
+                        radius = size.minDimension / 2f * 0.92f,
+                        teal = IslamicGreen,
+                        gold = GoldAccent
+                    )
+                }
+                // Medal body — gold-bordered rounded square w/ military_tech emoji
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(96.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(
+                            Brush.linearGradient(
+                                listOf(DarkSurfaceVariant, DarkSurface)
+                            )
                         )
-                        Text(
-                            text = "$unlockedLevel",
-                            fontSize = 42.sp,
-                            fontWeight = FontWeight.Black,
-                            color = TextLight,
-                            letterSpacing = (-1).sp
+                        .border(
+                            BorderStroke(2.dp, GoldAccent),
+                            RoundedCornerShape(20.dp)
                         )
-                    }
+                        .shadow(
+                            elevation = 0.dp,
+                            shape = RoundedCornerShape(20.dp),
+                            ambientColor = GoldAccent.copy(alpha = 0.6f),
+                            spotColor = GoldAccent.copy(alpha = 0.8f)
+                        )
+                ) {
+                    // ponytail: medal icon via emoji — replace with vector asset if design demands fidelity
+                    Text(text = "🎖️", fontSize = 52.sp)
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            // ── REWARDS UNLOCKED section ──
+            Text(
+                text = "REWARDS UNLOCKED",
+                style = MaterialTheme.typography.labelLarge,
+                fontSize = 12.sp,
+                color = TextMuted,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // ── RANK UP banner ──
-            AnimatedVisibility(
-                visible = phase == 3,
-                enter = fadeIn(animationSpec = tween(400)) + slideInVertically(
-                    initialOffsetY = { it / 2 },
-                    animationSpec = tween(500, easing = FastOutSlowInEasing)
-                )
+            // ponytail: reward values are static mockup copy. VM exposes no
+            // reward breakdown into this overlay; promote to params when wired.
+            RewardRow(
+                icon = "⭐",
+                iconColor = IslamicGreen,
+                iconBgTint = IslamicGreen.copy(alpha = 0.10f),
+                borderColor = IslamicGreen.copy(alpha = 0.20f),
+                label = "Experience",
+                value = "+500 XP",
+                valueColor = IslamicGreen
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            RewardRow(
+                icon = "🛡️",
+                iconColor = GoldAccent,
+                iconBgTint = GoldAccent.copy(alpha = 0.10f),
+                borderColor = GoldAccent.copy(alpha = 0.20f),
+                label = "Badge Baru",
+                value = "Penjaga Subuh",
+                valueColor = GoldAccent
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            RewardRow(
+                icon = "💎",
+                iconColor = CyanAccent,
+                iconBgTint = CyanAccent.copy(alpha = 0.10f),
+                borderColor = CyanAccent.copy(alpha = 0.20f),
+                label = "Nur Points",
+                value = "+10",
+                valueColor = CyanAccent
+            )
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // ── KLAIM HADIAH button (gold gradient + glow) ──
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Brush.horizontalGradient(GradientGoldAmber))
+                    .clickable(enabled = revealed) { onDismiss() }
+                    .testTag("level_up_claim_button"),
+                contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "RANK UP!",
-                        fontSize = 44.sp,
-                        fontWeight = FontWeight.Black,
-                        color = GoldAccent,
-                        letterSpacing = 4.sp,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = "SELAMAT, PEJUANG! 🎉",
-                        fontSize = 14.sp,
-                        color = TextLight,
-                        fontWeight = FontWeight.Medium,
-                        letterSpacing = 1.5.sp
-                    )
-
-                    Text(
-                        text = rankTitle,
-                        fontSize = 26.sp,
-                        color = IslamicGreen,
-                        fontWeight = FontWeight.ExtraBold,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-
-                    Text(
-                        text = "Level $unlockedLevel tercapai!",
-                        fontSize = 16.sp,
-                        color = TextLight.copy(alpha = 0.8f),
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(40.dp))
-
-                    Text(
-                        text = "TAP DI MANA AJA BUAT LANJUT 🎮",
-                        fontSize = 11.sp,
-                        color = TextMuted,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp
-                    )
-                }
+                Text(
+                    text = "KLAIM HADIAH",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Black,
+                    color = DarkBackground,
+                    letterSpacing = 3.sp
+                )
             }
+
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "Level $unlockedLevel tercapai! 🎉",
+                fontSize = 11.sp,
+                color = TextMuted,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 0.5.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
+    }
+}
+
+/**
+ * Single reward row matching naik_level mockup: icon bubble (left) + label,
+ * value (right) in label-caps style, tinted border.
+ */
+@Composable
+private fun RewardRow(
+    icon: String,
+    iconColor: Color,
+    iconBgTint: Color,
+    borderColor: Color,
+    label: String,
+    value: String,
+    valueColor: Color
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(DarkSurfaceElevated)
+            .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(12.dp))
+            .padding(horizontal = 12.dp, vertical = 10.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(iconBgTint)
+            ) {
+                Text(text = icon, fontSize = 18.sp)
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = label,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = TextLight
+            )
+        }
+        Text(
+            text = value,
+            style = MaterialTheme.typography.labelLarge,
+            fontSize = 12.sp,
+            color = valueColor,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
